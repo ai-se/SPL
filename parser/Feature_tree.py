@@ -1,0 +1,114 @@
+import pdb
+import numpy as np
+import random
+
+
+class Node(object):
+    def __init__(self, id, parent = None, node_type = 'o'):
+        self.id = id
+        self.parent = parent
+        self.node_type = node_type
+        self.children = []
+        if node_type == 'g':
+            self.g_u = 1
+            self.g_d = 0
+
+    def add_child(self, node):
+        node.parent = self
+        self.children.append(node)
+
+    def __repr__(self):
+        return '\nid: %s\ntype:%s\n'%(
+            self.id,
+            self.node_type)
+
+
+class Constraint(object):
+    def __init__(self, id, literals, literals_pos):
+        self.id = id
+        self.literals = literals
+        self.li_pos = literals_pos
+
+    def __repr__(self):
+        return self.id+'\n'+str(self.literals)+'\n'+str(self.li_pos)
+
+    def iscorret(self, ft, filledForm):
+        for i in range(len(self.literals)):
+            for index in range(len(ft.features)):
+                if self.literals[i] == ft.features[index].id: break
+            if self.li_pos[i] and filledForm[index] == 1:
+                return True
+            elif not self.li_pos[i] and  filledForm[index] == 0:
+                return True
+        return False
+
+class FeatureTree(object):
+    def __init__(self):
+        self.root = None
+        self.features = []
+        self.groups = []
+        self.leaves = []
+        self.con = []
+        self.featureNum = 0
+
+    def set_root(self,root):
+        self.root = root
+
+    def add_constraint(self,con):
+        self.con.append(con)
+
+    # featch all the features in the tree basing on the children structure
+    def set_features_list(self):
+        def setting_feature_list(self,node):
+            if node.node_type == 'g':
+                node.g_u = int(node.g_u) if node.g_u != np.inf else len(node.children)
+                node.g_d = int(node.g_d) if node.g_d != np.inf else len(node.children)
+                self.features.append(node)
+                self.groups.append(node)
+            if node.node_type != 'g':
+                self.features.append(node)
+            if len(node.children) == 0:
+                self.leaves.append(node)
+            for i in node.children:
+                setting_feature_list(self, i)
+        setting_feature_list(self, self.root)
+        self.featureNum = len(self.features)
+
+    def postorder(self, node, func, extraArgs = []):
+        if node.children:
+            for c in node.children:
+                self.postorder(c,func, extraArgs)
+        func(node, *extraArgs)
+
+
+    # setting the form by the structure of feature tree
+    # leaves should be filled in the form in advanced
+    # all not filled feature should be -1 in the form
+    def fillForm4AlFea(self, form):
+        def filling(node):
+            index = self.features.index(node)
+            if form[index] != -1:
+                return
+            # handleing the group featues
+            if node.node_type == 'g':
+                sum = 0
+                for i in node.children:
+                    i_index = self.features.index(i)
+                    sum += form[i_index]
+                form[index] = 1 if sum >= node.g_d and sum <= node.g_u else 0
+                return
+            for i in node.children:
+                i_index = self.features.index(i)
+                if i.node_type != 'o' and form[i_index] == 0:
+                    form[index] = 0
+                    return
+            form[index] = 1
+            return
+
+        self.postorder(self.root, filling)
+
+    def getFeatureNum(self):
+        return len(self.features) - len(self.groups)
+
+    def getConsNum(self):
+        return len(self.con)

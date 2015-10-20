@@ -1,0 +1,30 @@
+<!-- This model was created online using SPLOT's Feature Model Editor (http://www.splot-research.org) on Wed, Oct 22, 2014 - 8:27 AM  -->
+<feature_model name="Web_Portal">
+<meta>
+<data name="description">This feature model describes the configurations of a web portal product line</data>
+<data name="creator">Marcilio Mendonca</data>
+<data name="address">200 University Ave. West, Waterloo, ON, Canada</data>
+<data name="email">marcilio dot mendonca at gmail dot com</data>
+<data name="phone">+1-519-883-7198</data>
+<data name="website">http://gsd.uwaterloo.ca/</data>
+<data name="organization">University of Waterloo</data>
+<data name="department">School of Computer Science</data>
+<data name="date"></data>
+<data name="reference">Marcilio Mendonca, Thiago Bartolomei, and Donald Cowan. Decision-making coordination in collaborative product con?guration. In 23rd Annual ACM Symposium on Applied Computing. ACM, March 2008.</data>
+</meta>
+<feature_tree>
+:r Web Portal(web_portal)
+	:m Web Server(web_server)
+		:g (_id_5) [1,1] 
+			: Ms(ms)
+			: Sec(sec)
+			: Min(min)
+	:o Persistence(persistence)
+		:g (_id_3) [1,1] 
+			: XML(xml)
+			: Database(database)
+</feature_tree>
+<constraints>
+C2:~sec or database
+</constraints>
+</feature_model>
