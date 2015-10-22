@@ -13,6 +13,8 @@ class BinGALE(GALE):
     def __init__(self, model, np=100):
         self.model = model # FTModel is needed (FTModel is a binary model for SPL)
         self.np = np # initial population size
+        self.passcount = 0
+        self.notpasscount = 0
 
 
     ##################################################
@@ -48,6 +50,10 @@ class BinGALE(GALE):
                 new.decs[i] = e
             else:
                 new.decs[i] = w
+        if self.model.ok(new):
+            self.passcount += 1
+        else:
+            self.notpasscount += 1
         return new
 
 def main_find_init_pop_passrate():

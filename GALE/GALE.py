@@ -202,7 +202,7 @@ class GALE(object):
         #pdb.set_trace()
         patience = lamb
         for generation in range(max):
-            print '-'*30, generation
+            #print '-'*30, generation
             scores = []
             #pdb.set_trace()
             scores, leafs = self.where(pop)
@@ -213,7 +213,12 @@ class GALE(object):
             print
             """
             #pdb.set_trace()
+            self.passcount = 0
+            self.notpasscount = 0
             mutants = self.mutate(leafs)
+            if self.passcount+self.notpasscount != 0:
+                #print 'mutant pass rate:', (self.passcount+0.0)/(self.passcount+self.notpasscount)
+                print round((self.passcount+0.0)/(self.passcount+self.notpasscount)*100,2),'%'
             """ printing the average score of the mutants"""
             #for x in item(mutants): self.model.eval(x)
             #temp = [x.scores[0] for x in item(mutants)]
