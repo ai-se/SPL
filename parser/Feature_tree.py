@@ -32,7 +32,7 @@ class Constraint(object):
     def __repr__(self):
         return self.id+'\n'+str(self.literals)+'\n'+str(self.li_pos)
 
-    def iscorret(self, ft, filledForm):
+    def iscorrect(self, ft, filledForm):
         for i in range(len(self.literals)):
             for index in range(len(ft.features)):
                 if self.literals[i] == ft.features[index].id: break

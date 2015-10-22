@@ -37,25 +37,34 @@ class BinGALE(GALE):
 
     def mutate1(self, old, c, east, west, gamma = 1.5, delta = 1):
         # east is better than the west
-        new = old[:]
-        for i in range(len(old)):
-            if east[i] == west[i]:
-                new[i] = east[i]
+        if c == 0: return old
+        new = o(decs=old.decs[:],scores=[]) #copy the decisions and omit the score
+        for i,(e,w) in enumerate(zip(east.decs, west.decs)):
+            if e == w:
+                new.decs[i] = e
             elif random.random() < c:
-                new[i] = east[i]
+                new.decs[i] = e
             else:
-                new[i] = west[i]
+                new.decs[i] = w
         return new
 
+def main_find_init_pop_passrate():
+    eis = FTModel('../feature_tree_data/cellphone.xml','cellphone')
+    bing = BinGALE(eis)
+    bing.model.printModelInfo()
+    count = 0
+    tries = 500
+    for i in range(tries):
+        e = bing.model.genRandomCan(guranteeOK=False)
+        if bing.model.ok(e): count += 1
+    print 'initial pop pass rate:', count/float(tries)*100, '%'
 
-# def EISmodel():
-#     print "=======EIS============"
-#     m = parser.FMing('../feature_tree_data/EIS.xml')
-#     gale = BinGALE(m.argD, m.objD,50,m.getObj)
-#     x = gale.gale()
-#     print x
+    #eis = FTModel('../feature_tree_data/webportal.xml','web portal')
+    #eis = FTModel('../feature_tree_data/eshop.xml','e-shop')
 
+    #pdb.set_trace()
+    #bing.gale()
 
+    
 if __name__ == '__main__':
-    pdb.set_trace()
-    pass
+    main_find_init_pop_passrate()

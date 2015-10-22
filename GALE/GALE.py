@@ -195,7 +195,8 @@ class GALE(object):
                 if self.model.obj[q].goal(now, before): return True
             return False
 
-        pop = [self.model.genRandomCan() for _ in range(self.np)]
+        pop = [self.model.genRandomCan(guranteeOK=True) for _ in range(self.np)]
+
         #print 'initial pop','-'*10
         #print sort([round(a.decs[0],0) for a in pop])
         #pdb.set_trace()
@@ -203,6 +204,7 @@ class GALE(object):
         for generation in range(max):
             print '-'*30, generation
             scores = []
+            pdb.set_trace()
             scores, leafs = self.where(pop)
             """
             print 'before mutation'
@@ -210,6 +212,7 @@ class GALE(object):
                 print round(x.decs[0],2),
             print
             """
+            pdb.set_trace()
             mutants = self.mutate(leafs)
             """
             print 'after mutation'
@@ -220,7 +223,7 @@ class GALE(object):
             if generation > 0:
                 if not improved(oldScores, scores):
                     patience -= 1
-                if patience < 0:
+                if patience < 0 or generation == max-1:
                     _, leafs = self.where(pop, prune = True)
                     r = []
                     for x in item(leafs):
@@ -230,7 +233,7 @@ class GALE(object):
             pop=[]
             for m in item(mutants): pop.append(m)
             required = self.np - len(pop)
-            for _ in range(required): pop.append(self.model.genRandomCan())
+            for _ in range(required): pop.append(self.model.genRandomCan(guranteeOK=True))
             """
             print 'pop for next generation'
             for x in pop:
@@ -241,10 +244,10 @@ class GALE(object):
 
 
 def testw_baseline():
-    k_model = Schaffer()
+    k_model = ZDT2()
     k_model.learn_base_line(1000)
     g = GALE(k_model)
-    v = g.gale()
+    v = g.gale(lamb=10000)
     pdb.set_trace()
 
 if __name__ == '__main__':

@@ -68,10 +68,12 @@ class model(object):
         for index,f in enumerate(can.scores):
             can.scores[index] = i.obj[index].norm(f)
 
-    def genRandomCan(i):
-        while True:
-            can = candidate(decs=[x.any() for x in i.dec])
-            if i.ok(can):break
+    def genRandomCan(i,guranteeOK = False):
+        can = candidate(decs=[x.any() for x in i.dec])
+        if guranteeOK:
+            while True:
+                if i.ok(can):break
+                can = candidate(decs=[x.any() for x in i.dec])
         return can
 
     """

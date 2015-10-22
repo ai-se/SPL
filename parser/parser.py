@@ -95,7 +95,9 @@ def load_ft_url(url):
 
 # two objectives at this time
 class FTModel(model):
-    def __init__(self, url):
+    def __init__(self, url, name):
+        self.name = name
+        self.url = url
         self.ft = load_ft_url(url)
         dec = [Has(l.id,0,1) for l in self.ft.leaves]
         obj = [Has(name='fea', lo=0, hi=self.ft.featureNum-len(self.ft.groups), goal = gt),
@@ -113,7 +115,7 @@ class FTModel(model):
             fulfill[t.features.index(t.leaves[x])] = sol[x]
         # fill other tree elements
         t.fillForm4AlFea(fulfill)
-        pdb.set_trace()
+        #print fulfill
         # here group should not count as feature
         gsum = 0
         for g in t.groups:
@@ -123,7 +125,7 @@ class FTModel(model):
         # obj2: constraint violation
         obj2 = 0
         for cc in t.con:
-            if cc.iscorret(t,fulfill):
+            if cc.iscorrect(t,fulfill):
                 obj2 += 1
         obj2 = len(t.con) - obj2
         c.scores = [obj1, obj2]
@@ -143,9 +145,20 @@ class FTModel(model):
             self.eval(c)
         return c.scores[1] == 0
 
-    def genRandomCan(self):
-        randBinList = lambda n: [random.randint(0,1) for b in range(1,n+1)]
-        return candidate(decs=randBinList(len(self.dec)),scores=[])
+    def genRandomCan(self,guranteeOK = False):
+        while True:
+            randBinList = lambda n: [random.randint(0,1) for b in range(1,n+1)]
+            can = candidate(decs=randBinList(len(self.dec)),scores=[])
+            if not guranteeOK or self.ok(can): break
+        return can
+
+    def printModelInfo(self):
+        print '---Information for SPL--------'
+        print 'Name:', self.name
+        print 'Leaves #:', len(self.ft.leaves)
+        print 'Total Features#:', self.ft.featureNum-len(self.ft.groups)
+        print 'Constraints#:', len(self.ft.con)
+        print '-'*30
 
 def main():
     m = FTModel('../feature_tree_data/cellphone.xml')
