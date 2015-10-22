@@ -1,4 +1,5 @@
-import pdb, math, random
+import pdb,traceback, sys
+import math, random
 import numpy as np
 from GALE import *
 
@@ -26,6 +27,7 @@ class BinGALE(GALE):
         # q: Y N
         # r: N Y
         # s: N N
+        if x == y: return 0
         p,q,r,s = 0,0,0,0
         for i in range(len(x)):
             if x[i] and y[i]: p += 1
@@ -65,6 +67,17 @@ def main_find_init_pop_passrate():
     #pdb.set_trace()
     #bing.gale()
 
-    
+def main_gale_with_spl():
+    #eis = FTModel('../feature_tree_data/eshop.xml','eshop')
+    eis = FTModel('../feature_tree_data/cellphone.xml','cell phone')
+    bing = BinGALE(eis)
+    b = bing.gale()
+    pdb.set_trace()
+
 if __name__ == '__main__':
-    main_find_init_pop_passrate()
+    try:
+        main_gale_with_spl()
+    except:
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        pdb.post_mortem(tb)
