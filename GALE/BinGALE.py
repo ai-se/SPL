@@ -38,7 +38,10 @@ class BinGALE(GALE):
             if not x[i] and not y[i]: s += 1
         return (0.0+ q+r)/(0.0 + p+q+r)
 
-
+    ###################################
+    # mutate for the binary variables #
+    # TODO: new strategy              #
+    ###################################
     def mutate1(self, old, c, east, west, gamma = 1.5, delta = 1):
         # east is better than the west
         if c == 0: return old
@@ -58,7 +61,7 @@ class BinGALE(GALE):
 
 def main_find_init_pop_passrate():
     eis = FTModel('../feature_tree_data/cellphone.xml','cellphone')
-    bing = BinGALE(eis)
+    bingh = BinGALE(eis)
     bing.model.printModelInfo()
     count = 0
     tries = 500

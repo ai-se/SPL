@@ -11,7 +11,7 @@ def lt(x,y): return x < y # less than
 def gt(x,y): return x > y # larger than
 
 class Has(object):
-    def __init__(i,name='',lo=0,hi=1e32,init=0,
+    def __init__(i,name='', lo=0, hi=1e32, init=0,
                goal=None,touch=True):
        i.name,i.lo,i.hi      = name,lo,hi
        i.init,i.goal,i.touch = init,goal,touch
@@ -96,4 +96,5 @@ class model(object):
         for x in range(i.decNum):
             if not i.dec[x].ok(c.decs[x]): return False
         return True
+
 
