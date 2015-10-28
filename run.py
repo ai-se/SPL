@@ -20,15 +20,17 @@ import numpy as np
 # ENTRANCE OF TESTING AND RUNNING THE PROJECT #
 # python run.py -***                          #
 ###############################################
+eis = None
+spldata = None
+
 def main_gale_with_spl(model,modelName):
-    eis = FTModel(model, modelName)
     bing = BinGALE(eis)
     b = bing.gale()
 
 if __name__ == '__main__':
     rungale = True
     model, modelName = './feature_tree_data/cellphone.xml','cell phone'
-    for arg in sys.argv:
+    for i,arg in enumerate(sys.argv):
         if arg == '-cellphone' or arg == '-s':
             model, modelName = './feature_tree_data/cellphone.xml','cell phone'
         if arg == '-eshop' or arg == '-XL':
@@ -39,8 +41,19 @@ if __name__ == '__main__':
             model, modelName = './feature_tree_data/EIS.xml', 'eis'
         if arg == '-nogale':
             rungale = False
+        if arg == '-data':
+            spldata = './input/'+argv[i+1]
+        if arg == '-clear':
+            pattern = "*.pyc"
+            for root, dirs, files in os.walk(GALEpath):
+                for file in filter(lambda x: re.match(pattern, x), files):
+                    os.remove(os.path.join(root, file))
+            os._exit(0)
     try:
-        if rungale: main_gale_with_spl(model,modelName)
+        eis = FTModel(model, modelName)
+        if spldata == None: spldata = './input/modelName'
+        
+        if rungale: main_gale_with_spl()
         print 'end of running~~~~~'
         pdb.set_trace()
     except:

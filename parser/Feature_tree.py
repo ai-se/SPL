@@ -1,6 +1,7 @@
 import pdb
 import numpy as np
 import random
+import pickle
 
 
 class Node(object):
@@ -49,6 +50,7 @@ class FeatureTree(object):
         self.groups = []
         self.leaves = []
         self.con = []
+        self.cost=[]
         self.featureNum = 0
 
     def set_root(self,root):
@@ -112,3 +114,15 @@ class FeatureTree(object):
 
     def getConsNum(self):
         return len(self.con)
+
+    def _genRandomCost(self,tofile):
+        any=random.random
+        self.cost = [any() for _ in self.features]
+        f = open(tofile, 'w')
+        pickle.dump(self.cost, f)
+        f.close()
+
+    def loadCost(self, fromfile):
+        f = open(fromfile)
+        self.cost = pickle.load(f)
+        f.close()

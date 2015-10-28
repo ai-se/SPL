@@ -59,6 +59,7 @@ class BinGALE(GALE):
             self.notpasscount += 1
         return new
 
+"""
 def main_find_init_pop_passrate():
     eis = FTModel('../feature_tree_data/cellphone.xml','cellphone')
     bingh = BinGALE(eis)
@@ -90,3 +91,4 @@ if __name__ == '__main__':
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         pdb.post_mortem(tb)
+"""
