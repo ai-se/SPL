@@ -2,6 +2,7 @@ import pdb
 import numpy as np
 import random
 import pickle
+import os
 
 
 class Node(object):
@@ -123,6 +124,8 @@ class FeatureTree(object):
         f.close()
 
     def loadCost(self, fromfile):
+        if not os.path.isfile(fromfile):
+            self._genRandomCost(fromfile)
         f = open(fromfile)
         self.cost = pickle.load(f)
         f.close()

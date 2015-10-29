@@ -1,8 +1,10 @@
 import os,sys
+import glob
 currentpath = os.path.dirname(os.path.abspath(__file__))
 GALEpath   = currentpath+'/GALE/'
 parserpath = currentpath+'/parser/'
 datapath   = currentpath+'/feature_tree_data/'
+inputpath  = currentpath+'input/'
 for x in [currentpath,GALEpath,datapath]:
     if x not in sys.path: sys.path.insert(0,x)
 
@@ -23,6 +25,16 @@ import numpy as np
 eis = None
 spldata = None
 
+def clear():
+   junkType = ['pyc','cost']
+   for x in os.walk(currentpath):
+       path = x[0]
+       if '.' in path: continue
+       for type in junkType:
+           for junk in glob.glob(path+'/*.'+type):
+               print junk +' moved'
+               os.remove(junk)
+
 def main_gale_with_spl(model,modelName):
     bing = BinGALE(eis)
     b = bing.gale()
@@ -39,20 +51,16 @@ if __name__ == '__main__':
             model, modelName = './feature_tree_data/Web_portal_FM.xml', 'web portal'
         if arg == '-eis':
             model, modelName = './feature_tree_data/EIS.xml', 'eis'
-        if arg == '-nogale':
+        if arg == '-nogale' or arg =='-ng':
             rungale = False
         if arg == '-data':
-            spldata = './input/'+argv[i+1]
+            spldata = currentpath+'/input/'+argv[i+1]+'.cost'
         if arg == '-clear':
-            pattern = "*.pyc"
-            for root, dirs, files in os.walk(GALEpath):
-                for file in filter(lambda x: re.match(pattern, x), files):
-                    os.remove(os.path.join(root, file))
+            clear()
             os._exit(0)
     try:
-        eis = FTModel(model, modelName)
-        if spldata == None: spldata = './input/modelName'
-        
+        if spldata == None: spldata = currentpath+'/input/'+modelName.replace(" ","")+'.cost'
+        eis = FTModel(model, modelName,spldata)
         if rungale: main_gale_with_spl()
         print 'end of running~~~~~'
         pdb.set_trace()

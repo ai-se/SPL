@@ -95,10 +95,11 @@ def load_ft_url(url):
 
 # three objectives at this time
 class FTModel(model):
-    def __init__(self, url, name):
+    def __init__(self, url, name, spldata):
         self.name = name
         self.url = url
         self.ft = load_ft_url(url)
+        self.ft.loadCost(spldata)
         dec = [Has(l.id,0,1) for l in self.ft.leaves]
         obj = [Has(name='fea', lo=0, hi=self.ft.featureNum-len(self.ft.groups), goal = gt),
                Has(name='conVio', lo=0,hi=len(self.ft.con), goal = lt),
