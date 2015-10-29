@@ -5,6 +5,11 @@ from model import *
 from problem import *
 from o import *
 
+import os,sys
+tooldir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/tools/'
+sys.path.insert(0,tooldir)
+from stat import *
+
 #pdb.set_trace = lambda: None
 class GALE(object):
     def __init__(self, model, np=100):
@@ -178,6 +183,18 @@ class GALE(object):
             out.append(r)
         return out
 
+    def tool_print_pop_dist(self,cans, featureid = [],noprint=False):
+        #print 'distribution for all leaves:' #TODO INCLUDING NON-LEAVES?
+        N = sum(1 for _ in item(cans))
+        if featureid == []: featureid = range(len(self.model.ft.leaves))
+        result = []
+        for i,f in enumerate(self.model.ft.leaves):
+            if i not in featureid:continue
+            s = sum(can.decs[i] for can in item(cans))
+            p = round(s/(N+0.0001),2)
+            result.append(p)
+        if not noprint: print result
+        return result
 
     ###################################
     # the kernel of the gale function #
@@ -188,6 +205,9 @@ class GALE(object):
         new : scores sets to be evaluated
         return whether new is improved.(as long as one obj is imporved, return True)
         """
+        lea = self.model.ft.leaves
+        #record_dist = [[lea[5].id],[lea[6].id],[lea[7].id],[lea[8].id],[lea[9].id]]
+        record_dist = [[l.id] for l in lea]
         def improved(old,new):
             for q in range(self.model.objNum):
                 before = mean([p[q] for p in old])
@@ -196,6 +216,9 @@ class GALE(object):
             return False
 
         pop = [self.model.genRandomCan() for _ in range(self.np)]
+        e = self.tool_print_pop_dist(pop,[],True)
+        for i,ee in enumerate(e): record_dist[i].append(ee)
+
 
         #print 'initial pop','-'*10
         #print sort([round(a.decs[0],0) for a in pop])
@@ -206,6 +229,8 @@ class GALE(object):
             scores = []
             #pdb.set_trace()
             scores, leafs = self.where(pop)
+            e = self.tool_print_pop_dist(leafs,[],True)
+            for i,ee in enumerate(e): record_dist[i].append(ee)
             """
             print 'before mutation'
             for x in item(leafs):
@@ -213,12 +238,12 @@ class GALE(object):
             print
             """
             #pdb.set_trace()
-            self.passcount = 0
-            self.notpasscount = 0
+            #self.passcount = 0
+            #self.notpasscount = 0
             mutants = self.mutate(leafs)
-            if self.passcount+self.notpasscount != 0:
+            #if self.passcount+self.notpasscount != 0:
                 #print 'mutant pass rate:', (self.passcount+0.0)/(self.passcount+self.notpasscount)
-                print round((self.passcount+0.0)/(self.passcount+self.notpasscount)*100,2),'%'
+             #   print round((self.passcount+0.0)/(self.passcount+self.notpasscount)*100,2),'%'
             """ printing the average score of the mutants"""
             #for x in item(mutants): self.model.eval(x)
             #temp = [x.scores[0] for x in item(mutants)]
@@ -233,6 +258,12 @@ class GALE(object):
                 if not improved(oldScores, scores):
                     patience -= 1
                 if patience < 0 or generation == max-1:
+                    ###
+                    import pickle
+                    f = open('./ts','w')
+                    pickle.dump(record_dist,f)
+                    f.close
+                    ###
                     _, leafs = self.where(pop, prune = True)
                     r = []
                     for x in item(leafs):

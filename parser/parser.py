@@ -95,7 +95,7 @@ def load_ft_url(url):
 
 # three objectives at this time
 class FTModel(model):
-    def __init__(self, url, name, spldata):
+    def __init__(self, url, name, spldata, objnum = 3):
         self.name = name
         self.url = url
         self.ft = load_ft_url(url)
@@ -103,7 +103,7 @@ class FTModel(model):
         dec = [Has(l.id,0,1) for l in self.ft.leaves]
         obj = [Has(name='fea', lo=0, hi=self.ft.featureNum-len(self.ft.groups), goal = gt),
                Has(name='conVio', lo=0,hi=len(self.ft.con), goal = lt),
-               Has(name='cost', lo=0,)] #TODO
+               Has(name='cost', lo=0,hi=sum(self.ft.cost), goal = lt)]
         model.__init__(self, dec, obj)
 
     def eval(self, c, doNorm=True):
@@ -130,8 +130,14 @@ class FTModel(model):
             if cc.iscorrect(t,fulfill):
                 obj2 += 1
         obj2 = len(t.con) - obj2
-        c.scores = [obj1, obj2]
 
+        # obj3: total cost
+        obj3 = 0
+        for i,f in enumerate(t.features):
+            if fulfill[i] == 1 and f.node_type != 'g':
+                obj3 += t.cost[i]
+
+        c.scores = [obj1, obj2, obj3]
         if doNorm:
             self.normObjs(c)
         return c
@@ -170,6 +176,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-

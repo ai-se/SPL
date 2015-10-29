@@ -4,7 +4,7 @@ currentpath = os.path.dirname(os.path.abspath(__file__))
 GALEpath   = currentpath+'/GALE/'
 parserpath = currentpath+'/parser/'
 datapath   = currentpath+'/feature_tree_data/'
-inputpath  = currentpath+'input/'
+inputpath  = currentpath+'/input/'
 for x in [currentpath,GALEpath,datapath]:
     if x not in sys.path: sys.path.insert(0,x)
 
@@ -22,7 +22,7 @@ import numpy as np
 # ENTRANCE OF TESTING AND RUNNING THE PROJECT #
 # python run.py -***                          #
 ###############################################
-eis = None
+ftm = None
 spldata = None
 
 def clear():
@@ -35,19 +35,19 @@ def clear():
                print junk +' moved'
                os.remove(junk)
 
-def main_gale_with_spl(model,modelName):
-    bing = BinGALE(eis)
+def main_gale_with_spl(ftm):
+    bing = BinGALE(ftm)
     b = bing.gale()
 
 if __name__ == '__main__':
     rungale = True
     model, modelName = './feature_tree_data/cellphone.xml','cell phone'
     for i,arg in enumerate(sys.argv):
-        if arg == '-cellphone' or arg == '-s':
+        if arg == '-cellphone' or arg == '-S':
             model, modelName = './feature_tree_data/cellphone.xml','cell phone'
         if arg == '-eshop' or arg == '-XL':
             model, modelName = './feature_tree_data/eshop.xml', 'eshop'
-        if arg == '-webportal':
+        if arg == '-webportal' or arg == '-M':
             model, modelName = './feature_tree_data/Web_portal_FM.xml', 'web portal'
         if arg == '-eis':
             model, modelName = './feature_tree_data/EIS.xml', 'eis'
@@ -60,8 +60,8 @@ if __name__ == '__main__':
             os._exit(0)
     try:
         if spldata == None: spldata = currentpath+'/input/'+modelName.replace(" ","")+'.cost'
-        eis = FTModel(model, modelName,spldata)
-        if rungale: main_gale_with_spl()
+        ftm = FTModel(model, modelName,spldata)
+        if rungale: main_gale_with_spl(ftm)
         print 'end of running~~~~~'
         pdb.set_trace()
     except:

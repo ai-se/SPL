@@ -631,4 +631,11 @@ def rdivDemo(data, isLatex=False, globalMinMax=False, high=100, low=0):
     return ranks
 
 
-
+###
+import pickle
+f = open('../ts')
+s = pickle.load(f)
+rdivDemo(s)
+#print s
+f.close()
+###
