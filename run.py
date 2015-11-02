@@ -19,7 +19,7 @@ import pdb,traceback,random
 import numpy as np
 
 ###############################################
-# ENTRANCE OF TESTING AND RUNNING THE PROJECT #
+# ENTRANCE TO TESTING AND RUNNING THE PROJECT #
 # python run.py -***                          #
 ###############################################
 ftm = None
@@ -43,19 +43,19 @@ if __name__ == '__main__':
     rungale = True
     model, modelName = './feature_tree_data/cellphone.xml','cell phone'
     for i,arg in enumerate(sys.argv):
-        if arg == '-cellphone' or arg == '-S':
+        if arg in ['-cellphone', '-S']:
             model, modelName = './feature_tree_data/cellphone.xml','cell phone'
-        if arg == '-eshop' or arg == '-XL':
-            model, modelName = './feature_tree_data/eshop.xml', 'eshop'
-        if arg == '-webportal' or arg == '-M':
+        if arg in ['-webportal', '-M']:
             model, modelName = './feature_tree_data/Web_portal_FM.xml', 'web portal'
-        if arg == '-eis':
+        if arg in ['-eis', '-L']:
             model, modelName = './feature_tree_data/EIS.xml', 'eis'
-        if arg == '-nogale' or arg =='-ng':
+        if arg in ['-eshop', '-XL']:
+            model, modelName = './feature_tree_data/eshop.xml', 'eshop'
+        if arg in ['-nogale', '-ng']:
             rungale = False
         if arg == '-data':
             spldata = currentpath+'/input/'+argv[i+1]+'.cost'
-        if arg == '-clear':
+        if arg in ['-clear','-clean']:
             clear()
             os._exit(0)
     try:
