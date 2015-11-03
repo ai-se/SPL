@@ -4,18 +4,14 @@ from ZDT4 import *
 from model import *
 from problem import *
 from o import *
+from result_stat import Stat
+show = Stat.rdivDemo
 
-import os,sys
-tooldir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/tools/'
-sys.path.insert(0,tooldir)
-from stat import *
-
-#pdb.set_trace = lambda: None
+# pdb.set_trace = lambda: None
 class GALE(object):
     def __init__(self, model, np=100):
         self.model = model
-        self.np = np # initial population size
-
+        self.np = np  # initial population size
 
     ##################################################
     # Canx  : candidate 1                            #
@@ -23,9 +19,8 @@ class GALE(object):
     # return: distance of decs between candidate 1&2 #
     ##################################################
     def dist(self, canx, cany):
-        x,y = canx.decs, cany.decs
-        return math.sqrt(sum( (a - b)**2 for a, b in zip(x, y))) / math.sqrt(len(x))
-
+        x, y = canx.decs, cany.decs
+        return math.sqrt(sum((a - b) ** 2 for a, b in zip(x, y))) / math.sqrt(len(x))
 
     ##################################
     # x     : given candidate        #
@@ -33,22 +28,20 @@ class GALE(object):
     # return: the furthest candidate #
     ##################################
     def furthest(self, x, data):
-        dis, p = 0,x
+        dis, p = 0, x
         for a in data:
-            temp = self.dist(x,a)
+            temp = self.dist(x, a)
             if temp > dis:
                 dis, p = temp, a
         return p
-
 
     #########################################
     # data  : given candidate list          #
     # return: the left part, the right part #
     #########################################
     def split(self, data):
-        mid = len(data)/2
+        mid = len(data) / 2
         return data[:mid], data[mid:]
-
 
     ##########################################
     # west  : west candidate                 #
@@ -59,7 +52,7 @@ class GALE(object):
     def project(self, west, east, c, x):
         a = self.dist(x, west)
         b = self.dist(x, east)
-        return (a**2 + c**2 - b**2) / (2*c) # cosin rule
+        return (a ** 2 + c ** 2 - b ** 2) / (2 * c)  # cosin rule
 
     ######################################
     # data  : given candidate list       #
@@ -79,10 +72,9 @@ class GALE(object):
     def fastmap(self, data):
         west, east, c = self.getPoles(data)
         if c != 0:
-            data.sort(key = lambda x: self.project(west,east,c,x))
-        LEFT,RIGHT = self.split(data)
+            data.sort(key=lambda x: self.project(west, east, c, x))
+        LEFT, RIGHT = self.split(data)
         return west, east, c, LEFT, RIGHT
-
 
     ####################################################
     # WARNING scores should have filled in the x and y #
@@ -91,17 +83,17 @@ class GALE(object):
     # return: true is x better than y; otherwise false #
     ####################################################
     def better(self, x, y):
-        def loss(x,y):
+        def loss(x, y):
             sum = 0
             for t in range(self.model.objNum):
                 if self.model.obj[t].goal == lt:
-                    sum += -1 * math.exp((x.scores[t]-y.scores[t])/self.model.objNum)
+                    sum += -1 * math.exp((x.scores[t] - y.scores[t]) / self.model.objNum)
                 else:
-                    sum += -1 * math.exp((y.scores[t]-x.scores[t])/self.model.objNum)
+                    sum += -1 * math.exp((y.scores[t] - x.scores[t]) / self.model.objNum)
             return sum / self.model.objNum
-        if x == y : return False
-        return loss(x,y) > loss(y,x)
 
+        if x == y: return False
+        return loss(x, y) > loss(y, x)
 
     ##############################################################################################
     # data  : candidates tried to decomposs                                                      #
@@ -114,10 +106,9 @@ class GALE(object):
         west, east, c, left, right = self.fastmap(data)
         self.model.eval(west)
         self.model.eval(east)
-        goWest = len(left)  > omega
+        goWest = len(left) > omega
         goEast = len(right) > omega
         if lvl < 1 or (not (goWest and goEast)):
-            #return [self.center(data).scores], data  #IDEA: using center instead of poles
             return [west.scores, east.scores], data
         if prune:
             if goEast and self.better(west, east): goEast = False
@@ -125,17 +116,16 @@ class GALE(object):
         leafs = []
         scores = []
         if goWest:
-            sw,lw = self.where(left, lvl-1, prune)
+            sw, lw = self.where(left, lvl - 1, prune)
             scores.extend(sw)
             ll = [x for x in item(lw)]
             leafs.append(ll)
         if goEast:
-            sr, lr = self.where(right, lvl-1, prune)
+            sr, lr = self.where(right, lvl - 1, prune)
             scores.extend(sr)
             rr = [x for x in item(lr)]
             leafs.append(rr)
         return scores, leafs
-
 
     ###############################################
     # Nudge the old towards east, but not too far #
@@ -151,13 +141,13 @@ class GALE(object):
     ###############################################
     def mutate1(self, old, c, east, west, gamma=1.5, delta=0.5):
         if c == 0: return old
-        new = o(decs=old.decs[:],scores=[]) #copy the decisions and omit the score
+        new = o(decs=old.decs[:], scores=[])  # copy the decisions and omit the score
         index = 0
-        for n,e,w,H in zip(new.decs, east.decs, west.decs, self.model.dec):
+        for n, e, w, H in zip(new.decs, east.decs, west.decs, self.model.dec):
             d = sign(e - n)
-            #n = delta * n * (1 +abs(c)*d)
-            n = n + d * (abs(e-n) * delta)
-            new.decs[index] = H.restrain(n) # avoid running out of the range
+            # n = delta * n * (1 +abs(c)*d)
+            n = n + d * (abs(e - n) * delta)
+            new.decs[index] = H.restrain(n)  # avoid running out of the range
             index += 1
         newDist = self.project(west, east, c, new) - \
                   self.project(west, east, c, west)
@@ -165,13 +155,12 @@ class GALE(object):
             return new
         return old
 
-
     #####################################
     # mutate the leafs by mutate1 above #
     #####################################
     def mutate(self, leafs):
         out = []
-        #pdb.set_trace()
+        # pdb.set_trace()
         for leaf in leafs:
             r = []
             west, east, c = self.getPoles(leaf)
@@ -179,19 +168,16 @@ class GALE(object):
             if east.scores == []: self.model.eval(east)
             if self.better(west, east): east, west = west, east
             for candidate in leaf:
-                r.append(self.mutate1(candidate,c,east,west))
+                r.append(self.mutate1(candidate, c, east, west))
             out.append(r)
         return out
 
-    def tool_print_pop_dist(self,cans, featureid = [],noprint=False):
-        #print 'distribution for all leaves:' #TODO INCLUDING NON-LEAVES?
-        N = sum(1 for _ in item(cans))
-        if featureid == []: featureid = range(len(self.model.ft.leaves))
+    def tool_print_pop_dist(self, cans, noprint=False):
+        N = len(cans)
         result = []
-        for i,f in enumerate(self.model.ft.leaves):
-            if i not in featureid:continue
-            s = sum(can.decs[i] for can in item(cans))
-            p = round(s/(N+0.0001),2)
+        for i, f in enumerate(self.model.ft.leaves):
+            s = sum(c.decs[i] for c in cans)
+            p = round(s / (N + 0.0001), 2)
             result.append(p)
         if not noprint: print result
         return result
@@ -205,82 +191,42 @@ class GALE(object):
         new : scores sets to be evaluated
         return whether new is improved.(as long as one obj is imporved, return True)
         """
-        lea = self.model.ft.leaves
-        #record_dist = [[lea[5].id],[lea[6].id],[lea[7].id],[lea[8].id],[lea[9].id]]
-        record_dist = [[l.id] for l in lea]
-        def improved(old,new):
+
+        def improved(old, new):
             for q in range(self.model.objNum):
                 before = mean([p[q] for p in old])
-                now    = mean([p[q] for p in new])
+                now = mean([p[q] for p in new])
                 if self.model.obj[q].goal(now, before): return True
             return False
 
         pop = [self.model.genRandomCan() for _ in range(self.np)]
-        e = self.tool_print_pop_dist(pop,[],True)
-        for i,ee in enumerate(e): record_dist[i].append(ee)
+        e = self.tool_print_pop_dist(pop, True)
+        print e
+        pdb.set_trace()
 
-
-        #print 'initial pop','-'*10
-        #print sort([round(a.decs[0],0) for a in pop])
-        #pdb.set_trace()
         patience = lamb
         for generation in range(max):
-            #print '-'*30, generation
+            print '-'*30, generation
             scores = []
-            #pdb.set_trace()
+            # pdb.set_trace()
             scores, leafs = self.where(pop)
-            e = self.tool_print_pop_dist(leafs,[],True)
-            for i,ee in enumerate(e): record_dist[i].append(ee)
-            """
-            print 'before mutation'
-            for x in item(leafs):
-                print round(x.decs[0],2),
-            print
-            """
-            #pdb.set_trace()
-            #self.passcount = 0
-            #self.notpasscount = 0
+            e = self.tool_print_pop_dist(leafs, [], True)
+            for i, ee in enumerate(e): record_dist[i].append(ee)
             mutants = self.mutate(leafs)
-            #if self.passcount+self.notpasscount != 0:
-                #print 'mutant pass rate:', (self.passcount+0.0)/(self.passcount+self.notpasscount)
-             #   print round((self.passcount+0.0)/(self.passcount+self.notpasscount)*100,2),'%'
-            """ printing the average score of the mutants"""
-            #for x in item(mutants): self.model.eval(x)
-            #temp = [x.scores[0] for x in item(mutants)]
-            #print 'mean of features#', sum(temp)/len(temp)
-            """
-            print 'after mutation'
-            for x in item(mutants):
-                print round(x.decs[0],2),
-            print
-            """
             if generation > 0:
                 if not improved(oldScores, scores):
                     patience -= 1
-                if patience < 0 or generation == max-1:
-                    ###
-                    import pickle
-                    f = open('./ts','w')
-                    pickle.dump(record_dist,f)
-                    f.close
-                    ###
-                    _, leafs = self.where(pop, prune = True)
+                if patience < 0 or generation == max - 1:
+                    _, leafs = self.where(pop, prune=True)
                     r = []
                     for x in item(leafs):
                         r.append(x)
                     return r
             oldScores = scores
-            pop=[]
+            pop = []
             for m in item(mutants): pop.append(m)
             required = self.np - len(pop)
             for _ in range(required): pop.append(self.model.genRandomCan())
-            """
-            print 'pop for next generation'
-            for x in pop:
-                print round(x.decs[0],2),
-            print
-            """
-            #pdb.set_trace()
 
 
 def testw_baseline():
@@ -290,6 +236,6 @@ def testw_baseline():
     v = g.gale(lamb=10000)
     pdb.set_trace()
 
+
 if __name__ == '__main__':
     testw_baseline()
-

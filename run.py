@@ -1,11 +1,12 @@
 import os,sys
 import glob
-currentpath = os.path.dirname(os.path.abspath(__file__))
+currentpath= os.path.dirname(os.path.abspath(__file__))
 GALEpath   = currentpath+'/GALE/'
 parserpath = currentpath+'/parser/'
 datapath   = currentpath+'/feature_tree_data/'
 inputpath  = currentpath+'/input/'
-for x in [currentpath,GALEpath,datapath]:
+toolspath  = currentpath+'/tools/'
+for x in [currentpath, GALEpath, datapath, toolspath]:
     if x not in sys.path: sys.path.insert(0,x)
 
 from GALE import *
@@ -13,6 +14,7 @@ from BinGALE import *
 from model import *
 from problem import *
 from Feature_tree import *
+from result_stat import *
 from parser import *
 
 import pdb,traceback,random
@@ -35,13 +37,14 @@ def clear():
                print junk +' moved'
                os.remove(junk)
 
-def main_gale_with_spl(ftm):
-    bing = BinGALE(ftm)
+def main_gale_with_spl(ftm,np):
+    bing = BinGALE(ftm,np)
     b = bing.gale()
 
 if __name__ == '__main__':
     rungale = True
     model, modelName = './feature_tree_data/cellphone.xml','cell phone'
+    np = None
     for i,arg in enumerate(sys.argv):
         if arg in ['-cellphone', '-S']:
             model, modelName = './feature_tree_data/cellphone.xml','cell phone'
@@ -54,14 +57,16 @@ if __name__ == '__main__':
         if arg in ['-nogale', '-ng']:
             rungale = False
         if arg == '-data':
-            spldata = currentpath+'/input/'+argv[i+1]+'.cost'
+            spldata = currentpath+'/input/'+sys.argv[i+1]+'.cost'
+        if arg == '-np':
+            np = int(sys.argv[i+1])
         if arg in ['-clear','-clean']:
             clear()
             os._exit(0)
     try:
         if spldata == None: spldata = currentpath+'/input/'+modelName.replace(" ","")+'.cost'
         ftm = FTModel(model, modelName,spldata)
-        if rungale: main_gale_with_spl(ftm)
+        if rungale: main_gale_with_spl(ftm, np)
         print 'end of running~~~~~'
         pdb.set_trace()
     except:

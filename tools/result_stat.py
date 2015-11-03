@@ -13,7 +13,7 @@ import sys
 import random
 import math
 from functools import reduce
-sys.dont_write_bytecode = True
+#sys.dont_write_bytecode = True
 """
 
 #### Standard Utils
@@ -548,94 +548,88 @@ Driver for the demos:
 
 """
 
-
-def rdivDemo(data, isLatex=False, globalMinMax=False, high=100, low=0):
-  if isLatex:
-    #     print(r"""\documentclass{article}
-    #     \usepackage{colortbl} % not sure if needed
-    #     \usepackage[table]{xcolor} % not sure if needed
-    #     %%%% needed %%%
-    #     \usepackage{picture}
-    #     \newcommand{\quart}[4]{\begin{picture}(100,6)%1
-    # {\color{black}\put(#3,3){\circle*{4}}\put(#1,3){\line(1,0){#2}}}\end{picture}}
-    #     \begin{document}
-    #     """)
-    def z(x):
-      return int(80 * (x - lo) / (hi - lo + 0.00001))
-    data = map(lambda lst: Num(lst[0], lst[1:]),
-               data)
-    print ""
-    ranks = []
-    for x in scottknott(data, useA12=True):
-      ranks += [(x.rank, x.median(), x)]
-    all = []
-    for _, __, x in sorted(ranks):
-      all += x.quartiles()
-    all = sorted(all)
-    if globalMinMax:
-      lo, hi = min(low, all[0]), max(all[-1], high)
+class Stat:
+  @staticmethod
+  def rdivDemo(data, isLatex=False, globalMinMax=False, high=100, low=0):
+    if isLatex:
+      #     print(r"""\documentclass{article}
+      #     \usepackage{colortbl} % not sure if needed
+      #     \usepackage[table]{xcolor} % not sure if needed
+      #     %%%% needed %%%
+      #     \usepackage{picture}
+      #     \newcommand{\quart}[4]{\begin{picture}(100,6)%1
+      # {\color{black}\put(#3,3){\circle*{4}}\put(#1,3){\line(1,0){#2}}}\end{picture}}
+      #     \begin{document}
+      #     """)
+      def z(x):
+        return int(80 * (x - lo) / (hi - lo + 0.00001))
+      data = map(lambda lst: Num(lst[0], lst[1:]),
+                 data)
+      print ""
+      ranks = []
+      for x in scottknott(data, useA12=True):
+        ranks += [(x.rank, x.median(), x)]
+      all = []
+      for _, __, x in sorted(ranks):
+        all += x.quartiles()
+      all = sorted(all)
+      if globalMinMax:
+        lo, hi = min(low, all[0]), max(all[-1], high)
+      else:
+        lo, hi = all[0], all[-1]
+      print r'{\scriptsize \begin{tabular}{l@{~~~}l@{~~~}r@{~~~}r@{~~~}c}'
+      print r'\arrayrulecolor{lightgray}'
+      # min= %s, max= %s\\\\' % (int(lo),int(hi))
+      print r'\textbf{Rank} & \textbf{Treatment} & \textbf{Median} & \textbf{IQR} & \\\hline'
+      last = None
+      for _, __, x in sorted(ranks):
+        q1, q2, q3 = x.quartiles()
+        pre = ""
+        if not last is None and not last == x.rank:
+          pre = "\\hline"
+        print pre, r'%2s & %12s &    %s  &  %s & \quart{%s}{%s}{%s}{%s} \\' % \
+            (x.rank + 1,
+             x.name,
+             float(q2 / 100),
+                float((q3 - q1) / 100),
+                z(q1),
+                z(q3) - z(q1),
+                z(q2),
+                z(100))
+        last = x.rank
+      print r"\hline \end{tabular}}"
+      return ranks
+  #     print('''
+  #     \end{document}
+  #     ''')
     else:
-      lo, hi = all[0], all[-1]
-    print r'{\scriptsize \begin{tabular}{l@{~~~}l@{~~~}r@{~~~}r@{~~~}c}'
-    print r'\arrayrulecolor{lightgray}'
-    # min= %s, max= %s\\\\' % (int(lo),int(hi))
-    print r'\textbf{Rank} & \textbf{Treatment} & \textbf{Median} & \textbf{IQR} & \\\hline'
-    last = None
-    for _, __, x in sorted(ranks):
-      q1, q2, q3 = x.quartiles()
-      pre = ""
-      if not last is None and not last == x.rank:
-        pre = "\\hline"
-      print pre, r'%2s & %12s &    %s  &  %s & \quart{%s}{%s}{%s}{%s} \\' % \
-          (x.rank + 1,
-           x.name,
-           float(q2 / 100),
-              float((q3 - q1) / 100),
-              z(q1),
-              z(q3) - z(q1),
-              z(q2),
-              z(100))
-      last = x.rank
-    print r"\hline \end{tabular}}"
-    return ranks
-#     print('''
-#     \end{document}
-#     ''')
-  else:
-    def z(x):
-      return int(100 * (x - lo) / (hi - lo + 0.00001))
-    data = map(lambda lst: Num(lst[0], lst[1:]),
-               data)
-    print ""
-    ranks = []
-    for x in scottknott(data, useA12=True):
-      ranks += [(x.rank, x.median(), x)]
-    all = []
-    for _, __, x in sorted(ranks):
-      all += x.all
-    all = sorted(all)
-    if globalMinMax:
-      lo, hi = min(low, all[0]), max(all[-1], high)
-    else:
-      lo, hi = all[0], all[-1]
-    line = "----------------------------------------------------"
-    last = None
-    print ('%4s , %12s ,    %s   , %4s ' %
-           ('rank', 'name', 'med', 'iqr')) + "\n" + line
-    for _, __, x in sorted(ranks):
-      q1, q2, q3 = x.quartiles()
-      print ('%4s , %12s ,    %0.2f  ,  %0.2f ' %
-             (x.rank + 1, x.name, x.median(), x.spread())) + \
-          xtile(x.all, lo=lo, hi=hi, width=30)
-      last = x.rank
-    return ranks
+      def z(x):
+        return int(100 * (x - lo) / (hi - lo + 0.00001))
+      data = map(lambda lst: Num(lst[0], lst[1:]),
+                 data)
+      print ""
+      ranks = []
+      for x in scottknott(data, useA12=True):
+        ranks += [(x.rank, x.median(), x)]
+      all = []
+      for _, __, x in sorted(ranks):
+        all += x.all
+      all = sorted(all)
+      if globalMinMax:
+        lo, hi = min(low, all[0]), max(all[-1], high)
+      else:
+        lo, hi = all[0], all[-1]
+      line = "----------------------------------------------------"
+      last = None
+      print ('%4s , %12s ,    %s   , %4s ' %
+             ('rank', 'name', 'med', 'iqr')) + "\n" + line
+      for _, __, x in sorted(ranks):
+        q1, q2, q3 = x.quartiles()
+        print ('%4s , %12s ,    %0.2f  ,  %0.2f ' %
+               (x.rank + 1, x.name, x.median(), x.spread())) + \
+            xtile(x.all, lo=lo, hi=hi, width=30)
+        last = x.rank
+      return ranks
 
 
-###
-import pickle
-f = open('../ts')
-s = pickle.load(f)
-rdivDemo(s)
-#print s
-f.close()
-###
+
