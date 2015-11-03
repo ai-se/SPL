@@ -13,8 +13,6 @@ class BinGALE(GALE):
     def __init__(self, model, np=100):
         self.model = model # FTModel is needed (FTModel is a binary model for SPL)
         self.np = np # initial population size
-        self.passcount = 0
-        self.notpasscount = 0
 
 
     ##################################################
@@ -24,6 +22,7 @@ class BinGALE(GALE):
     ##################################################
     def dist(self, canx,cany):
         x,y = canx.decs, cany.decs
+        """
         # definition to binary distance - Jaccard's distance
         # p: Y Y
         # q: Y N
@@ -37,6 +36,9 @@ class BinGALE(GALE):
             if not x[i] and y[i]: r += 1
             if not x[i] and not y[i]: s += 1
         return (0.0+ q+r)/(0.0 + p+q+r)
+        """
+        # Hamming distance
+        return sum(ch1 != ch2 for ch1, ch2 in zip(x, y))
 
     ###################################
     # mutate for the binary variables #
@@ -53,10 +55,6 @@ class BinGALE(GALE):
                 new.decs[i] = e
             else:
                 new.decs[i] = w
-        if self.model.ok(new):
-            self.passcount += 1
-        else:
-            self.notpasscount += 1
         return new
 
 """

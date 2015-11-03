@@ -38,7 +38,10 @@ def clear():
                os.remove(junk)
 
 def main_gale_with_spl(ftm,np):
-    bing = BinGALE(ftm,np)
+    if np:
+        bing = BinGALE(ftm,np)
+    else:
+        bing = BinGALE(ftm)
     b = bing.gale()
 
 if __name__ == '__main__':
@@ -66,6 +69,7 @@ if __name__ == '__main__':
     try:
         if spldata == None: spldata = currentpath+'/input/'+modelName.replace(" ","")+'.cost'
         ftm = FTModel(model, modelName,spldata)
+        ftm.printModelInfo()
         if rungale: main_gale_with_spl(ftm, np)
         print 'end of running~~~~~'
         pdb.set_trace()

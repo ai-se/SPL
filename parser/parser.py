@@ -155,7 +155,7 @@ class FTModel(model):
 
     def genRandomCan(self,guranteeOK = False):
         while True:
-            randBinList = lambda n: [random.randint(0,1) for b in range(1,n+1)]
+            randBinList = lambda n: [random.randint(0,1) for _ in range(n)]
             can = candidate(decs=randBinList(len(self.dec)),scores=[])
             if not guranteeOK or self.ok(can): break
         return can

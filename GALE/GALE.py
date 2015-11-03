@@ -78,11 +78,13 @@ class GALE(object):
 
     ####################################################
     # WARNING scores should have filled in the x and y #
-    # x     : first candidate                          #
-    # y     : first candidate                          #
+    # better indicates MUCH BETTER!                    #
+    # canx  : first candidate                          #
+    # cany  : first candidate                          #
     # return: true is x better than y; otherwise false #
     ####################################################
-    def better(self, x, y):
+    def better(self, canx, cany):
+        """"
         def loss(x, y):
             sum = 0
             for t in range(self.model.objNum):
@@ -93,7 +95,13 @@ class GALE(object):
             return sum / self.model.objNum
 
         if x == y: return False
-        return loss(x, y) > loss(y, x)
+        return loss(canx, cany) > loss(cany, canx)
+        """
+        index = 0
+        for x, y, m in zip(canx.scores, cany.scores, self.model.obj):
+            index += (x-y)/(m.hi-m.lo)
+        print index
+        return index > 0.15
 
     ##############################################################################################
     # data  : candidates tried to decomposs                                                      #
@@ -115,6 +123,7 @@ class GALE(object):
             if goWest and self.better(east, west): goWest = False
         leafs = []
         scores = []
+        #if goWest and goEast: print "not comparable for data size = ", len(data)
         if goWest:
             sw, lw = self.where(left, lvl - 1, prune)
             scores.extend(sw)
@@ -160,7 +169,6 @@ class GALE(object):
     #####################################
     def mutate(self, leafs):
         out = []
-        # pdb.set_trace()
         for leaf in leafs:
             r = []
             west, east, c = self.getPoles(leaf)
@@ -199,19 +207,14 @@ class GALE(object):
                 if self.model.obj[q].goal(now, before): return True
             return False
 
-        pop = [self.model.genRandomCan() for _ in range(self.np)]
-        e = self.tool_print_pop_dist(pop, True)
-        print e
-        pdb.set_trace()
-
+        pop = [self.model.genRandomCan(guranteeOK=False) for _ in range(self.np)]
+        e = self.tool_print_pop_dist(pop)
         patience = lamb
         for generation in range(max):
-            print '-'*30, generation
+            #print '-'*30, generation
             scores = []
-            # pdb.set_trace()
             scores, leafs = self.where(pop)
-            e = self.tool_print_pop_dist(leafs, [], True)
-            for i, ee in enumerate(e): record_dist[i].append(ee)
+            print len(leafs),
             mutants = self.mutate(leafs)
             if generation > 0:
                 if not improved(oldScores, scores):
@@ -227,7 +230,6 @@ class GALE(object):
             for m in item(mutants): pop.append(m)
             required = self.np - len(pop)
             for _ in range(required): pop.append(self.model.genRandomCan())
-
 
 def testw_baseline():
     k_model = ZDT2()
