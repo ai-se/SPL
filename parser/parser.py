@@ -169,9 +169,10 @@ class FTModel(model):
         print '-'*30
 
 def main():
-    m = FTModel('../feature_tree_data/cellphone.xml')
-    can = m.genRandomCan()
-    m.eval(can,doNorm=False)
+    m = FTModel('../feature_tree_data/cellphone.xml', 'cell phone', 'celphone.cost')
+    m.smartGenRandomCan()
+    #can = m.genRandomCan()
+    #m.eval(can,doNorm=False)
     pdb.set_trace()
 
 if __name__ == '__main__':

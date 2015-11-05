@@ -40,7 +40,7 @@ class Constraint(object):
                 if self.literals[i] == ft.features[index].id: break
             if self.li_pos[i] and filledForm[index] == 1:
                 return True
-            elif not self.li_pos[i] and  filledForm[index] == 0:
+            elif not self.li_pos[i] and filledForm[index] == 0:
                 return True
         return False
 
@@ -51,7 +51,7 @@ class FeatureTree(object):
         self.groups = []
         self.leaves = []
         self.con = []
-        self.cost=[]
+        self.cost = []
         self.featureNum = 0
 
     def set_root(self,root):
