@@ -170,7 +170,6 @@ class FTModel(model):
 
 def main():
     m = FTModel('../feature_tree_data/cellphone.xml', 'cell phone', 'celphone.cost')
-    m.smartGenRandomCan()
     #can = m.genRandomCan()
     #m.eval(can,doNorm=False)
     pdb.set_trace()
