@@ -59,7 +59,7 @@ class mutateEngine(object):
         if node.children == []: return
         if node.node_type == 'g': # the current node is a group
             if not me: map(lambda x:self.setFulfill(x,0), node.children)
-                #for c in node.children: self.setFulfill(c,0)
+                #For c in node.children: self.setFulfill(c,0)
             else:
                 want = randint(node.g_d, node.g_u)
                 exist_1 = len([c for c in node.children if self.getFulfill(c)==1])
