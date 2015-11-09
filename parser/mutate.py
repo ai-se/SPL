@@ -1,9 +1,9 @@
-import pdb
+import pdb,traceback,random
 import os
 import time
 from Feature_tree import *
 from parser import *
-from copy import deepcopy
+from copy import *
 from random import *
 
 
@@ -33,20 +33,27 @@ class mutateEngine(object):
             self.checkConstraints(node)
 
     @staticmethod
-    def getShuffleList(list, cut = None):
-        return sorted(list, key=os.urandom)[0:cut]
+    def getShuffleList(l, cut = 'notset'):
+        l2 = copy(l)
+        shuffle(l2)
+        if cut != 'notset':
+            return l2[0:cut]
+        else:
+            return l2
 
     def checkConstraints(self,setted_node):
         me = self.getFulfill(setted_node)
         for i,con in enumerate(self.con_repo):
             if self.con_fulfill[i]: continue
             if setted_node.id not in con.literals: continue
-            if con.li_pos[con.literals.index(setted_node.id)] == me:
+            location = con.literals.index(setted_node.id)
+            if con.li_pos[location] == me:
                 self.con_fulfill[i] = 1
             else:
-                con.literals.pop(i)
-                con.li_pos.pop(i)
-                if len(con) == 0:  raise Exception('constraint fail!')
+                con.literals.pop(location)
+                con.li_pos.pop(location)
+                if len(con.literals) == 0:
+                    raise Exception('constraint fail!')
 
     def checkWhetherSet(self, node, want):
         a = self.getFulfill(node)
@@ -55,23 +62,21 @@ class mutateEngine(object):
 
     def mutateChild(self, node):
         me = self.getFulfill(node)
-        #pdb.set_trace()
         if node.children == []: return
         if node.node_type == 'g': # the current node is a group
             if not me: map(lambda x:self.setFulfill(x,0), node.children)
-                #For c in node.children: self.setFulfill(c,0)
             else:
                 want = randint(node.g_d, node.g_u)
                 exist_1 = len([c for c in node.children if self.getFulfill(c)==1])
                 want = want-exist_1
                 if want < 0: raise Exception('group fail!')
                 for i,c in enumerate(self.getShuffleList(node.children)):
-                    self.setFulfill(c, int(i<=want))
+                    self.setFulfill(c, int(i<want))
                     self.mutateChild(c)
             return
         if node.children[0].node_type == 'g': # my child is a group-> just to set as me
             c = node.children[0]
-            self.setFulfill(c,me,Flase)
+            self.setFulfill(c,me,False)
             self.mutateChild(c)
             return
         # the current node is root, mandory or optional
@@ -79,46 +84,83 @@ class mutateEngine(object):
         o_child = [c for c in node.children if c.node_type == 'o']
         shuffle(m_child)
         shuffle(o_child)
-        #pdb.set_trace()
+
         if me:
             for m in m_child:
                self.setFulfill(m,1)
+               self.mutateChild(m)
             for o in o_child:
                 self.setFulfill(o,randint(0,1))
+                self.mutateChild(o)
         if not me:
             if len(m_child) == 0:
                 for o in o_child:
                     self.setFulfill(o,0)
+                    self.mutateChild(o)
             else:
                 self.setFulfill(m_child[0],0)
+                self.mutateChild(m_child[0])
                 for other in m_child[1:]+o_child:
-                    self.setFulfill(o, randint(0,1))
+                    self.setFulfill(other, randint(0,1))
+                    self.mutateChild(other)
         return
+    
+    def findLevesFulfill(self, fulfill):
+        r = []
+        for x in self.ft.leaves:
+            index = self.ft.features.index(x)
+            r.append(fulfill[index])
+        return r
 
-    def generate(self, pop = 10):
+    """
+    Generate valid candidates with size equals given pop
+    if returnFulfill is False, then return the a list--each element in the list is one can.decs
+    if returnFulfill is True,  then return a list--list[0] is fulfill lists; list[1] is same as upper introduction. Note: list[0][a] is matching list[1][a]
+    """
+    def generate(self, pop = 10, returnFulfill = False):
         i = 0
-        self.refresh()
+        fulfill2return = []
         while True:
             try:
+                self.refresh()
                 self.setFulfill(self.ft.root, 1)
                 self.mutateChild(self.ft.root)
-                #print "mutate DONE!"
+                fulfill2return.append(self.fea_fulfill)
                 i = i+1
-                if i >= pop :return
+                if i >= pop:
+                    leaves2return = [self.findLevesFulfill(r) for r in fulfill2return]
+                    if returnFulfill: return fulfill2return, leaves2return
+                    else: return leaves2return
             except:
+                """
+                print 'errors'
+                type, value, tb = sys.exc_info()
+                traceback.print_exc()
+                pdb.post_mortem(tb)
+                """
                 pass
 
+def comparePerformance():
+    for name in ['cellphone','eshop','webportal','EIS']:
+        m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+        m.printModelInfo()
+        engine = mutateEngine(m.ft)
+        start_time = time.time()
+        engine.setFulfill(m.ft.root,1)
+        engine.generate(10)
+        print("--- %s seconds --- for 10 by new mutate engine" % (time.time() - start_time))
+        start_time = time.time()
+        for i in range(10):
+            m.genRandomCan(guranteeOK=True)
+        print("--- %s seconds --- for 10 by origin mutate engine" % (time.time() - start_time))
 
-for name in ['cellphone','eshop','webportal','eis']:
-    m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+def unitTest():
+    m = FTModel('../feature_tree_data/cellphone.xml', 'cell phone', 'cellphone.cost')
     m.printModelInfo()
     engine = mutateEngine(m.ft)
-    start_time = time.time()
-    engine.setFulfill(m.ft.root,1)
-    engine.generate(10)
-    print("--- %s seconds --- for 10 by new mutate engine" % (time.time() - start_time))
-    start_time = time.time()
-    for i in range(10):
-        m.genRandomCan(guranteeOK=True)
-    print("--- %s seconds --- for 10 by origin mutate engine" % (time.time() - start_time))
-
+    q = engine.generate(10,True)
+    print q
+    
+if __name__ == '__main__':
+    #comparePerformance()
+    unitTest()
