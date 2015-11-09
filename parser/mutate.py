@@ -114,8 +114,8 @@ class mutateEngine(object):
 
     """
     Generate valid candidates with size equals given pop
-    if returnFulfill is False, then return the a list--each element in the list is one can.decs
     if returnFulfill is True,  then return a list--list[0] is fulfill lists; list[1] is same as upper introduction. Note: list[0][a] is matching list[1][a]
+    if returnFulfill is False, then list[0] is None
     """
     def generate(self, pop = 10, returnFulfill = False):
         i = 0
@@ -130,7 +130,7 @@ class mutateEngine(object):
                 if i >= pop:
                     leaves2return = [self.findLevesFulfill(r) for r in fulfill2return]
                     if returnFulfill: return fulfill2return, leaves2return
-                    else: return leaves2return
+                    else: return None,leaves2return
             except:
                 """
                 print 'errors'
