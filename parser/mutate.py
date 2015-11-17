@@ -51,6 +51,7 @@ class mutateEngine(object):
             else:
                 con.literals.pop(location)
                 con.li_pos.pop(location)
+
                 if len(con.literals) == 1: #have a try for the last literal
                     last_i = [qq for qq,x in enumerate(self.ft.features) if x.id == con.literals[0]]
                     last_i = last_i[0]
@@ -61,6 +62,8 @@ class mutateEngine(object):
                     self.con_fulfill[i] = 1
                 if len(con.literals) == 0:
                     print 'constraint fail coused by ' + setted_node.id + ' at constraint '+ str(i)
+
+                if len(con.literals) == 0:
                     raise Exception('constraint fail!')
 
     def checkWhetherSet(self, node, want):
@@ -135,6 +138,7 @@ class mutateEngine(object):
             r.append(fulfill[index])
         return r
 
+
     """
     Generate valid candidates with size equals given pop
     if returnFulfill is True,  then return a list--list[0] is fulfill lists; list[1] is same as upper introduction. Note: list[0][a] is matching list[1][a]
@@ -183,7 +187,7 @@ class mutateEngine(object):
                 pdb.post_mortem(tb)
                 #"""
                 pass
-"""
+
 def comparePerformance():
     for name in ['cellphone','eshop','webportal','EIS']:
         m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
@@ -197,6 +201,7 @@ def comparePerformance():
         for i in range(10):
             m.genRandomCan(guranteeOK=True)
         print("--- %s seconds --- for 10 by origin mutate engine" % (time.time() - start_time))
+
 """
 
 def unitTest():
@@ -211,8 +216,20 @@ def unitTest():
     can = candidate(decs=ww[1])
     m.ok(can)
     pdb.set_trace()
-
+"""
 
 if __name__ == '__main__':
     #comparePerformance()
     unitTest()
+
+def unitTest():
+    m = FTModel('../feature_tree_data/cellphone.xml', 'cell phone', 'cellphone.cost')
+    m.printModelInfo()
+    engine = mutateEngine(m.ft)
+    q = engine.generate(10,True)
+    print q
+
+if __name__ == '__main__':
+    #comparePerformance()
+    unitTest()
+

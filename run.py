@@ -66,6 +66,8 @@ if __name__ == '__main__':
         if arg in ['-clear','-clean']:
             clear()
             os._exit(0)
+        if arg == '-nodebug':
+            pdb.set_trace = pdb.set_trace = lambda: None
     try:
         if spldata == None: spldata = currentpath+'/input/'+modelName.replace(" ","")+'.cost'
         ftm = FTModel(model, modelName,spldata)

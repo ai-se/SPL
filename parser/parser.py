@@ -88,7 +88,6 @@ def load_ft_url(url):
         con_stmt = Constraint(id = con_id, literals = literal, literals_pos = li_pos)
         ft.add_constraint(con_stmt)
 
-    # pdb.set_trace()
     ft.set_features_list()
 
     return ft

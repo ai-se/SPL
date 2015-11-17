@@ -75,7 +75,6 @@ class FeatureTree(object):
                 self.leaves.append(node)
             for i in node.children:
                 setting_feature_list(self, i)
-        print 'runned'
         setting_feature_list(self, self.root)
         self.featureNum = len(self.features)
 
