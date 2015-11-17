@@ -24,7 +24,6 @@ class Node(object):
             self.id,
             self.node_type)
 
-
 class Constraint(object):
     def __init__(self, id, literals, literals_pos):
         self.id = id
@@ -35,14 +34,11 @@ class Constraint(object):
         return self.id+'\n'+str(self.literals)+'\n'+str(self.li_pos)
 
     def iscorrect(self, ft, filledForm):
-        for i in range(len(self.literals)):
-            for index in range(len(ft.features)):
-                if self.literals[i] == ft.features[index].id: break
-            if self.li_pos[i] and filledForm[index] == 1:
-                return True
-            elif not self.li_pos[i] and filledForm[index] == 0:
-                return True
+        for (li, pos) in zip(self.literals, self.li_pos):
+            i = ft.find_fea_index_by_id(li)
+            if int(pos) == filledForm[i]: return True
         return False
+
 
 class FeatureTree(object):
     def __init__(self):
@@ -60,6 +56,11 @@ class FeatureTree(object):
     def add_constraint(self,con):
         self.con.append(con)
 
+    def find_fea_index_by_id(self, id):
+        for i,x in enumerate(self.features):
+            if x.id == id:
+                return i
+
     # featch all the features in the tree basing on the children structure
     def set_features_list(self):
         def setting_feature_list(self,node):
@@ -74,6 +75,7 @@ class FeatureTree(object):
                 self.leaves.append(node)
             for i in node.children:
                 setting_feature_list(self, i)
+        print 'runned'
         setting_feature_list(self, self.root)
         self.featureNum = len(self.features)
 
@@ -92,7 +94,7 @@ class FeatureTree(object):
             index = self.features.index(node)
             if form[index] != -1:
                 return
-            # handleing the group featues
+            # handeling the group featues
             if node.node_type == 'g':
                 sum = 0
                 for i in node.children:
@@ -100,9 +102,25 @@ class FeatureTree(object):
                     sum += form[i_index]
                 form[index] = 1 if sum >= node.g_d and sum <= node.g_u else 0
                 return
-            for i in node.children:
+
+            # the child is a group
+            if node.children[0].node_type == 'g':
+                form[index] = form[index+1]
+                return
+
+            #handeling the other type of node
+            m_child = [x for x in node.children if x.node_type in ['m','r','']]
+            o_child = [x for x in node.children if x.node_type == 'o']
+            if len(m_child) == 0:
+                s = 0
+                for i in o_child:
+                    i_index = self.features.index(i)
+                    s += form[i_index]
+                form[index] = 1 if s>0 else 0
+                return
+            for i in m_child:
                 i_index = self.features.index(i)
-                if i.node_type != 'o' and form[i_index] == 0:
+                if form[i_index] == 0:
                     form[index] = 0
                     return
             form[index] = 1

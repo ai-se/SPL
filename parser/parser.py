@@ -117,7 +117,6 @@ class FTModel(model):
             fulfill[t.features.index(t.leaves[x])] = sol[x]
         # fill other tree elements
         t.fillForm4AlFea(fulfill)
-        #print fulfill
         # here group should not count as feature
         gsum = 0
         for g in t.groups:
@@ -170,7 +169,8 @@ class FTModel(model):
 
 def main():
     m = FTModel('../feature_tree_data/cellphone.xml', 'cell phone', 'celphone.cost')
-    #can = m.genRandomCan()
+    #m = FTModel('../feature_tree_data/eshop.xml', 'eshop', 'eshop.cost')
+    #can = m.genRandomCan(guranteeOK=True)
     #m.eval(can,doNorm=False)
     pdb.set_trace()
 
