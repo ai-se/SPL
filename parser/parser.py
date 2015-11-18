@@ -105,17 +105,19 @@ class FTModel(model):
                Has(name='cost', lo=0,hi=sum(self.ft.cost), goal = lt)]
         model.__init__(self, dec, obj)
 
-    def eval(self, c, doNorm=True):
+    def eval(self, c, doNorm=True, returnFulfill=False):
         t = self.ft #abbr.
         sol = c.decs
 
         # obj1: features numbers
         # initialize the fulfill list
         fulfill = [-1] * t.featureNum
-        for x in range(len(sol)):
-            fulfill[t.features.index(t.leaves[x])] = sol[x]
+        for i,l in enumerate(t.leaves):
+            fulfill[t.features.index(l)] = sol[i]
+
         # fill other tree elements
         t.fillForm4AlFea(fulfill)
+
         # here group should not count as feature
         gsum = 0
         for g in t.groups:
@@ -138,7 +140,9 @@ class FTModel(model):
         c.scores = [obj1, obj2, obj3]
         if doNorm:
             self.normObjs(c)
-        return c
+
+        if returnFulfill: return fulfill
+        else: return None
 
     """
     checking whether the candidate meets ALL constraints
@@ -146,10 +150,10 @@ class FTModel(model):
     def ok(self,c):
         try:
             if c.scores == []:
-                self.eval(c)
+                f = self.eval(c, returnFulfill=True)
         except:
-            self.eval(c)
-        return c.scores[1] == 0
+            f = self.eval(c, returnFulfill = True)
+        return c.scores[1] == 0 and f[0] == 1
 
     def genRandomCan(self,guranteeOK = False):
         while True:
@@ -166,12 +170,11 @@ class FTModel(model):
         print 'Constraints#:', len(self.ft.con)
         print '-'*30
 
-def main():
-    m = FTModel('../feature_tree_data/cellphone.xml', 'cell phone', 'celphone.cost')
-    #m = FTModel('../feature_tree_data/eshop.xml', 'eshop', 'eshop.cost')
-    #can = m.genRandomCan(guranteeOK=True)
+def main(name):
+    m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+    can = m.genRandomCan(guranteeOK=True)
     #m.eval(can,doNorm=False)
     pdb.set_trace()
 
 if __name__ == '__main__':
-    main()
+    main('webportal')

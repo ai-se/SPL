@@ -96,29 +96,31 @@ class FeatureTree(object):
             # handeling the group featues
             if node.node_type == 'g':
                 sum = 0
-                for i in node.children:
-                    i_index = self.features.index(i)
+                for c in node.children:
+                    i_index = self.features.index(c)
                     sum += form[i_index]
                 form[index] = 1 if sum >= node.g_d and sum <= node.g_u else 0
                 return
 
+            """
             # the child is a group
             if node.children[0].node_type == 'g':
                 form[index] = form[index+1]
                 return
+            """
 
             #handeling the other type of node
-            m_child = [x for x in node.children if x.node_type in ['m','r','']]
+            m_child = [x for x in node.children if x.node_type in ['m','r','g']]
             o_child = [x for x in node.children if x.node_type == 'o']
-            if len(m_child) == 0:
+            if len(m_child) == 0: #all children are optional
                 s = 0
-                for i in o_child:
-                    i_index = self.features.index(i)
+                for o in o_child:
+                    i_index = self.features.index(o)
                     s += form[i_index]
                 form[index] = 1 if s>0 else 0
                 return
-            for i in m_child:
-                i_index = self.features.index(i)
+            for m in m_child:
+                i_index = self.features.index(m)
                 if form[i_index] == 0:
                     form[index] = 0
                     return
