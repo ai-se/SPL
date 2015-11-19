@@ -2,11 +2,11 @@ import pdb,traceback, sys
 import math, random
 import numpy as np
 from GALE import *
-
 import os,sys
 parserdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/parser/'
 sys.path.insert(0,parserdir)
 from parser import *
+
 
 class BinGALE(GALE):
 
@@ -27,7 +27,7 @@ class BinGALE(GALE):
         # p: Y Y
         # q: Y N
         # r: N Y
-        # s: N N
+        # s: N Ns
         if x == y: return 0
         p,q,r,s = 0,0,0,0
         for i in range(len(x)):
@@ -51,7 +51,7 @@ class BinGALE(GALE):
         for i,(e,w) in enumerate(zip(east.decs, west.decs)):
             if e == w:
                 new.decs[i] = e
-            elif random.random() < c:
+            elif random() < c:
                 new.decs[i] = e
             else:
                 new.decs[i] = w
@@ -74,19 +74,20 @@ def main_find_init_pop_passrate():
 
     #pdb.set_trace()
     #bing.gale()
+"""
 
-def main_gale_with_spl():
-    #eis = FTModel('../feature_tree_data/eshop.xml','eshop')
-    eis = FTModel('../feature_tree_data/cellphone.xml','cell phone')
-    bing = BinGALE(eis)
+def main_gale_with_spl(name):
+    m = FTModel('../feature_tree_data/'+name+'.xml',name, name+'.cost')
+    # gale
+    bing = BinGALE(m)
     b = bing.gale()
     pdb.set_trace()
 
 if __name__ == '__main__':
     try:
-        main_gale_with_spl()
+        main_gale_with_spl('cellphone')
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         pdb.post_mortem(tb)
-"""
+

@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from Feature_tree import *
 from model import *
+from mutate import * #v2 mutate engine
 
 def load_ft_url(url):
     # load the feature tree and constraints
@@ -103,6 +104,7 @@ class FTModel(model):
         obj = [Has(name='fea', lo=0, hi=self.ft.featureNum-len(self.ft.groups), goal = gt),
                Has(name='conVio', lo=0,hi=len(self.ft.con), goal = lt),
                Has(name='cost', lo=0,hi=sum(self.ft.cost), goal = lt)]
+        self.mutateEngine2 = mutateEngine(self.ft)
         model.__init__(self, dec, obj)
 
     def eval(self, c, doNorm=True, returnFulfill=False):
@@ -155,12 +157,20 @@ class FTModel(model):
             f = self.eval(c, returnFulfill = True)
         return c.scores[1] == 0 and f[0] == 1
 
+    """
     def genRandomCan(self,guranteeOK = False):
         while True:
             randBinList = lambda n: [random.randint(0,1) for _ in range(n)]
             can = candidate(decs=randBinList(len(self.dec)),scores=[])
             if not guranteeOK or self.ok(can): break
         return can
+    """
+
+    """
+    Applying v2 mutate engine
+    """
+    def genRandomCan(self, guranteeOK = False):
+        return candidate(decs=self.mutateEngine2.genValidOne(),scores=[])
 
     def printModelInfo(self):
         print '---Information for SPL--------'
@@ -177,4 +187,4 @@ def main(name):
     pdb.set_trace()
 
 if __name__ == '__main__':
-    main('webportal')
+    main('eis')

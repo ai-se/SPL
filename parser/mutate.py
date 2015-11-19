@@ -57,7 +57,7 @@ class mutateEngine(object):
                     self.setFulfill(self.ft.features[last_i], int(con.li_pos[0]))
                     self.con_fulfill[i] = 1
                 if len(con.literals) == 0:
-                    print 'constraint fail coused by ' + setted_node.id + ' at constraint '+ str(i)
+                    #print 'constraint fail coused by ' + setted_node.id + ' at constraint '+ str(i)
                     raise Exception('constraint fail!')
 
     """
@@ -143,7 +143,7 @@ class mutateEngine(object):
                 fulfill2return = self.fea_fulfill
                 leaves2return = self.findLeavesFulfill(fulfill2return)
                 if returnFulfill: return fulfill2return, leaves2return
-                else: return None, leaves2return
+                else: return leaves2return
             except:
                 #type, value, tb = sys.exc_info()
                 #traceback.print_exc()
@@ -170,7 +170,8 @@ def unitTest(name):
     m.printModelInfo()
     engine = mutateEngine(m.ft)
     a  = engine.genValidOne(True)
+    pdb.set_trace()
 
 if __name__ == '__main__':
-    comparePerformance()
-    #unitTest('eshop')
+    #comparePerformance()
+    unitTest('eshop')

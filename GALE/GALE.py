@@ -4,8 +4,8 @@ from ZDT4 import *
 from model import *
 from problem import *
 from o import *
-from result_stat import Stat
-show = Stat.rdivDemo
+#from result_stat import Stat
+#show = Stat.rdivDemo
 
 # pdb.set_trace = lambda: None
 class GALE(object):
@@ -100,7 +100,7 @@ class GALE(object):
         index = 0
         for x, y, m in zip(canx.scores, cany.scores, self.model.obj):
             index += (x-y)/(m.hi-m.lo)
-        print index
+        #print index
         return index > 0.15
 
     ##############################################################################################
@@ -207,14 +207,14 @@ class GALE(object):
                 if self.model.obj[q].goal(now, before): return True
             return False
 
-        pop = [self.model.genRandomCan(guranteeOK=False) for _ in range(self.np)]
-        e = self.tool_print_pop_dist(pop)
+        pop = [self.model.genRandomCan() for _ in range(self.np)]
+        #e = self.tool_print_pop_dist(pop)
         patience = lamb
         for generation in range(max):
             #print '-'*30, generation
             scores = []
             scores, leafs = self.where(pop)
-            print len(leafs),
+            #print len(leafs),
             mutants = self.mutate(leafs)
             if generation > 0:
                 if not improved(oldScores, scores):
