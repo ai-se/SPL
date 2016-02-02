@@ -294,6 +294,7 @@ def sampleWithReplacement(lst):
 """
 
 
+
 Then, for all those samples,
  check if some *testStatistic* in the original pair
 hold for all the other pairs. If it does more than (say) 99%
