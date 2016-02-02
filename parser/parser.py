@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from Feature_tree import *
 from model import *
-from mutate import * #v2 mutate engine
+from mutate2 import * #v2 mutate engine
 
 def load_ft_url(url):
     # load the feature tree and constraints
@@ -151,8 +151,8 @@ class FTModel(model):
     """
     def ok(self,c):
         try:
-            if c.scores == []:
-                f = self.eval(c, returnFulfill=True)
+            #if c.scores == []:
+            f = self.eval(c, returnFulfill=True)
         except:
             f = self.eval(c, returnFulfill = True)
         return c.scores[1] == 0 and f[0] == 1
@@ -182,9 +182,10 @@ class FTModel(model):
 
 def main(name):
     m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
-    can = m.genRandomCan(guranteeOK=True)
+    m.printModelInfo()
+    #can = m.genRandomCan(guranteeOK=True)
     #m.eval(can,doNorm=False)
     pdb.set_trace()
 
 if __name__ == '__main__':
-    main('eis')
+    main('eshop')

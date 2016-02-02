@@ -3,6 +3,7 @@ from numpy import *
 from ZDT4 import *
 from model import *
 from problem import *
+from time import time
 from o import *
 #from result_stat import Stat
 #show = Stat.rdivDemo
@@ -12,7 +13,7 @@ class GALE(object):
     def __init__(self, model, np=100):
         self.model = model
         self.np = np  # initial population size
-
+        self.time_ran_pop = 0
     ##################################################
     # Canx  : candidate 1                            #
     # cany  : candidate 2                            #
@@ -207,7 +208,9 @@ class GALE(object):
                 if self.model.obj[q].goal(now, before): return True
             return False
 
+        t = time()
         pop = [self.model.genRandomCan() for _ in range(self.np)]
+        self.time_ran_pop += time()-t
         #e = self.tool_print_pop_dist(pop)
         patience = lamb
         for generation in range(max):
@@ -237,7 +240,7 @@ def testw_baseline():
     g = GALE(k_model)
     v = g.gale(lamb=10000)
     pdb.set_trace()
-
+    pdb.
 
 if __name__ == '__main__':
     testw_baseline()

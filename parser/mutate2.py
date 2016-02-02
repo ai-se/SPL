@@ -5,6 +5,7 @@ from Feature_tree import *
 from parser import *
 from copy import *
 from random import *
+from mutate import *
 
 # TESTING FOR ALL KINDS OF MUTATE ENGINES
 # MUTATE WITH BACKTRACKING OF VARIABLES
@@ -16,6 +17,8 @@ class mutateEngine(object):
         self.con_fulfill = [0] * self.ft.getConsNum()
         self.temp_c = [0]*len(self.ft.features)
         self.tem_c_c = [0]*self.ft.getConsNum()
+        self.YESs = []
+        self.NOs  = []
         self.con_repo = deepcopy(self.ft.con)
 
     def refresh(self):
@@ -77,7 +80,7 @@ class mutateEngine(object):
         if a == -1: return True # not set before
         if a != want:
             index =  self.ft.features.index(node)
-            self.temp_c[index] += 1
+            self.temp_c[index] += 1 if want == 0 else 0
             raise Exception('setting conflict')
         else: return False
 
@@ -194,14 +197,29 @@ def unitTest(name):
     m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
     m.printModelInfo()
     engine = mutateEngine(m.ft)
-    for i in range(100):
-        print i
+    start_time = time.time()
+    for i in range(50):
         a  = engine.genValidOne()
         can = candidate(decs = a)
         pdb.set_trace()
-        if not  m.ok(can): pdb.set_trace()
-    #pdb.set_trace()
+    end_time = time.time()
+    print end_time-start_time
+
+def unitTest2(name):
+    m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+    m.printModelInfo()
+    engine = mutateEngine(m.ft)
+    start_time = time.time()
+    for i in range(50):
+        a  = engine.genValidOne()
+        can = candidate(decs = a)
+    end_time = time.time()
+    print end_time-start_time
 
 if __name__ == '__main__':
     #comparePerformance()
-    unitTest('eshop')
+    #unitTest('eshop')
+    #unitTest2('eshop')
+    name = 'eis'
+    unitTest(name)
+    #unitTest2(name)

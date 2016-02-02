@@ -1,7 +1,7 @@
 import pdb,traceback, sys
 import math, random
 import numpy as np
-from GALE import *
+from GALE_timing import *
 import os,sys
 parserdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/parser/'
 sys.path.insert(0,parserdir)
@@ -13,7 +13,9 @@ class BinGALE(GALE):
     def __init__(self, model, np=100):
         self.model = model # FTModel is needed (FTModel is a binary model for SPL)
         self.np = np # initial population size
-
+        self.time_ran_pop = 0
+        self.time_where = 0
+        self.time_mutate = 0
 
     ##################################################
     # Canx  : candidate 1                            #
@@ -79,13 +81,25 @@ def main_find_init_pop_passrate():
 def main_gale_with_spl(name):
     m = FTModel('../feature_tree_data/'+name+'.xml',name, name+'.cost')
     # gale
-    bing = BinGALE(m)
+    import time
+    t = time.time()
+    bing = BinGALE(m,100)
     b = bing.gale()
-    pdb.set_trace()
+    total_time = time.time()-t
+    # print '---time info---'
+    # print 'total time:', total_time*10
+    # print 'random generated pop: ', round(bing.time_ran_pop/total_time*100,2), '%'
+    # print 'where func: ',  round(bing.time_where/total_time*100,2), '%'
+    # print 'mutate func: ', round(bing.time_mutate/total_time*100,2), '%'
+    # print '---the end-----'
+    #pdb.set_trace()
 
 if __name__ == '__main__':
     try:
-        main_gale_with_spl('cellphone')
+        #main_gale_with_spl('cellphone')
+        #main_gale_with_spl('webportal')
+        #main_gale_with_spl('eshop')
+        main_gale_with_spl('eis')
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
