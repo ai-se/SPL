@@ -240,7 +240,6 @@ def testw_baseline():
     g = GALE(k_model)
     v = g.gale(lamb=10000)
     pdb.set_trace()
-    pdb.
 
 if __name__ == '__main__':
     testw_baseline()

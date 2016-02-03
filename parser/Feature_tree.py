@@ -6,7 +6,7 @@ import os
 
 
 class Node(object):
-    def __init__(self, id, parent = None, node_type = 'o'):
+    def __init__(self, id, parent=None, node_type='o'):
         self.id = id
         self.parent = parent
         self.node_type = node_type
@@ -20,9 +20,10 @@ class Node(object):
         self.children.append(node)
 
     def __repr__(self):
-        return '\nid: %s\ntype:%s\n'%(
+        return '\nid: %s\ntype:%s\n' % (
             self.id,
             self.node_type)
+
 
 class Constraint(object):
     def __init__(self, id, literals, literals_pos):
@@ -31,7 +32,7 @@ class Constraint(object):
         self.li_pos = literals_pos
 
     def __repr__(self):
-        return self.id+'\n'+str(self.literals)+'\n'+str(self.li_pos)
+        return self.id + '\n' + str(self.literals) + '\n' + str(self.li_pos)
 
     def iscorrect(self, ft, filledForm):
         for (li, pos) in zip(self.literals, self.li_pos):
@@ -48,22 +49,23 @@ class FeatureTree(object):
         self.leaves = []
         self.con = []
         self.cost = []
+        self.time = []
         self.featureNum = 0
 
-    def set_root(self,root):
+    def set_root(self, root):
         self.root = root
 
-    def add_constraint(self,con):
+    def add_constraint(self, con):
         self.con.append(con)
 
     def find_fea_index_by_id(self, id):
-        for i,x in enumerate(self.features):
+        for i, x in enumerate(self.features):
             if x.id == id:
                 return i
 
     # featch all the features in the tree basing on the children structure
     def set_features_list(self):
-        def setting_feature_list(self,node):
+        def setting_feature_list(self, node):
             if node.node_type == 'g':
                 node.g_u = int(node.g_u) if node.g_u != np.inf else len(node.children)
                 node.g_d = int(node.g_d) if node.g_d != np.inf else len(node.children)
@@ -75,15 +77,15 @@ class FeatureTree(object):
                 self.leaves.append(node)
             for i in node.children:
                 setting_feature_list(self, i)
+
         setting_feature_list(self, self.root)
         self.featureNum = len(self.features)
 
-    def postorder(self, node, func, extraArgs = []):
+    def postorder(self, node, func, extraArgs=[]):
         if node.children:
             for c in node.children:
-                self.postorder(c,func, extraArgs)
+                self.postorder(c, func, extraArgs)
         func(node, *extraArgs)
-
 
     # setting the form by the structure of feature tree
     # leaves should be filled in the form in advanced
@@ -109,15 +111,15 @@ class FeatureTree(object):
                 return
             """
 
-            #handeling the other type of node
-            m_child = [x for x in node.children if x.node_type in ['m','r','g']]
+            # handeling the other type of node
+            m_child = [x for x in node.children if x.node_type in ['m', 'r', 'g']]
             o_child = [x for x in node.children if x.node_type == 'o']
-            if len(m_child) == 0: #all children are optional
+            if len(m_child) == 0:  # all children are optional
                 s = 0
                 for o in o_child:
                     i_index = self.features.index(o)
                     s += form[i_index]
-                form[index] = 1 if s>0 else 0
+                form[index] = 1 if s > 0 else 0
                 return
             for m in m_child:
                 i_index = self.features.index(m)
@@ -135,16 +137,36 @@ class FeatureTree(object):
     def getConsNum(self):
         return len(self.con)
 
-    def _genRandomCost(self,tofile):
-        any=random.random
-        self.cost = [any() for _ in self.features]
-        f = open(tofile, 'w')
-        pickle.dump(self.cost, f)
-        f.close()
+    def _genRandomCost(self, tofile):
+        import numpy.random
+        tmp_list = numpy.random.normal(6.0, 2.0, len(self.features)).tolist()
+        tmp_list = [max(0, i) for i in tmp_list]
+        random.shuffle(tmp_list)
+        self.cost = tmp_list
+        with open(tofile, 'w') as f:
+            pickle.dump(self.cost, f)
 
-    def loadCost(self, fromfile):
+    def _genRandomTime(self, tofile):
+        import numpy.random
+        tmp_list = numpy.random.normal(3.0, 1.0, len(self.features)).tolist()
+        tmp_list = [max(0, i) for i in tmp_list]
+        random.shuffle(tmp_list)
+        self.time = tmp_list
+        with open(tofile, 'w') as f:
+            pickle.dump(self.time, f)
+
+    def loadCost(self, model_name):
+        fromfile = "input/" + model_name + ".cost"
         if not os.path.isfile(fromfile):
             self._genRandomCost(fromfile)
-        f = open(fromfile)
-        self.cost = pickle.load(f)
-        f.close()
+
+        with open(fromfile, 'r') as f:
+            self.cost = pickle.load(f)
+
+    def loadTime(self, model_name):
+        fromfile = "input/" + model_name + ".time"
+        if not os.path.isfile(fromfile):
+            self._genRandomTime(fromfile)
+
+        with open(fromfile, 'r') as f:
+            self.time = pickle.load(f)
