@@ -37,6 +37,7 @@ def clear():
                print junk +' moved'
                os.remove(junk)
 
+
 def main_gale_with_spl(ftm,np):
     if np:
         bing = BinGALE(ftm,np)
@@ -44,11 +45,12 @@ def main_gale_with_spl(ftm,np):
         bing = BinGALE(ftm)
     b = bing.gale()
 
+
 if __name__ == '__main__':
     rungale = True
     model, modelName = './feature_tree_data/cellphone.xml','cell phone'
     np = None
-    for i,arg in enumerate(sys.argv):
+    for i, arg in enumerate(sys.argv):
         if arg in ['-cellphone', '-S']:
             model, modelName = './feature_tree_data/cellphone.xml','cell phone'
         if arg in ['-webportal', '-M']:
