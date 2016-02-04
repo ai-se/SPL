@@ -1,8 +1,10 @@
-import os, sys, random
-import pdb, re
+import sys
+import re
 import xml.etree.ElementTree as ET
 import numpy as np
 from Feature_tree import *
+from os import sys, path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
 from mutate2 import *  # v2 mutate engine
 
@@ -94,10 +96,14 @@ def load_ft_url(url):
 
 # three objectives at this time
 class FTModel(model):
-    def __init__(self, url, name, objnum=3, setConVioAsObj=True):
+    def __init__(self, name, objnum=3, setConVioAsObj=True):
         self.name = name
+
+        spl_addr = [i for i in sys.path if i.endswith('SPL')][0]
+        url = spl_addr + '/feature_tree_data/' + self.name + '.xml'
         self.url = url
         self.ft = load_ft_url(url)
+
         self.ft.loadCost(name)
         self.ft.loadTime(name)
         dec = [Has(l.id, 0, 1) for l in self.ft.leaves]
@@ -166,14 +172,13 @@ class FTModel(model):
             f = self.eval(c, returnFulfill=True)
         return c.scores[1] == 0 and f[0] == 1
 
-    """
-    def genRandomCan(self,guranteeOK = False):
+    def genRandomCanBrute(self,guranteeOK = False):
+        import random
         while True:
-            randBinList = lambda n: [random.randint(0,1) for _ in range(n)]
-            can = candidate(decs=randBinList(len(self.dec)),scores=[])
+            randBinList = lambda n: [random.choice([0, 1]) for _ in range(n)]
+            can = candidate(decs=randBinList(len(self.dec)), scores=[])
             if not guranteeOK or self.ok(can): break
         return can
-    """
 
     """
     Applying v2 mutate engine
@@ -192,7 +197,7 @@ class FTModel(model):
 
 
 def main(name):
-    m = FTModel('../feature_tree_data/' + name + '.xml', name)
+    m = FTModel(name, setConVioAsObj=False)
     m.printModelInfo()
     # can = m.genRandomCan(guranteeOK=True)
     # m.eval(can,doNorm=False)
