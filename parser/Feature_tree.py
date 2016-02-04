@@ -143,7 +143,7 @@ class FeatureTree(object):
         tmp_list = [max(0, i) for i in tmp_list]
         random.shuffle(tmp_list)
         self.cost = tmp_list
-        with open(tofile, 'w') as f:
+        with open(tofile, 'w+') as f:
             pickle.dump(self.cost, f)
 
     def _genRandomTime(self, tofile):
@@ -152,11 +152,14 @@ class FeatureTree(object):
         tmp_list = [max(0, i) for i in tmp_list]
         random.shuffle(tmp_list)
         self.time = tmp_list
-        with open(tofile, 'w') as f:
+        with open(tofile, 'w+') as f:
             pickle.dump(self.time, f)
 
     def loadCost(self, model_name):
-        fromfile = "input/" + model_name + ".cost"
+        import sys
+        spl_addr = [i for i in sys.path if i.endswith('/SPL')][0]
+        fromfile = spl_addr + "/input/" + model_name + ".cost"
+
         if not os.path.isfile(fromfile):
             self._genRandomCost(fromfile)
 
@@ -164,7 +167,10 @@ class FeatureTree(object):
             self.cost = pickle.load(f)
 
     def loadTime(self, model_name):
-        fromfile = "input/" + model_name + ".time"
+        import sys
+        spl_addr = [i for i in sys.path if i.endswith('/SPL')][0]
+        fromfile = spl_addr + "/input/" + model_name + ".time"
+
         if not os.path.isfile(fromfile):
             self._genRandomTime(fromfile)
 
