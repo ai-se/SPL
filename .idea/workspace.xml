@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="19437feb-3279-4340-841f-ed8e71020d68" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/surrogate_testing/__init__.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ropeproject/config.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ropeproject/globalnames" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ropeproject/history" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ropeproject/objectdb" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/parser/Feature_tree.py" afterPath="$PROJECT_DIR$/parser/Feature_tree.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/parser/parser.py" afterPath="$PROJECT_DIR$/parser/parser.py" />
-    </list>
+    <list default="true" id="19437feb-3279-4340-841f-ed8e71020d68" name="Default" comment="" />
     <ignored path="SPL.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
