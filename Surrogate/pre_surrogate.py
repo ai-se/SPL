@@ -30,7 +30,7 @@ def write_random_individuals(name, num_of_individuals=100):
 
 if __name__ == '__main__':
     try:
-        write_random_individuals('eis', 100)
+        write_random_individuals('simple', 100)
     except:
         type, value, tb = sys.exc_info()
         # traceback.print_exc()
