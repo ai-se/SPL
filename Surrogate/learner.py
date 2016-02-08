@@ -49,6 +49,20 @@ def get_cart(name, object_index):
 
     return clf
 
+def _drawTree(name, clf):
+    """
+    temporary function
+    :param name:
+    :param clf:
+    :return:
+    """
+    with open(name+ '.dot','w+') as f:
+        f = tree.export_graphviz(clf, out_file=f)
+    import os
+    os.system("dot -Tpdf " + name + ".dot -o "+ name + ".pdf")
+
 if __name__ == '__main__':
-    ccc = get_cart("simple", 0)
+    name = 'eis'
+    clf = get_cart(name, 0)
+    _drawTree(name, clf)
     pdb.set_trace()
