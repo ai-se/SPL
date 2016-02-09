@@ -18,7 +18,7 @@ class Has(object):
 
     # WARNING: norm does not change the x
     def norm(i,x):
-        return  (x - i.lo) / (i.hi-i.lo+0.00001)
+        return  round((x - i.lo) / (i.hi-i.lo+0.00001),2)
 
 
     def restrain(i,x):

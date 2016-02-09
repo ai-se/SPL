@@ -1,17 +1,17 @@
-import sys
 import re
-import xml.etree.ElementTree as ET
-import numpy as np
+import xml.etree.ElementTree
 from Feature_tree import *
-from os import sys, path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from GALE.model import *
-from mutate2 import *  # v2 mutate engine
+
+__author__ = "Jianfeng Chen"
+__copyright__ = "Copyright (C) 2016 Jianfeng Chen"
+__license__ = "MIT"
+__version__ = "1.0"
+__email__ = "jchen37@ncsu.edu"
 
 
 def load_ft_url(url):
     # load the feature tree and constraints
-    tree = ET.parse(url)
+    tree = xml.etree.ElementTree.parse(url)
     root = tree.getroot()
 
     for child in root:
@@ -92,117 +92,3 @@ def load_ft_url(url):
     ft.set_features_list()
 
     return ft
-
-
-# three objectives at this time
-class FTModel(model):
-    def __init__(self, name, objnum=3, setConVioAsObj=True):
-        self.name = name
-
-        spl_addr = [i for i in sys.path if i.endswith('SPL')][0]
-        url = spl_addr + '/feature_tree_data/' + self.name + '.xml'
-        self.url = url
-        self.ft = load_ft_url(url)
-
-        self.ft.loadCost(name)
-        self.ft.loadTime(name)
-        dec = [Has(l.id, 0, 1) for l in self.ft.leaves]
-
-        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum - len(self.ft.groups), goal=lt)] #number of NOT included features
-        if setConVioAsObj:
-            obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con), goal=lt))
-        if len(obj) < objnum:
-            obj.append(Has(name='cost', lo=0, hi=sum(self.ft.cost), goal=lt))
-        if len(obj) < objnum:
-            obj.append(Has(name='time', lo=0, hi=sum(self.ft.time), goal=lt))
-
-        self.mutateEngine2 = mutateEngine(self.ft)  # TODO setting the mutate engine!!!
-        model.__init__(self, dec, obj)
-
-    def eval(self, c, doNorm=True, returnFulfill=False):
-        t = self.ft  # abbr.
-        sol = c.decs
-
-        # obj1: features numbers
-        # initialize the fulfill list
-        fulfill = [-1] * t.featureNum
-        for i, l in enumerate(t.leaves):
-            fulfill[t.features.index(l)] = sol[i]
-
-        # fill other tree elements
-        t.fillForm4AlFea(fulfill)
-
-        # here group should not count as feature
-        gsum = 0
-        for g in t.groups:
-            gsum += fulfill[t.features.index(g)]
-        obj1 = sum(fulfill) - gsum
-
-        # obj2: constraint violation
-        obj2 = 0
-        for cc in t.con:
-            if cc.iscorrect(t, fulfill):
-                obj2 += 1
-        obj2 = len(t.con) - obj2
-
-        # obj3: total cost
-        obj3 = 0
-        for i, f in enumerate(t.features):
-            if fulfill[i] == 1 and f.node_type != 'g':
-                obj3 += t.cost[i]
-
-        c.scores = [obj1, obj2, obj3]
-        if doNorm:
-            self.normObjs(c)
-
-        if returnFulfill:
-            return fulfill
-        else:
-            return None
-
-    """
-    checking whether the candidate meets ALL constraints
-    """
-
-    def ok(self, c):
-        try:
-            # if c.scores == []:
-            f = self.eval(c, returnFulfill=True)
-        except:
-            f = self.eval(c, returnFulfill=True)
-        return c.scores[1] == 0 and f[0] == 1
-
-    def genRandomCanBrute(self,guranteeOK = False):
-        import random
-        while True:
-            randBinList = lambda n: [random.choice([0, 1]) for _ in range(n)]
-            can = candidate(decs=randBinList(len(self.dec)), scores=[])
-            if not guranteeOK or self.ok(can): break
-        return can
-
-    """
-    Applying v2 mutate engine
-    """
-
-    def genRandomCan(self, guranteeOK=False):
-        return candidate(decs=self.mutateEngine2.genValidOne(), scores=[])
-
-    def printModelInfo(self):
-        print '---Information for SPL--------'
-        print 'Name:', self.name
-        print 'Leaves #:', len(self.ft.leaves)
-        print 'Total Features #:', self.ft.featureNum - len(self.ft.groups)
-        print 'Constraints#:', len(self.ft.con)
-        print '-' * 30
-
-
-def main(name):
-    m = FTModel(name, setConVioAsObj=False)
-    m.printModelInfo()
-    # can = m.genRandomCan(guranteeOK=True)
-    # m.eval(can,doNorm=False)
-    pdb.set_trace()
-
-
-if __name__ == '__main__':
-    main('eshop')

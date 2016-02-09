@@ -1,7 +1,7 @@
 import pdb
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from Parser.parser import FTModel
+from Parser.ftmodel import FTModel
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -10,13 +10,28 @@ __version__ = "1.0"
 __email__ = "jchen37@ncsu.edu"
 
 
-def main(name):
-    m = FTModel(name, setConVioAsObj=False)
-    m.printModelInfo()
-    # can = m.genRandomCan(guranteeOK=True)
-    # m.eval(can,doNorm=False)
-    pdb.set_trace()
-
+def write_random_individuals(name, num_of_individuals=100):
+    ft_model = FTModel(name, num_of_attached_objs=2, setConVioAsObj=True)
+    cans = [ft_model.genRandomCanBrute() for _ in range(num_of_individuals)]
+    map(ft_model.eval, cans)
+    # write the candidates to folder surrogate_testing
+    spl_addr = [i for i in sys.path if i.endswith('SPL')][0]
+    with open(spl_addr+'/surrogate_data/' + name + '.raw', 'w+') as f:
+        dec_head = ['>' + i.name for i in ft_model.dec]
+        obj_head = ['$' + i.name for i in ft_model.obj]
+        head = ','.join(dec_head) + ',' + ','.join(obj_head)
+        f.write(head)
+        f.write('\n')
+        for can in cans:
+            f.write(','.join(map(str, can.decs)))
+            f.write(',')
+            f.write(','.join(map(str, can.scores)))
+            f.write('\n')
 
 if __name__ == '__main__':
-    main('eshop')
+    try:
+        write_random_individuals('simple', 100)
+    except:
+        type, value, tb = sys.exc_info()
+        # traceback.print_exc()
+        # pdb.post_mortem(tb)
