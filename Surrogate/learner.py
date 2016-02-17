@@ -33,6 +33,7 @@ def get_cart(name, object_index):
     # counting the decs# and objs#
     dec_num = len([i for i in head if i.startswith('>')])
     obj_num = len([i for i in head if i.startswith('$')])
+    #pdb.set_trace()
 
     assert 0 <= object_index < obj_num, "error: check object_index again"
 
@@ -49,6 +50,7 @@ def get_cart(name, object_index):
 
     return clf
 
+
 def _drawTree(name, clf):
     """
     temporary function
@@ -63,6 +65,6 @@ def _drawTree(name, clf):
 
 if __name__ == '__main__':
     name = 'eis'
-    clf = get_cart(name, 0)
+    clf = get_cart(name, 2)
     _drawTree(name, clf)
     pdb.set_trace()
