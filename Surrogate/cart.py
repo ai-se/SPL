@@ -24,7 +24,7 @@ class CART(object):
                 assert 'X' in self._info_dict.keys(), "set up cart node determined X"
                 assert 'op' in self._info_dict.keys(), "set up the operator"
                 assert 'op_right' in self._info_dict.keys(), "set up op right"
-            assert 'mse' in self._info_dict.keys(), "set up card node mse"
+            assert 'mse' in self._info_dict.keys(), "set up cart node mse"
             assert 'samples' in self._info_dict.keys(), "set up number of samples"
             assert 'value' in self._info_dict.keys(), "set up the value"
 
@@ -110,10 +110,10 @@ class CART(object):
                     'is_leaf': False,
                     'X': int(grouped_record_info.group(2)),
                     'op': grouped_record_info.group(3),
-                    'op_right': grouped_record_info.group(4),
-                    'mse': grouped_record_info.group(5),
-                    'samples': grouped_record_info.group(6),
-                    'value': grouped_record_info.group(7)
+                    'op_right': float(grouped_record_info.group(4)),
+                    'mse': float(grouped_record_info.group(5)),
+                    'samples': int(grouped_record_info.group(6)),
+                    'value': float(grouped_record_info.group(7))
                 }
                 self.nodes.append(self.CartNode(temp_info_dict))
                 assert len(self.nodes)-1 == int(grouped_record_info.group(1)), "cannot use append?"
@@ -123,9 +123,9 @@ class CART(object):
             if grouped_record_info:  # leaf node found
                 temp_info_dict = {
                     'is_leaf': True,
-                    'mse': grouped_record_info.group(2),
-                    'samples': grouped_record_info.group(3),
-                    'value': grouped_record_info.group(4)
+                    'mse': float(grouped_record_info.group(2)),
+                    'samples': int(grouped_record_info.group(3)),
+                    'value': float(grouped_record_info.group(4))
                 }
                 self.nodes.append(self.CartNode(temp_info_dict))
                 assert len(self.nodes)-1 == int(grouped_record_info.group(1)), "cannot use append?"
@@ -137,8 +137,9 @@ class CART(object):
 
 
 def test():
-    c = CART('simple')
-    c._load_dot_file()
+    ca = CART('eis')
+    ca._load_dot_file()
+    # print c.nodes[2].testing([2,1,0,3,4])
     pdb.set_trace()
 
 if __name__ == '__main__':

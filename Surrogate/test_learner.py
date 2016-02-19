@@ -36,7 +36,9 @@ def confirm_precise(name, writeReport=False):
 
     # prepare for the report
     if writeReport:
-        report_file = open(spl_addr + '/report/' + name + '_cart_precise_test.report', 'w+')
+        report_file = open(spl_addr + '/report/' + name + '_cart_precise_test.report', 'a+')
+        import time
+        report_file.write('REPORT TIME: ' + time.strftime("%m-%d-%Y %H:%M") + '\n')
 
     # counting the decs# and objs#
     dec_num = len([i for i in head if i.startswith('>')])
@@ -74,11 +76,20 @@ def confirm_precise(name, writeReport=False):
         if writeReport:
             report_file.write(report)
             report_file.write('\n')
+
         print report
 
     if writeReport:
+        report_file.write('*'*10)
+        report_file.write('\n')
         report_file.close()
 
 if __name__ == '__main__':
-    confirm_precise("simple", writeReport=True)
-    pdb.set_trace()
+    from pre_surrogate import *
+    from learner import *
+    name = 'eshop'
+    write_random_individuals(name, 500)
+    clf = get_cart(name, 2)
+    drawTree(name, clf)
+    confirm_precise(name, writeReport=True)
+    # pdb.set_trace()

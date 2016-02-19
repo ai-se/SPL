@@ -138,14 +138,16 @@ class FeatureTree(object):
         return len(self.con)
 
     def _genRandomCost(self, tofile):
-        tmp_list = [random.uniform(1, 10) for _ in range(len(self.features))]
+        tmp_list = [random.uniform(1, 10) * (i % 3+1) for i in range(len(self.features))]
+        # note to upper line: try to diverse the data
         random.shuffle(tmp_list)
         self.cost = tmp_list
         with open(tofile, 'w+') as f:
             pickle.dump(self.cost, f)
 
     def _genRandomTime(self, tofile):
-        tmp_list = [random.uniform(5, 15) for _ in range(len(self.features))]
+        tmp_list = [random.uniform(5, 15) * (i % 4+1) for i in range(len(self.features))]
+        # note to upper line: try to diverse the data
         random.shuffle(tmp_list)
         self.time = tmp_list
         with open(tofile, 'w+') as f:

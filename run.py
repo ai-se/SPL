@@ -28,12 +28,14 @@ ftm = None
 spldata = None
 
 def clear():
-   junkType = ['pyc','cost']
+   junkType = ['pyc','cost', 'raw', 'dot', 'time', 'png']
    for x in os.walk(currentpath):
        path = x[0]
        if '.' in path: continue
        for type in junkType:
            for junk in glob.glob(path+'/*.'+type):
+               if 'surrogate_data' not in junk and 'png' in junk:
+                   continue  # avoid deleting the pictures in report
                print junk +' moved'
                os.remove(junk)
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
             spldata = currentpath+'/input/'+sys.argv[i+1]+'.cost'
         if arg == '-np':
             np = int(sys.argv[i+1])
-        if arg in ['-clear','-clean']:
+        if arg in ['-clear', '-clean', '-cls']:
             clear()
             os._exit(0)
         if arg == '-nodebug':
