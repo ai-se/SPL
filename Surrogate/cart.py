@@ -1,6 +1,7 @@
 from __future__ import division
 import pdb
 import re
+import traceback
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
@@ -13,16 +14,50 @@ __email__ = "jchen37@ncsu.edu"
 
 
 class CART(object):
-    class cart_node(object):
-        def __init__(self, info_dict, parent_index, true_hand_child_index=-1, false_hand_child_index=-1):
-            self.info_dict = info_dict
-            assert self.info_dict['is_leaf'], "please claim whether this is a leaf"
+    class CartNode(object):
+        def __init__(self, info_dict, parent_index=-1, true_hand_child_index=-1, false_hand_child_index=-1):
+            self._info_dict = info_dict
 
-            assert self.info_dict['X'], "please set up cart node determined X"
-            assert self.info_dict[]
+            # safe checking
+            assert 'is_leaf' in self._info_dict.keys(), "claim whether this is a leaf"
+            if not self._info_dict['is_leaf']:
+                assert 'X' in self._info_dict.keys(), "set up cart node determined X"
+                assert 'op' in self._info_dict.keys(), "set up the operator"
+                assert 'op_right' in self._info_dict.keys(), "set up op right"
+            assert 'mse' in self._info_dict.keys(), "set up card node mse"
+            assert 'samples' in self._info_dict.keys(), "set up number of samples"
+            assert 'value' in self._info_dict.keys(), "set up the value"
+
+            self.is_leaf = self._info_dict['is_leaf']
+            self.parent_index = parent_index  # note: set parent of root -1
+            if not self.is_leaf:
+                self.true_child_index = true_hand_child_index
+                self.false_child_index = false_hand_child_index
+
+        def testing(self, x_list):
+            """
+            given the list of X, determine go to True, or go to false
+            :param x_list:
+            :return: boolean result
+            """
+            fetch = x_list[self._info_dict['X']]
+            right = self._info_dict['op_right']
+            op = self._info_dict['op']
+            if op == '<':
+                return fetch < right
+            if op == '<=':
+                return fetch <= right
+            if op in ['=', '==']:
+                return fetch == right
+            if op == '>':
+                return fetch > right
+            if op == '>=':
+                return fetch >= right
 
     def __init__(self, name_of_model):
         self.model_name = name_of_model
+        self.root = None
+        self.nodes = []
 
     def _load_dot_file(self):
         # read the dot file
@@ -55,19 +90,61 @@ class CART(object):
                                        r'.*')
 
         for record in records:
+            if len(record) <= 1 or (not record[0].isdigit()):  # useless info
+                continue
+
             grouped_record_info = connection_pattern.match(record)
-            if grouped_record_info:
-                continue  # TODO connection found
+            if grouped_record_info:  # connection found
+                start = int(grouped_record_info.group(1))
+                end = int(grouped_record_info.group(2))
+                self.nodes[end].parent_index = start
+                if self.nodes[start].true_child_index == -1:
+                    self.nodes[start].true_child_index = end
+                else:
+                    self.nodes[start].false_child_index = end
+                continue
 
             grouped_record_info = non_leaf_node_pattern.match(record)
-            if grouped_record_info:
-                continue  # TODO non-leaf node found
+            if grouped_record_info:  # non-leaf node found
+                temp_info_dict = {
+                    'is_leaf': False,
+                    'X': int(grouped_record_info.group(2)),
+                    'op': grouped_record_info.group(3),
+                    'op_right': grouped_record_info.group(4),
+                    'mse': grouped_record_info.group(5),
+                    'samples': grouped_record_info.group(6),
+                    'value': grouped_record_info.group(7)
+                }
+                self.nodes.append(self.CartNode(temp_info_dict))
+                assert len(self.nodes)-1 == int(grouped_record_info.group(1)), "cannot use append?"
+                continue
 
             grouped_record_info = leaf_node_pattern.match(record)
-            if grouped_record_info:
-                continue  # TODO leaf node found
+            if grouped_record_info:  # leaf node found
+                temp_info_dict = {
+                    'is_leaf': True,
+                    'mse': grouped_record_info.group(2),
+                    'samples': grouped_record_info.group(3),
+                    'value': grouped_record_info.group(4)
+                }
+                self.nodes.append(self.CartNode(temp_info_dict))
+                assert len(self.nodes)-1 == int(grouped_record_info.group(1)), "cannot use append?"
+                continue
+
+            assert False, "errors in matching" + record
+
+        self.root = self.nodes[0]
 
 
-        return False
+def test():
+    c = CART('simple')
+    c._load_dot_file()
+    pdb.set_trace()
 
-pdb.set_trace()
+if __name__ == '__main__':
+    try:
+        test()
+    except:
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        pdb.post_mortem(tb)
