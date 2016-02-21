@@ -12,6 +12,7 @@ __license__ = "MIT"
 __version__ = "1.0"
 __email__ = "jchen37@ncsu.edu"
 
+project_path = [i for i in sys.path if i.endswith('SPL')][0]
 
 def get_cart(name, object_index):
     """
@@ -22,8 +23,7 @@ def get_cart(name, object_index):
     :return:
     """
     # load the learning material
-    spl_addr = [i for i in sys.path if i.endswith('SPL')][0]
-    with open(spl_addr + '/surrogate_data/' + name + '.raw') as f:
+    with open(project_path + '/surrogate_data/' + name + '.raw') as f:
         reader = csv.reader(f)
         head = reader.next()
         all_data = []
@@ -33,6 +33,7 @@ def get_cart(name, object_index):
     # counting the decs# and objs#
     dec_num = len([i for i in head if i.startswith('>')])
     obj_num = len([i for i in head if i.startswith('$')])
+    #pdb.set_trace()
 
     assert 0 <= object_index < obj_num, "error: check object_index again"
 
@@ -49,20 +50,28 @@ def get_cart(name, object_index):
 
     return clf
 
-def _drawTree(name, clf):
+
+def drawTree(name, clf, drawPng=False, drawPdf=False):
     """
     temporary function
     :param name:
     :param clf:
     :return:
     """
-    with open(name+ '.dot','w+') as f:
+
+    with open(project_path + '/surrogate_data/' + name + '.dot','w+') as f:
         f = tree.export_graphviz(clf, out_file=f)
-    import os
-    os.system("dot -Tpdf " + name + ".dot -o "+ name + ".pdf")
+    if drawPdf:
+        import os
+        os.system("dot -Tpdf " + project_path + '/surrogate_data/' + name + ".dot -o " +
+                  project_path + '/surrogate_data/' + name + ".pdf")
+    if drawPng:
+        import os
+        os.system("dot -Tpng " + project_path + '/surrogate_data/' + name + ".dot -o " +
+                  project_path + '/surrogate_data/' + name + ".png")
 
 if __name__ == '__main__':
-    name = 'eis'
-    clf = get_cart(name, 0)
-    _drawTree(name, clf)
+    name = 'simple'
+    clf = get_cart(name, 2)
+    drawTree(name, clf)
     pdb.set_trace()
