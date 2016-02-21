@@ -15,7 +15,7 @@ __email__ = "jchen37@ncsu.edu"
 
 class CART(object):
     class CartNode(object):
-        def __init__(self, info_dict, parent_index=-1, true_hand_child_index=-1, false_hand_child_index=-1):
+        def __init__(self, info_dict, parent_index=-1, true_hand_child=None, false_hand_child=None):
             self._info_dict = info_dict
 
             # safe checking
@@ -29,10 +29,13 @@ class CART(object):
             assert 'value' in self._info_dict.keys(), "set up the value"
 
             self.is_leaf = self._info_dict['is_leaf']
+            self.value = self._info_dict['value']
+            self.mse = self._info_dict['mse']
+            self.samples = self._info_dict['samples']
             self.parent_index = parent_index  # note: set parent of root -1
             if not self.is_leaf:
-                self.true_child_index = true_hand_child_index
-                self.false_child_index = false_hand_child_index
+                self.true_child = true_hand_child
+                self.false_child = false_hand_child
 
         def testing(self, x_list):
             """
@@ -58,6 +61,7 @@ class CART(object):
         self.model_name = name_of_model
         self.root = None
         self.nodes = []
+        self._load_dot_file()
 
     def _load_dot_file(self):
         # read the dot file
@@ -98,10 +102,10 @@ class CART(object):
                 start = int(grouped_record_info.group(1))
                 end = int(grouped_record_info.group(2))
                 self.nodes[end].parent_index = start
-                if self.nodes[start].true_child_index == -1:
-                    self.nodes[start].true_child_index = end
+                if not self.nodes[start].true_child:
+                    self.nodes[start].true_child = self.nodes[end]
                 else:
-                    self.nodes[start].false_child_index = end
+                    self.nodes[start].false_child = self.nodes[end]
                 continue
 
             grouped_record_info = non_leaf_node_pattern.match(record)
@@ -135,11 +139,29 @@ class CART(object):
 
         self.root = self.nodes[0]
 
+    def prune(self, remaining_rate=0.3, less_is_more=True):
+        """
+        prune the decision tree. Prune start from the leaves. Remove one node if its leaf&right child have both been
+        removed. (this process will do recursively)
+        :param remaining_rate:
+        :param less_is_more:
+        :return:
+        """
+        leaf_values = [node.value for node in ca.nodes if node.is_leaf]
+        cutting_cursor = min(max(int(len(leaf_values)*remaining_rate), 0), len(leaf_values)-1)
+        cut = sorted(leaf_values, reverse=not less_is_more)[cutting_cursor]
+        for node in self.nodes:
+            if node.is_leaf:
+                if (node.value <= cut and less_is_more) or (node.value >= cut and not less_is_more):
+                    continue
+                # TODO delete the node and remove the pointer at parent node
+
+
+
 
 def test():
-    ca = CART('eis')
-    ca._load_dot_file()
-    # print c.nodes[2].testing([2,1,0,3,4])
+    cart = CART('webportal')
+    # cart.prune()
     pdb.set_trace()
 
 if __name__ == '__main__':

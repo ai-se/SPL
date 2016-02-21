@@ -51,7 +51,7 @@ def get_cart(name, object_index):
     return clf
 
 
-def drawTree(name, clf, drawPng=False):
+def drawTree(name, clf, drawPng=False, drawPdf=False):
     """
     temporary function
     :param name:
@@ -61,6 +61,10 @@ def drawTree(name, clf, drawPng=False):
 
     with open(project_path + '/surrogate_data/' + name + '.dot','w+') as f:
         f = tree.export_graphviz(clf, out_file=f)
+    if drawPdf:
+        import os
+        os.system("dot -Tpdf " + project_path + '/surrogate_data/' + name + ".dot -o " +
+                  project_path + '/surrogate_data/' + name + ".pdf")
     if drawPng:
         import os
         os.system("dot -Tpng " + project_path + '/surrogate_data/' + name + ".dot -o " +
