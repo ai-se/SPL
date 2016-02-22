@@ -2,6 +2,7 @@ from __future__ import division
 import pdb
 import re
 import traceback
+import logging
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
@@ -15,7 +16,7 @@ __email__ = "jchen37@ncsu.edu"
 
 class CART(object):
     class CartNode(object):
-        def __init__(self, info_dict, parent_index=-1, true_hand_child=None, false_hand_child=None):
+        def __init__(self, info_dict, parent=None, true_hand_child=None, false_hand_child=None):
             self._info_dict = info_dict
 
             # safe checking
@@ -32,7 +33,7 @@ class CART(object):
             self.value = self._info_dict['value']
             self.mse = self._info_dict['mse']
             self.samples = self._info_dict['samples']
-            self.parent_index = parent_index  # note: set parent of root -1
+            self.parent = parent  # note: set parent of root None
             if not self.is_leaf:
                 self.true_child = true_hand_child
                 self.false_child = false_hand_child
@@ -101,7 +102,7 @@ class CART(object):
             if grouped_record_info:  # connection found
                 start = int(grouped_record_info.group(1))
                 end = int(grouped_record_info.group(2))
-                self.nodes[end].parent_index = start
+                self.nodes[end].parent = self.nodes[start]
                 if not self.nodes[start].true_child:
                     self.nodes[start].true_child = self.nodes[end]
                 else:
@@ -139,7 +140,7 @@ class CART(object):
 
         self.root = self.nodes[0]
 
-    def prune(self, remaining_rate=0.3, less_is_more=True):
+    def prune(self, remaining_rate=0.9, less_is_more=True):
         """
         prune the decision tree. Prune start from the leaves. Remove one node if its leaf&right child have both been
         removed. (this process will do recursively)
@@ -147,25 +148,60 @@ class CART(object):
         :param less_is_more:
         :return:
         """
-        leaf_values = [node.value for node in ca.nodes if node.is_leaf]
+        leaf_values = [node.value for node in self.nodes if node.is_leaf]
         cutting_cursor = min(max(int(len(leaf_values)*remaining_rate), 0), len(leaf_values)-1)
         cut = sorted(leaf_values, reverse=not less_is_more)[cutting_cursor]
+
+        logging.info("Pruning the CART...")
+        logging.info("before prune, node #: "+str(len(self.nodes)))
+
+        to_remove_node = []
         for node in self.nodes:
             if node.is_leaf:
                 if (node.value <= cut and less_is_more) or (node.value >= cut and not less_is_more):
                     continue
-                # TODO delete the node and remove the pointer at parent node
 
+                if node.parent.true_child == node:
+                    node.parent.true_child = None
+                else:
+                    node.parent.false_child = None
+                to_remove_node.append(node)
 
+        for kill_node in to_remove_node:
+            self.nodes.remove(kill_node)
+
+        logging.info('inter # '+str(len(self.nodes)))
+
+        to_remove_node = ['just_to_start!']
+        while to_remove_node:
+            to_remove_node = []
+            for node in self.nodes[1:]:
+                if (hasattr(node, 'true_child') and node.true_child) or \
+                        (hasattr(node, 'false_child') and node.false_child) or \
+                        node.is_leaf:
+                    continue
+
+                # releasing this node
+                if hasattr(node.parent, 'true_child') and node.parent.true_child == node:
+                    node.parent.true_child = None
+                else:
+                    node.parent.false_child = None
+                to_remove_node.append(node)
+
+            for kill_node in to_remove_node:
+                self.nodes.remove(kill_node)
+
+        logging.info("after prune, node #: "+ str(len(self.nodes)))
+        pdb.set_trace()
 
 
 def test():
-    cart = CART('webportal')
-    # cart.prune()
-    pdb.set_trace()
+    cart = CART('simple')
+    cart.prune()
 
 if __name__ == '__main__':
     try:
+        logging.basicConfig(level=logging.DEBUG, format='Line %(lineno)d info:  %(message)s')
         test()
     except:
         type, value, tb = sys.exc_info()

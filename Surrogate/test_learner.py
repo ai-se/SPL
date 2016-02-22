@@ -87,9 +87,9 @@ def confirm_precise(name, writeReport=False):
 if __name__ == '__main__':
     from pre_surrogate import *
     from learner import *
-    name = 'webportal'
+    name = 'simple'
     write_random_individuals(name, 500, contain_non_leaf=True)
     clf = get_cart(name, 0)
-    drawTree(name, clf, drawPng=True)
+    drawTree(name, clf, drawPdf=True)
     confirm_precise(name, writeReport=True)
     # pdb.set_trace()
