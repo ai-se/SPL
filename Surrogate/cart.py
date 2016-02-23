@@ -35,6 +35,7 @@ class CART(object):
             self.samples = self._info_dict['samples']
             self.parent = parent  # note: set parent of root None
             if not self.is_leaf:
+                self.x = int(self._info_dict['X'])
                 self.true_child = true_hand_child
                 self.false_child = false_hand_child
 
@@ -58,16 +59,16 @@ class CART(object):
             if op == '>=':
                 return fetch >= right
 
-    def __init__(self, name_of_model):
+    def __init__(self, name_of_model, obj_index=0):
         self.model_name = name_of_model
         self.root = None
         self.nodes = []
-        self._load_dot_file()
+        self._load_dot_file(obj_index)
 
-    def _load_dot_file(self):
+    def _load_dot_file(self, obj_index):
         # read the dot file
         records = []
-        with open(project_path + '/surrogate_data/' + self.model_name + '.dot', 'r') as f:
+        with open("%s/surrogate_data/%s_%d.dot" % (project_path, self.model_name, obj_index), 'r') as f:
             for record in f:
                 records.append(record[:-1])  # ignore the final \n
 
@@ -152,8 +153,8 @@ class CART(object):
         cutting_cursor = min(max(int(len(leaf_values)*remaining_rate), 0), len(leaf_values)-1)
         cut = sorted(leaf_values, reverse=not less_is_more)[cutting_cursor]
 
-        logging.info("Pruning the CART...")
-        logging.info("before prune, node #: "+str(len(self.nodes)))
+        logging.debug("Pruning the CART...")
+        logging.debug("before prune, node #: "+str(len(self.nodes)))
 
         to_remove_nodes = []
         for node in self.nodes:
@@ -171,7 +172,7 @@ class CART(object):
         for kill_node in to_remove_nodes:
             self.nodes.remove(kill_node)
 
-        logging.info('inter # '+str(len(self.nodes)))
+        logging.debug('inter # '+str(len(self.nodes)))
 
         # recursively delete the bad subtree
         to_remove_nodes = ['just_to_start!']
@@ -193,13 +194,79 @@ class CART(object):
             for kill_node in to_remove_nodes:
                 self.nodes.remove(kill_node)
 
-        logging.info("after prune, node #: " + str(len(self.nodes)))
+        logging.debug("after prune, node #: " + str(len(self.nodes)))
         # pdb.set_trace()
+
+    def get_bad_paths(self):
+        """
+        this function should be called after pruned.
+        return the paths which have been pruned, that is the bad paths
+        :return: list of bad paths. each path expressed as [True,False,False...]
+        """
+
+        def find_full_path_from_end(self, end_node, end_node_direction):
+            path = [end_node_direction]
+            parent = end_node.parent
+
+            while end_node is not self.root:
+                if hasattr(parent, 'true_child') and parent.true_child is end_node:
+                    end_node_direction = True
+                else:
+                    end_node_direction = False
+                path.insert(0, end_node_direction)
+
+                end_node = parent
+                parent = end_node.parent
+
+            return path
+
+        bad_paths = []
+        for node in self.nodes:
+            if (hasattr(node, 'true_child') and node.true_child and hasattr(node, 'false_child') and node.false_child) \
+                    or node.is_leaf:
+                continue
+            direction = hasattr(node, 'true_child') and node.true_child
+            bad_paths.append(find_full_path_from_end(self, node, not direction))
+
+        return bad_paths
+
+    def translate_into_binary_list(self, bad_paths, x_list_length):
+        """
+        translate the standard bad paths into binary list. -1 in the binary list indicates no information provides.
+        :param bad_paths:
+        :param x_list_length:
+        :return:
+        """
+
+        if type(bad_paths) is not list:
+            bad_paths = [bad_paths]
+
+        binary_bad_paths = []
+        for bad_path in bad_paths:
+            binary_bad_path = [-1] * x_list_length
+            current_node = self.root
+            for direction_cursor in bad_path:
+                tmp_x = current_node.x
+                binary_bad_path[tmp_x] = 1
+                if not (current_node.testing(binary_bad_path) == direction_cursor):
+                    binary_bad_path[tmp_x] = 0
+
+                if direction_cursor:
+                    current_node = current_node.true_child
+                else:
+                    current_node = current_node.false_child
+
+            binary_bad_paths.append(binary_bad_path)
+
+        return binary_bad_paths
 
 
 def test():
-    cart = CART('webportal')
+    cart = CART('simple')
     cart.prune()
+    ww = cart.get_bad_path()
+    qq = cart.translate_into_binary_list(ww, 10)
+    pdb.set_trace()
 
 if __name__ == '__main__':
     try:
