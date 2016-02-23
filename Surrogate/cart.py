@@ -10,7 +10,7 @@ project_path = [i for i in sys.path if i.endswith('SPL')][0]
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.0"
+__version__ = "1.2"
 __email__ = "jchen37@ncsu.edu"
 
 
@@ -140,7 +140,7 @@ class CART(object):
 
         self.root = self.nodes[0]
 
-    def prune(self, remaining_rate=0.9, less_is_more=True):
+    def prune(self, remaining_rate=0.3, less_is_more=True):
         """
         prune the decision tree. Prune start from the leaves. Remove one node if its leaf&right child have both been
         removed. (this process will do recursively)
@@ -155,7 +155,7 @@ class CART(object):
         logging.info("Pruning the CART...")
         logging.info("before prune, node #: "+str(len(self.nodes)))
 
-        to_remove_node = []
+        to_remove_nodes = []
         for node in self.nodes:
             if node.is_leaf:
                 if (node.value <= cut and less_is_more) or (node.value >= cut and not less_is_more):
@@ -165,16 +165,18 @@ class CART(object):
                     node.parent.true_child = None
                 else:
                     node.parent.false_child = None
-                to_remove_node.append(node)
+                to_remove_nodes.append(node)
 
-        for kill_node in to_remove_node:
+        # delete the bad leaves
+        for kill_node in to_remove_nodes:
             self.nodes.remove(kill_node)
 
         logging.info('inter # '+str(len(self.nodes)))
 
-        to_remove_node = ['just_to_start!']
-        while to_remove_node:
-            to_remove_node = []
+        # recursively delete the bad subtree
+        to_remove_nodes = ['just_to_start!']
+        while to_remove_nodes:
+            to_remove_nodes = []
             for node in self.nodes[1:]:
                 if (hasattr(node, 'true_child') and node.true_child) or \
                         (hasattr(node, 'false_child') and node.false_child) or \
@@ -186,17 +188,17 @@ class CART(object):
                     node.parent.true_child = None
                 else:
                     node.parent.false_child = None
-                to_remove_node.append(node)
+                to_remove_nodes.append(node)
 
-            for kill_node in to_remove_node:
+            for kill_node in to_remove_nodes:
                 self.nodes.remove(kill_node)
 
-        logging.info("after prune, node #: "+ str(len(self.nodes)))
-        pdb.set_trace()
+        logging.info("after prune, node #: " + str(len(self.nodes)))
+        # pdb.set_trace()
 
 
 def test():
-    cart = CART('simple')
+    cart = CART('webportal')
     cart.prune()
 
 if __name__ == '__main__':
@@ -207,3 +209,4 @@ if __name__ == '__main__':
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         pdb.post_mortem(tb)
+

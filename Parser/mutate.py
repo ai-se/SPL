@@ -5,6 +5,7 @@ from Feature_tree import *
 from parser import *
 from copy import *
 from random import *
+from ftmodel import *
 
 # TESTING FOR ALL KINDS OF MUTATE ENGINES
 
