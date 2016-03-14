@@ -46,14 +46,26 @@ class MutateWithSurrogateEngine(object):
         result_set.sort()
         return list(result_set for result_set,_ in itertools.groupby(result_set))
 
-    def mutate(self):
+    def genValidOne(self, returnFulfill=True):
         # TODO core function
-        return 0
+        return self, returnFulfill
 
 if __name__ == '__main__':
+    import time
     try:
-        logging.basicConfig(level=logging.INFO, format='Line %(lineno)d at %(filename)s:\t %(message)s')
-        MutateWithSurrogateEngine('simple')
+        logging.basicConfig(level=logging.CRITICAL, format='Line %(lineno)d at %(filename)s:\t %(message)s')
+        to_test_models = ['simple', 'webportal', 'cellphone', 'eshop', 'eis']
+        for model in to_test_models:
+            start_time = time.time()
+            engine = MutateWithSurrogateEngine(model)
+            end_time = time.time()
+            pdb.set_trace()
+            print model
+            print 'init time: %d'% (end_time - start_time)
+            print 'Decision num: %d' % engine.ft_model.decNum
+            print 'Bad paths num: %d' % len(engine.avoid_paths)
+            print '*' * 8
+        pdb.set_trace()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
