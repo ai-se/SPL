@@ -6,6 +6,7 @@ from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.parser import *
+from FeatureModel.discoverer import Discoverer
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
 
 __author__ = "Jianfeng Chen"
@@ -15,11 +16,12 @@ __version__ = "1.0"
 __email__ = "jchen37@ncsu.edu"
 
 
-class MutateWithSurrogateEngine(object):
-    def __init__(self, name):
+class MutateWithSurrogateEngine(Discoverer):
+    def __init__(self, feature_model):
         # load the model
-        self.ft_model = FTModel(name)
+        self.ft_model = feature_model
         self.ft_tree = self.ft_model.ft
+        name = self.ft_model.name
         logging.info("model %s load successfully." % name)
 
         # get one decision tree for each objective and prune them
@@ -77,13 +79,13 @@ class MutateWithSurrogateEngine(object):
         pdb.set_trace()
         pass
 
-    def genValidOne(self, returnFulfill=True):
+    def gen_valid_one(self):
         filled_list = [-1] * self.ft_tree.featureNum
         filled_list[0] = 1  # let root be 1
         self.mutateNode(self.ft_tree.root, filled_list)
 
         pdb.set_trace()
-        return self, returnFulfill
+        # TODO ...
 
 
 def test_one_model(model):

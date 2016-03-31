@@ -13,10 +13,9 @@ __email__ = "jchen37@ncsu.edu"
 
 class BruteDiscoverer(Discoverer):
     def __init__(self, ft_model):
-        super(self)
         self.ft_model = ft_model
 
-    def gen_valid_one(self, return_fulfill=False, valid_sure=True):
+    def gen_valid_one(self, valid_sure=True):
         def rand_list(n):
             return [choice([0, 1]) for _ in range(n)]
 
@@ -25,5 +24,4 @@ class BruteDiscoverer(Discoverer):
             if not valid_sure or self.ft_model.ok(can):
                 break
 
-        if return_fulfill:
-            return can.fulfill
+        return can

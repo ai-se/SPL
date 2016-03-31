@@ -5,6 +5,8 @@ from random import randint, shuffle
 from ftmodel import FTModel
 from discoverer import Discoverer
 
+# file disable.
+# won't update
 
 class mutateEngine(Discoverer):
     def __init__(self, feature_model):

@@ -12,7 +12,7 @@ __email__ = "jchen37@ncsu.edu"
 
 def write_random_individuals(name, num_of_individuals=100, contain_non_leaf=False):
     ft_model = FTModel(name, num_of_attached_objs=2, setConVioAsObj=True)
-    cans = [ft_model.genRandomCanBrute() for _ in range(num_of_individuals)]
+    cans = [ft_model.genRandomCan('random_sample') for _ in range(num_of_individuals)]
     map(ft_model.eval, cans)
     # write the candidates to folder surrogate_testing
     spl_addr = [i for i in sys.path if i.endswith('SPL')][0]

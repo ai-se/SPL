@@ -3,17 +3,24 @@ import time
 from copy import deepcopy
 from random import randint, shuffle
 import ftmodel
+from discoverer import Discoverer
 from os import sys, path
+import traceback
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import candidate
 
-# TESTING FOR ALL KINDS OF MUTATE ENGINES
-# MUTATE WITH BACKTRACKING OF VARIABLES
+
+__author__ = "Jianfeng Chen"
+__copyright__ = "Copyright (C) 2016 Jianfeng Chen"
+__license__ = "MIT"
+__version__ = "1.0"
+__email__ = "jchen37@ncsu.edu"
 
 
-class mutateEngine(object):
-    def __init__(self, feature_tree):
-        self.ft = feature_tree
+class mutateEngine(Discoverer):
+    def __init__(self, feature_model):
+        self.feature_model = feature_model
+        self.ft = feature_model.ft
         self.fea_fulfill = [-1] * len(self.ft.features)
         self.con_fulfill = [0] * self.ft.get_cons_num()
         self.temp_c = [0]*len(self.ft.features)
@@ -162,65 +169,33 @@ class mutateEngine(object):
             r.append(fulfill[index])
         return r
 
-    def genValidOne(self, returnFulfill = False):
-        fulfill2return = []
+    def gen_valid_one(self):
         while True:
             try:
                 self.refresh()
-                self.setFulfill(self.ft.root,1)
+                self.setFulfill(self.ft.root, 1)
                 self.mutateChild(self.ft.root)
                 fulfill2return = self.fea_fulfill
                 leaves2return = self.findLeavesFulfill(fulfill2return)
-                if returnFulfill: return fulfill2return, leaves2return
-                else: return leaves2return
+                can = candidate(decs=leaves2return)
+                can.fulfill = fulfill2return
+                self.feature_model.eval(can)
+                return can
             except:
-                #type, value, tb = sys.exc_info()
-                #traceback.print_exc()
-                #pdb.post_mortem(tb)
+                # type, value, tb = sys.exc_info()
+                # traceback.print_exc()
+                # pdb.post_mortem(tb)
                 pass
 
-def comparePerformance():
-    for name in ['cellphone','eshop','webportal','EIS']:
-        m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
-        m.printModelInfo()
-        engine = mutateEngine(m.ft)
-        start_time = time.time()
-        for i in range(10): engine.genValidOne(True)
-        print("--- %s seconds --- for 10 by new mutate engine" % (time.time() - start_time))
-        continue
-        start_time = time.time()
-        for i in range(10):
-            m.genRandomCan(guranteeOK=True)
-        print("--- %s seconds --- for 10 by origin mutate engine" % (time.time() - start_time))
 
+def demo(name):
+    m = ftmodel.FTModel(name, setConVioAsObj=False)
+    print m
+    engine = mutateEngine(m)
+    for i in xrange(50):
+        engine.gen_valid_one()
 
-def unitTest(name):
-    m = ftmodel.FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
-    m.printModelInfo()
-    engine = mutateEngine(m.ft)
-    start_time = time.time()
-    for i in range(50):
-        a  = engine.genValidOne()
-        can = candidate(decs = a)
-        pdb.set_trace()
-    end_time = time.time()
-    print end_time-start_time
-
-def unitTest2(name):
-    m = ftmodel.FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
-    m.printModelInfo()
-    engine = mutateEngine(m.ft)
-    start_time = time.time()
-    for i in range(50):
-        a  = engine.genValidOne()
-        can = candidate(decs = a)
-    end_time = time.time()
-    print end_time-start_time
 
 if __name__ == '__main__':
-    #comparePerformance()
-    #unitTest('eshop')
-    #unitTest2('eshop')
     name = 'eis'
-    unitTest(name)
-    #unitTest2(name)
+    demo(name)

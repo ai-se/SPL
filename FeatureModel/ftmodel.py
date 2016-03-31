@@ -2,6 +2,7 @@ import pdb
 import mutate2  # v2 mutate engine
 from parser import load_ft_url
 from os import sys, path
+from bruteDiscover import BruteDiscoverer
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
 
@@ -24,8 +25,8 @@ class FTModel(model):
         self.ft.load_cost(name)
         self.ft.load_time(name)
         dec = [Has(l.id, 0, 1) for l in self.ft.leaves]
-
-        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum - len(self.ft.groups), goal=lt)]  # number of NOT included features
+        # number of NOT included features
+        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum - len(self.ft.groups), goal=lt)]
         if setConVioAsObj:
             obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con), goal=lt))
         if num_of_attached_objs >= 1:
@@ -35,25 +36,39 @@ class FTModel(model):
 
         self.eval_count = 0
 
-        self.mutateEngine2 = mutate2.mutateEngine(self.ft)  # TODO setting the mutate engine!!!
-        pdb.set_trace()
-        self.mutateEngines = []
+        self.mutateEngines = {
+            'brute': BruteDiscoverer(self),
+            'v2'   : BruteDiscoverer(self),
+        }
 
         model.__init__(self, dec, obj)
 
+    def __repr__(self):
+        s = '---Information for SPL--------\n'
+        s += 'Name:%s\n' % self.name
+        s += 'Leaves #:%d\n' % len(self.ft.leaves)
+        s += 'Total Features #:%d\n' % (self.ft.featureNum - len(self.ft.groups))
+        s += 'Constraints#:%d\n' % len(self.ft.con)
+        s += '-' * 30
+        s += '\n'
+        return s
+
     def eval(self, candidate, doNorm=True, returnFulfill=False):
-        self.eval_count += 1
         t = self.ft  # abbr.
         sol = candidate.decs
 
-        # obj1: features numbers
-        # initialize the fulfill list
-        fulfill = [-1] * t.featureNum
-        for i, l in zip(sol, t.leaves):
-            fulfill[t.features.index(l)] = i
+        if not hasattr(candidate, 'fulfill'):
+            # obj1: features numbers
+            # initialize the fulfill list
+            fulfill = [-1] * t.featureNum
+            for i, l in zip(sol, t.leaves):
+                fulfill[t.features.index(l)] = i
 
-        # fill other tree elements
-        t.fill_form4all_fea(fulfill)
+            # fill other tree elements
+            t.fill_form4all_fea(fulfill)
+            self.eval_count += 1
+        else:
+            fulfill = candidate.fulfill
 
         # here group should not count as feature
         gsum = 0
@@ -63,15 +78,18 @@ class FTModel(model):
         candidate.scores = [obj1]
 
         # constraint violation
-        if [o for o in self.obj if o.name == 'conVio']:
-            conVio = len(t.con)
-            for cc in t.con:
-                if cc.is_correct(t, fulfill):
-                    conVio -= 1
+        conVio = len(t.con)
+        for cc in t.con:
+            if cc.is_correct(t, fulfill):
+                conVio -= 1
+
+        all_obj_names = [o.name for o in self.obj]
+        if 'conVio' in all_obj_names:
             candidate.scores.append(conVio)
+        candidate.conVio = conVio
 
         # total cost
-        if [o for o in self.obj if o.name == 'cost']:
+        if 'cost' in all_obj_names:
             total_cost = 0
             for i, f in enumerate(t.features):
                 if fulfill[i] == 1 and f.node_type != 'g':
@@ -79,7 +97,7 @@ class FTModel(model):
             candidate.scores.append(total_cost)
 
         # total time
-        if [o for o in self.obj if o.name == 'time']:
+        if 'time' in all_obj_names:
             total_time = 0
             for i, f in enumerate(t.features):
                 if fulfill[i] == 1 and f.node_type != 'g':
@@ -106,41 +124,30 @@ class FTModel(model):
             self.eval(c)
         elif not c.scores:
             self.eval(c)
+        return c.conVio == 0 and c.fulfill[0] == 1
 
-        return c.scores[1] == 0 and c.fulfill[0] == 1
+    def genRandomCan(self, engine_version):
+        """
+        when engine_version == 'random_sample', then generate any sample regardless the validness.
+        """
 
-    # def genRandomCanBrute(self, guranteeOK = False):
-    #     import random
-    #     while True:
-    #         randBinList = lambda n: [random.choice([0, 1]) for _ in range(n)]
-    #         can = candidate(decs=randBinList(len(self.dec)), scores=[])
-    #         if not guranteeOK or self.ok(can): break
-    #     return can
+        if engine_version == 'random_sample':
+            engine = self.mutateEngines['brute']
+            return engine.gen_valid_one(valid_sure=False)
 
-    """
-    Applying v2 mutate engine
-    """
-
-    def genRandomCan(self, guranteeOK=False):
-        return candidate(decs=self.mutateEngine2.genValidOne(), scores=[])
-
-    def printModelInfo(self):
-        print '---Information for SPL--------'
-        print 'Name:', self.name
-        print 'Leaves #:', len(self.ft.leaves)
-        print 'Total Features #:', self.ft.featureNum - len(self.ft.groups)
-        print 'Constraints#:', len(self.ft.con)
-        print '-' * 30
+        engine = self.mutateEngines[engine_version]
+        return engine.gen_valid_one()
 
 
-def main(name):
+def demo(name):
     m = FTModel(name, setConVioAsObj=False)
-    m.printModelInfo()
-    can = m.genRandomCan(guranteeOK=True)
-    m.ok(can)
+    print m
+
+    can = m.genRandomCan('v2')
+    print m.ok(can)
     # m.eval(can,doNorm=False)
     pdb.set_trace()
 
 
 if __name__ == '__main__':
-    main('eshop')
+    demo('webportal')
