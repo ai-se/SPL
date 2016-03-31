@@ -1,7 +1,7 @@
 import pdb
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from Parser.ftmodel import FTModel
+from FeatureModel.ftmodel import FTModel
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"

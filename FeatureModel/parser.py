@@ -1,6 +1,7 @@
 import re
 import xml.etree.ElementTree
-from Feature_tree import *
+import numpy as np
+from Feature_tree import FeatureTree, Node, Constraint
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -39,9 +40,9 @@ def load_ft_url(url):
         layer = len(m.group(1))
         t = m.group(2)
         if t == 'r':
-            treeRoot = Node(id=m.group(3), node_type='r')
-            layer_dict[layer] = treeRoot
-            ft.set_root(treeRoot)
+            tree_root = Node(identification=m.group(3), node_type='r')
+            layer_dict[layer] = tree_root
+            ft.set_root(tree_root)
         elif t == 'g':
             mg = group_pattern.match(f)
             """
@@ -49,7 +50,7 @@ def load_ft_url(url):
             mg.group(2) down_count
             mg.group(3) up_count
             """
-            gNode = Node(id=mg.group(1), parent=layer_dict[layer - 1], node_type='g')
+            gNode = Node(identification=mg.group(1), parent=layer_dict[layer - 1], node_type='g')
             layer_dict[layer] = gNode
             if mg.group(3) == '*':
                 gNode.g_u = np.inf
@@ -59,7 +60,7 @@ def load_ft_url(url):
             layer_dict[layer] = gNode
             gNode.parent.add_child(gNode)
         else:
-            treeNode = Node(id=m.group(3), parent=layer_dict[layer - 1], node_type=t)
+            treeNode = Node(identification=m.group(3), parent=layer_dict[layer - 1], node_type=t)
             layer_dict[layer] = treeNode
             treeNode.parent.add_child(treeNode)
 
@@ -76,7 +77,7 @@ def load_ft_url(url):
         con_id = m.group(1)
         li_pos.append(not bool(m.group(2)))
         literal.append(m.group(3))
-        while (m.group(4)):
+        while m.group(4):
             cc = m.group(4)
             m = common_more_con_pattern.match(cc)
             li_pos.append(not bool(m.group(2)))
@@ -86,7 +87,7 @@ def load_ft_url(url):
          literal: literals
          li_pos: whether is positive or each literals
         """
-        con_stmt = Constraint(id=con_id, literals=literal, literals_pos=li_pos)
+        con_stmt = Constraint(identification=con_id, literals=literal, literals_pos=li_pos)
         ft.add_constraint(con_stmt)
 
     ft.set_features_list()

@@ -4,8 +4,8 @@ import learner
 from cart import *
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from Parser.ftmodel import FTModel
-from Parser.parser import *
+from FeatureModel.ftmodel import FTModel
+from FeatureModel.parser import *
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
 
 __author__ = "Jianfeng Chen"
@@ -23,17 +23,17 @@ class MutateWithSurrogateEngine(object):
         logging.info("model %s load successfully." % name)
 
         # get one decision tree for each objective and prune them
-        for obj_index in range(len(self.ft_model.obj)):
+        for obj_index, _ in enumerate(self.ft_model.obj):
             pre_surrogate.write_random_individuals(name, 500, contain_non_leaf=True)
             clf = learner.get_cart(name, obj_index)
             learner.drawTree(name, clf, obj_index)
 
-        self.carts = [CART(name, obj_index) for obj_index in range(len(self.ft_model.obj))]
-        for cart in self.carts:
-            cart.prune(remaining_rate=0.3)
+        self.carts = [CART(name, obj_index) for obj_index, _ in enumerate(self.ft_model.obj)]
+        map(lambda cart: cart.prune(remaining_rate=0.3), self.carts)
         logging.info("carts for model %s load successfully." % name)
 
         self.avoid_paths = self._get_avoid_paths()
+        # pdb.set_trace()
 
     def _get_avoid_paths(self):
         result_set = []
@@ -44,28 +44,62 @@ class MutateWithSurrogateEngine(object):
         # remove the duplicate
         import itertools
         result_set.sort()
-        return list(result_set for result_set,_ in itertools.groupby(result_set))
+        return list(result_set for result_set, _ in itertools.groupby(result_set))
+
+    def _can_set(self, after_set_filled_list):
+        # checking basing on the avoiding paths
+        for avoid_path in self.avoid_paths:
+            for i, j in zip(avoid_path, after_set_filled_list):
+                if i == 0 and j == 1:
+                    return False
+                if i == 1 and j == 0:
+                    return False
+        return True
+
+    def mutateNode(self, node, filled_list):
+        node_loc = self.ft_tree.features.index(node)
+        node_type = node.node_type
+        node_value = filled_list[node_loc]
+
+        if node_type in ['r', 'm']:
+            1
+            # setting children of a mandatory node
+            # TODO
+        elif node_type == 'g':
+            1
+            # TODO children of a group node
+        elif node_type == 'o':
+            1
+            # TODO children of optional node
+        else:  # leaves
+            1
+            # TODO we have arrived a leaf
+        pdb.set_trace()
+        pass
 
     def genValidOne(self, returnFulfill=True):
-        # TODO core function
+        filled_list = [-1] * self.ft_tree.featureNum
+        filled_list[0] = 1  # let root be 1
+        self.mutateNode(self.ft_tree.root, filled_list)
+
+        pdb.set_trace()
         return self, returnFulfill
 
+
+def test_one_model(model):
+    engine = MutateWithSurrogateEngine(model)
+    print 'Decision num: %d' % engine.ft_model.decNum
+    print 'Bad paths num: %d' % len(engine.avoid_paths)
+    print '*' * 8
+    engine.genValidOne()
+
+
 if __name__ == '__main__':
-    import time
+    # logging.basicConfig(level=logging.INFO)
     try:
-        logging.basicConfig(level=logging.CRITICAL, format='Line %(lineno)d at %(filename)s:\t %(message)s')
         to_test_models = ['simple', 'webportal', 'cellphone', 'eshop', 'eis']
         for model in to_test_models:
-            start_time = time.time()
-            engine = MutateWithSurrogateEngine(model)
-            end_time = time.time()
-            pdb.set_trace()
-            print model
-            print 'init time: %d'% (end_time - start_time)
-            print 'Decision num: %d' % engine.ft_model.decNum
-            print 'Bad paths num: %d' % len(engine.avoid_paths)
-            print '*' * 8
-        pdb.set_trace()
+            test_one_model(model)
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()

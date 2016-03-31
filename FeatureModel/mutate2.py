@@ -1,24 +1,30 @@
-import pdb,traceback,random
-import os
+import pdb
 import time
-from Feature_tree import *
-from parser import *
-from copy import *
-from random import *
-from ftmodel import *
+from copy import deepcopy
+from random import randint, shuffle
+import ftmodel
+from os import sys, path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from GALE.model import candidate
 
 # TESTING FOR ALL KINDS OF MUTATE ENGINES
+# MUTATE WITH BACKTRACKING OF VARIABLES
+
 
 class mutateEngine(object):
     def __init__(self, feature_tree):
         self.ft = feature_tree
         self.fea_fulfill = [-1] * len(self.ft.features)
-        self.con_fulfill = [0] * self.ft.getConsNum()
+        self.con_fulfill = [0] * self.ft.get_cons_num()
+        self.temp_c = [0]*len(self.ft.features)
+        self.tem_c_c = [0]*self.ft.get_cons_num()
+        self.YESs = []
+        self.NOs  = []
         self.con_repo = deepcopy(self.ft.con)
 
     def refresh(self):
         self.fea_fulfill = [-1] * len(self.ft.features)
-        self.con_fulfill = [0] * self.ft.getConsNum()
+        self.con_fulfill = [0] * self.ft.get_cons_num()
         self.con_repo = deepcopy(self.ft.con)
 
     def getFulfill(self, node):
@@ -32,6 +38,7 @@ class mutateEngine(object):
         if checkConstraint:
             self.checkConstraints(node)
 
+    """
     @staticmethod
     def getShuffleList(l, cut = 'notset'):
         l2 = copy(l)
@@ -40,6 +47,7 @@ class mutateEngine(object):
             return l2[0:cut]
         else:
             return l2
+    """
 
     def checkConstraints(self,setted_node):
         me = self.getFulfill(setted_node)
@@ -59,6 +67,7 @@ class mutateEngine(object):
                     self.con_fulfill[i] = 1
                 if len(con.literals) == 0:
                     #print 'constraint fail coused by ' + setted_node.id + ' at constraint '+ str(i)
+                    self.tem_c_c[i]+=1
                     raise Exception('constraint fail!')
 
     """
@@ -70,7 +79,10 @@ class mutateEngine(object):
     def checkNeedSet(self, node, want):
         a = self.getFulfill(node)
         if a == -1: return True # not set before
-        if a != want: raise Exception('setting conflict')
+        if a != want:
+            index =  self.ft.features.index(node)
+            self.temp_c[index] += 1 if want == 0 else 0
+            raise Exception('setting conflict')
         else: return False
 
     def mutateChild(self, node):
@@ -86,10 +98,26 @@ class mutateEngine(object):
                 exist_1 = len([c for c in node.children if self.getFulfill(c)==1])
                 want = want-exist_1
                 if want < 0: raise Exception('group fail!')
-                children = self.getShuffleList(node.children)
-                for i,c in enumerate(children):
-                    self.setFulfill(c, int(i<want))
-                    self.mutateChild(c)
+                children = [c for c in node.children]
+                shuffle(children)
+                for c in children:
+                    if want > 0:
+                        try:
+                            want -= 1
+                            self.setFulfill(c, 1)
+                            self.mutateChild(c)
+                        except:
+                            want += 1
+                            try:
+                                self.setFulfill(c,0)
+                                self.mutateChild(c)
+                            except:
+                                #print "SPECIAL SI"
+                                raise Exception
+                    else:
+                        self.setFulfill(c,0)
+                        self.mutateChild(c)
+                if want > 0: raise Exception('group fail!')
             return
 
         # the current node is root, mandory or optional
@@ -167,12 +195,32 @@ def comparePerformance():
 
 
 def unitTest(name):
-    m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+    m = ftmodel.FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
     m.printModelInfo()
     engine = mutateEngine(m.ft)
-    a  = engine.genValidOne(True)
-    pdb.set_trace()
+    start_time = time.time()
+    for i in range(50):
+        a  = engine.genValidOne()
+        can = candidate(decs = a)
+        pdb.set_trace()
+    end_time = time.time()
+    print end_time-start_time
+
+def unitTest2(name):
+    m = ftmodel.FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+    m.printModelInfo()
+    engine = mutateEngine(m.ft)
+    start_time = time.time()
+    for i in range(50):
+        a  = engine.genValidOne()
+        can = candidate(decs = a)
+    end_time = time.time()
+    print end_time-start_time
 
 if __name__ == '__main__':
     #comparePerformance()
-    unitTest('eshop')
+    #unitTest('eshop')
+    #unitTest2('eshop')
+    name = 'eis'
+    unitTest(name)
+    #unitTest2(name)

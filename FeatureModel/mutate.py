@@ -1,24 +1,21 @@
-import pdb,traceback,random
-import os
+import pdb
 import time
-from Feature_tree import *
-from parser import *
-from copy import *
-from random import *
-from ftmodel import *
+from copy import deepcopy, copy
+from random import randint, shuffle
+from ftmodel import FTModel
+from discoverer import Discoverer
 
-# TESTING FOR ALL KINDS OF MUTATE ENGINES
 
-class mutateEngine(object):
-    def __init__(self, feature_tree):
-        self.ft = feature_tree
+class mutateEngine(Discoverer):
+    def __init__(self, feature_model):
+        self.ft = feature_model.ft
         self.fea_fulfill = [-1] * len(self.ft.features)
-        self.con_fulfill = [0] * self.ft.getConsNum()
+        self.con_fulfill = [0] * self.ft.get_cons_num()
         self.con_repo = deepcopy(self.ft.con)
 
     def refresh(self):
         self.fea_fulfill = [-1] * len(self.ft.features)
-        self.con_fulfill = [0] * self.ft.getConsNum()
+        self.con_fulfill = [0] * self.ft.get_cons_num()
         self.con_repo = deepcopy(self.ft.con)
 
     def getFulfill(self, node):
@@ -134,22 +131,17 @@ class mutateEngine(object):
             r.append(fulfill[index])
         return r
 
-    def genValidOne(self, returnFulfill = False):
-        fulfill2return = []
-        while True:
-            try:
-                self.refresh()
-                self.setFulfill(self.ft.root,1)
-                self.mutateChild(self.ft.root)
-                fulfill2return = self.fea_fulfill
-                leaves2return = self.findLeavesFulfill(fulfill2return)
-                if returnFulfill: return fulfill2return, leaves2return
-                else: return leaves2return
-            except:
-                #type, value, tb = sys.exc_info()
-                #traceback.print_exc()
-                #pdb.post_mortem(tb)
-                pass
+    def gen_valid_one(self, return_fulfill=False):
+        self.refresh()
+        self.setFulfill(self.ft.root, 1)
+        self.mutateChild(self.ft.root)
+        fulfill2return = self.fea_fulfill
+        leaves2return = self.findLeavesFulfill(fulfill2return)
+        if return_fulfill:
+            return fulfill2return, leaves2return
+        else:
+            return leaves2return
+
 
 def comparePerformance():
     for name in ['cellphone','eshop','webportal','EIS']:

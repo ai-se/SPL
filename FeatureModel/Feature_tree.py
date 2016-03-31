@@ -1,4 +1,3 @@
-import pdb
 import numpy as np
 import random
 import pickle
@@ -6,8 +5,8 @@ import os
 
 
 class Node(object):
-    def __init__(self, id, parent=None, node_type='o'):
-        self.id = id
+    def __init__(self, identification, parent=None, node_type='o'):
+        self.id = identification
         self.parent = parent
         self.node_type = node_type
         self.children = []
@@ -20,24 +19,25 @@ class Node(object):
         self.children.append(node)
 
     def __repr__(self):
-        return '\nid: %s\ntype:%s\n' % (
+        return '\n id: %s\n type:%s \n' % (
             self.id,
             self.node_type)
 
 
 class Constraint(object):
-    def __init__(self, id, literals, literals_pos):
-        self.id = id
+    def __init__(self, identification, literals, literals_pos):
+        self.id = identification
         self.literals = literals
         self.li_pos = literals_pos
 
     def __repr__(self):
         return self.id + '\n' + str(self.literals) + '\n' + str(self.li_pos)
 
-    def iscorrect(self, ft, filledForm):
+    def is_correct(self, ft, filled_form):
         for (li, pos) in zip(self.literals, self.li_pos):
             i = ft.find_fea_index_by_id(li)
-            if int(pos) == filledForm[i]: return True
+            if int(pos) == filled_form[i]:
+                return True
         return False
 
 
@@ -58,14 +58,14 @@ class FeatureTree(object):
     def add_constraint(self, con):
         self.con.append(con)
 
-    def find_fea_index_by_id(self, id):
+    def find_fea_index_by_id(self, identification):
         for i, x in enumerate(self.features):
-            if x.id == id:
+            if x.id == identification:
                 return i
 
-    # featch all the features in the tree basing on the children structure
+    # fetch all the features in the tree basing on the children structure
     def set_features_list(self):
-        def setting_feature_list(self, node):
+        def setting_feature_list(node):
             if node.node_type == 'g':
                 node.g_u = int(node.g_u) if node.g_u != np.inf else len(node.children)
                 node.g_d = int(node.g_d) if node.g_d != np.inf else len(node.children)
@@ -76,32 +76,32 @@ class FeatureTree(object):
             if len(node.children) == 0:
                 self.leaves.append(node)
             for i in node.children:
-                setting_feature_list(self, i)
+                setting_feature_list(i)
 
-        setting_feature_list(self, self.root)
+        setting_feature_list(self.root)
         self.featureNum = len(self.features)
 
-    def postorder(self, node, func, extraArgs=[]):
+    def post_order(self, node, func, extra_args=[]):
         if node.children:
             for c in node.children:
-                self.postorder(c, func, extraArgs)
-        func(node, *extraArgs)
+                self.post_order(c, func, extra_args)
+        func(node, *extra_args)
 
     # setting the form by the structure of feature tree
     # leaves should be filled in the form in advanced
     # all not filled feature should be -1 in the form
-    def fillForm4AlFea(self, form):
+    def fill_form4all_fea(self, form):
         def filling(node):
             index = self.features.index(node)
             if form[index] != -1:
                 return
-            # handeling the group featues
+            # handling the group features
             if node.node_type == 'g':
                 sum = 0
                 for c in node.children:
                     i_index = self.features.index(c)
                     sum += form[i_index]
-                form[index] = 1 if sum >= node.g_d and sum <= node.g_u else 0
+                form[index] = 1 if node.g_d <= sum <= node.g_u else 0
                 return
 
             """
@@ -111,7 +111,7 @@ class FeatureTree(object):
                 return
             """
 
-            # handeling the other type of node
+            # handling the other type of node
             m_child = [x for x in node.children if x.node_type in ['m', 'r', 'g']]
             o_child = [x for x in node.children if x.node_type == 'o']
             if len(m_child) == 0:  # all children are optional
@@ -129,15 +129,15 @@ class FeatureTree(object):
             form[index] = 1
             return
 
-        self.postorder(self.root, filling)
+        self.post_order(self.root, filling)
 
-    def getFeatureNum(self):
+    def get_feature_num(self):
         return len(self.features) - len(self.groups)
 
-    def getConsNum(self):
+    def get_cons_num(self):
         return len(self.con)
 
-    def _genRandomCost(self, tofile):
+    def _gen_random_cost(self, tofile):
         tmp_list = [random.uniform(1, 10) * (i % 3+1) for i in range(len(self.features))]
         # note to upper line: try to diverse the data
         random.shuffle(tmp_list)
@@ -145,32 +145,32 @@ class FeatureTree(object):
         with open(tofile, 'w+') as f:
             pickle.dump(self.cost, f)
 
-    def _genRandomTime(self, tofile):
+    def _gen_random_time(self, target_file):
         tmp_list = [random.uniform(5, 15) * (i % 4+1) for i in range(len(self.features))]
         # note to upper line: try to diverse the data
         random.shuffle(tmp_list)
         self.time = tmp_list
-        with open(tofile, 'w+') as f:
+        with open(target_file, 'w+') as f:
             pickle.dump(self.time, f)
 
-    def loadCost(self, model_name):
+    def load_cost(self, model_name):
         import sys
-        spl_addr = [i for i in sys.path if i.endswith('/SPL')][0]
-        fromfile = spl_addr + "/input/" + model_name + ".cost"
+        spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
+        fromfile = spl_address + "/input/" + model_name + ".cost"
 
         if not os.path.isfile(fromfile):
-            self._genRandomCost(fromfile)
+            self._gen_random_cost(fromfile)
 
         with open(fromfile, 'r') as f:
             self.cost = pickle.load(f)
 
-    def loadTime(self, model_name):
+    def load_time(self, model_name):
         import sys
-        spl_addr = [i for i in sys.path if i.endswith('/SPL')][0]
-        fromfile = spl_addr + "/input/" + model_name + ".time"
+        spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
+        fromfile = spl_address + "/input/" + model_name + ".time"
 
         if not os.path.isfile(fromfile):
-            self._genRandomTime(fromfile)
+            self._gen_random_time(fromfile)
 
         with open(fromfile, 'r') as f:
             self.time = pickle.load(f)

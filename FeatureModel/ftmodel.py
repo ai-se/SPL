@@ -1,14 +1,14 @@
+import pdb
+import mutate2  # v2 mutate engine
+from parser import load_ft_url
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
-from mutate2 import *  # v2 mutate engine
-from Parser.parser import *
-
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.0"
+__version__ = "1.1"
 __email__ = "jchen37@ncsu.edu"
 
 
@@ -21,11 +21,11 @@ class FTModel(model):
         self.url = url
         self.ft = load_ft_url(url)
 
-        self.ft.loadCost(name)
-        self.ft.loadTime(name)
+        self.ft.load_cost(name)
+        self.ft.load_time(name)
         dec = [Has(l.id, 0, 1) for l in self.ft.leaves]
 
-        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum - len(self.ft.groups), goal=lt)] #number of NOT included features
+        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum - len(self.ft.groups), goal=lt)]  # number of NOT included features
         if setConVioAsObj:
             obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con), goal=lt))
         if num_of_attached_objs >= 1:
@@ -33,23 +33,27 @@ class FTModel(model):
         if num_of_attached_objs >= 2:
             obj.append(Has(name='time', lo=0, hi=sum(self.ft.time), goal=lt))
 
-        # TODO crete more objectives to extend our model...
+        self.eval_count = 0
 
-        self.mutateEngine2 = mutateEngine(self.ft)  # TODO setting the mutate engine!!!
+        self.mutateEngine2 = mutate2.mutateEngine(self.ft)  # TODO setting the mutate engine!!!
+        pdb.set_trace()
+        self.mutateEngines = []
+
         model.__init__(self, dec, obj)
 
     def eval(self, candidate, doNorm=True, returnFulfill=False):
+        self.eval_count += 1
         t = self.ft  # abbr.
         sol = candidate.decs
 
         # obj1: features numbers
         # initialize the fulfill list
         fulfill = [-1] * t.featureNum
-        for i, l in enumerate(t.leaves):
-            fulfill[t.features.index(l)] = sol[i]
+        for i, l in zip(sol, t.leaves):
+            fulfill[t.features.index(l)] = i
 
         # fill other tree elements
-        t.fillForm4AlFea(fulfill)
+        t.fill_form4all_fea(fulfill)
 
         # here group should not count as feature
         gsum = 0
@@ -62,7 +66,7 @@ class FTModel(model):
         if [o for o in self.obj if o.name == 'conVio']:
             conVio = len(t.con)
             for cc in t.con:
-                if cc.iscorrect(t, fulfill):
+                if cc.is_correct(t, fulfill):
                     conVio -= 1
             candidate.scores.append(conVio)
 
@@ -77,7 +81,7 @@ class FTModel(model):
         # total time
         if [o for o in self.obj if o.name == 'time']:
             total_time = 0
-            for i,f in enumerate(t.features):
+            for i, f in enumerate(t.features):
                 if fulfill[i] == 1 and f.node_type != 'g':
                     total_time += t.time[i]
             candidate.scores.append(total_time)
@@ -98,20 +102,20 @@ class FTModel(model):
     """
 
     def ok(self, c):
-        try:
-            # if c.scores == []:
-            f = self.eval(c, returnFulfill=True)
-        except:
-            f = self.eval(c, returnFulfill=True)
-        return c.scores[1] == 0 and f[0] == 1
+        if not hasattr(c, 'scores'):
+            self.eval(c)
+        elif not c.scores:
+            self.eval(c)
 
-    def genRandomCanBrute(self, guranteeOK = False):
-        import random
-        while True:
-            randBinList = lambda n: [random.choice([0, 1]) for _ in range(n)]
-            can = candidate(decs=randBinList(len(self.dec)), scores=[])
-            if not guranteeOK or self.ok(can): break
-        return can
+        return c.scores[1] == 0 and c.fulfill[0] == 1
+
+    # def genRandomCanBrute(self, guranteeOK = False):
+    #     import random
+    #     while True:
+    #         randBinList = lambda n: [random.choice([0, 1]) for _ in range(n)]
+    #         can = candidate(decs=randBinList(len(self.dec)), scores=[])
+    #         if not guranteeOK or self.ok(can): break
+    #     return can
 
     """
     Applying v2 mutate engine
@@ -132,7 +136,8 @@ class FTModel(model):
 def main(name):
     m = FTModel(name, setConVioAsObj=False)
     m.printModelInfo()
-    # can = m.genRandomCan(guranteeOK=True)
+    can = m.genRandomCan(guranteeOK=True)
+    m.ok(can)
     # m.eval(can,doNorm=False)
     pdb.set_trace()
 
