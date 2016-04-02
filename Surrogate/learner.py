@@ -90,7 +90,9 @@ def drawTree(name, clf, obj_index=0, write_dot=True, drawPng=False, drawPdf=Fals
 
 if __name__ == '__main__':
     name = 'eshop'
-    # clf = get_cart(name, 2, [2, 14, 47, 103, 112, 188, 204])
-    clf = get_cart(name, 2, )
+    clf = get_cart(name, 2, [2, 14, 47, 103, 112, 188, 204])
+    # clf = get_cart(name, 2, )
     ew = drawTree(name, clf, 2, write_dot=False)
+    from cart import CART
+    eee = CART('eshop', 2, given_dot_source=ew)
     pdb.set_trace()

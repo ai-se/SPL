@@ -46,6 +46,14 @@ class MutateWithSurrogateEngine(Discoverer):
         for obj_index, _ in enumerate(self.ft_model.obj):
             clf = learner.get_cart(name, obj_index)
             learner.drawTree(name, clf, obj_index)
+        """
+        beginning testing
+        """
+        pdb.set_trace()
+        """
+        end of testing
+        """
+        exit(0)
 
         self.carts = [CART(name, obj_index) for obj_index, _ in enumerate(self.ft_model.obj)]
         map(lambda cart: cart.prune(remaining_rate=0.3), self.carts)
@@ -170,12 +178,13 @@ def test_one_model(model):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     try:
-        to_test_models = ['simple',
-                          'webportal',
-                          # 'cellphone',
-                          'eshop',
-                          'eis',
-                          ]
+        to_test_models = [
+            # 'simple',
+            # 'webportal',
+            # 'cellphone',
+            'eshop',
+            # 'eis',
+        ]
         for model in to_test_models:
             test_one_model(model)
             # pdb.set_trace()

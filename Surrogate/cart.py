@@ -59,18 +59,25 @@ class CART(object):
             if op == '>=':
                 return fetch >= right
 
-    def __init__(self, name_of_model, obj_index=0):
+    def __init__(self, name_of_model, obj_index=0, given_dot_source=''):
         self.model_name = name_of_model
         self.root = None
         self.nodes = []
-        self._load_dot_file(obj_index)
+        if len(given_dot_source) == 0:
+            self._load_dot_file(obj_index)
+        else:
+            records = given_dot_source.split('\n')
+            self._load_dot_file(obj_index, given_record=records)
 
-    def _load_dot_file(self, obj_index):
-        # read the dot file
+    def _load_dot_file(self, obj_index, given_record=None):
         records = []
-        with open("%s/surrogate_data/%s_%d.dot" % (project_path, self.model_name, obj_index), 'r') as f:
-            for record in f:
-                records.append(record[:-1])  # ignore the final \n
+        if not given_record:
+            # read the dot file
+            with open("%s/surrogate_data/%s_%d.dot" % (project_path, self.model_name, obj_index), 'r') as f:
+                for record in f:
+                    records.append(record[:-1])  # ignore the final \n
+        else:
+            records = given_record
 
         # parsing by regular expression engine
         connection_pattern = re.compile(r'(\d+) -> (\d+) .*;')
