@@ -37,7 +37,7 @@ class FTModel(model):
 
         self.mutateEngines = {
             'brute': bruteDiscover.BruteDiscoverer(self),
-            'v2'   : mutate2.mutateEngine(self),
+            'v2': mutate2.MutateEngine(self),
         }
 
         model.__init__(self, dec, obj)
@@ -118,12 +118,12 @@ class FTModel(model):
     checking whether the candidate meets ALL constraints
     """
 
-    def ok(self, c):
+    def ok(self, c, con_vio_tol=0):
         if not hasattr(c, 'scores'):
             self.eval(c)
         elif not c.scores:
             self.eval(c)
-        return c.conVio == 0 and c.fulfill[0] == 1
+        return c.conVio <= con_vio_tol and c.fulfill[0] == 1
 
     def genRandomCan(self, engine_version):
         """

@@ -1,5 +1,4 @@
 import pdb
-import time
 from copy import deepcopy
 from random import randint, shuffle
 import ftmodel
@@ -17,7 +16,7 @@ __version__ = "1.0"
 __email__ = "jchen37@ncsu.edu"
 
 
-class mutateEngine(Discoverer):
+class MutateEngine(Discoverer):
     def __init__(self, feature_model):
         self.feature_model = feature_model
         self.ft = feature_model.ft
@@ -189,13 +188,22 @@ class mutateEngine(Discoverer):
 
 
 def demo(name):
+    import time
+    time1 = time.time()
+
     m = ftmodel.FTModel(name, setConVioAsObj=False)
     print m
-    engine = mutateEngine(m)
+    engine = MutateEngine(m)
+    R = []
     for i in xrange(50):
-        engine.gen_valid_one()
+        alpha = engine.gen_valid_one()
+        R.append(alpha)
 
+    print name
+    print 'running time:', time.time()-time1
+    # pdb.set_trace()
 
 if __name__ == '__main__':
-    name = 'eis'
-    demo(name)
+    name = ['webportal', 'eis', 'eshop']
+    for n in name:
+        demo(n)

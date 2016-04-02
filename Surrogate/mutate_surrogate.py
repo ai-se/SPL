@@ -1,18 +1,17 @@
 from __future__ import division
+from cart import CART
+from random import choice, randint, shuffle
+from operator import itemgetter
+from copy import deepcopy
+from os import sys
+from FeatureModel.discoverer import Discoverer
+from FeatureModel.ftmodel import FTModel
 import pre_surrogate
 import learner
 import logging
 import pdb
 import traceback
 import time
-from cart import CART
-from random import choice, randint, shuffle
-from operator import itemgetter
-from copy import deepcopy
-from os import sys, path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from FeatureModel.discoverer import Discoverer
-from FeatureModel.ftmodel import FTModel
 import UNIVERSE
 
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
@@ -25,8 +24,9 @@ __email__ = "jchen37@ncsu.edu"
 
 
 class BadPathConflict(Exception):
-    def __init__(self, node):
+    def __init__(self, node, cant_set):
         self.node = node
+        self.cant_set = cant_set
 
     def __str__(self):
         return repr(self.node)
@@ -41,9 +41,9 @@ class MutateWithSurrogateEngine(Discoverer):
         name = self.ft_model.name
         logging.info("model %s load successfully." % name)
 
-        # get one decision tree for each objective and prune them
+        # get one decision tree for each objective and prune them.
+        pre_surrogate.write_random_individuals(name, 100, contain_non_leaf=True)  # TODO Turn off here when testing
         for obj_index, _ in enumerate(self.ft_model.obj):
-            pre_surrogate.write_random_individuals(name, 500, contain_non_leaf=True)
             clf = learner.get_cart(name, obj_index)
             learner.drawTree(name, clf, obj_index)
 
@@ -77,10 +77,11 @@ class MutateWithSurrogateEngine(Discoverer):
         visited, queue = set(), [self.ft_tree.root]
         while queue:
             vertex = queue.pop(0)
-            print filled_list
-            print vertex
             if vertex not in visited:
-                childs = self.mutate_node(vertex, filled_list)
+                try:
+                    filled_list, childs = self.mutate_node(vertex, filled_list)
+                except BadPathConflict as bb:
+                    pdb.set_trace()
                 queue.extend(childs)
         return filled_list
 
@@ -93,8 +94,8 @@ class MutateWithSurrogateEngine(Discoverer):
             # pdb.set_trace()
             self.ft_tree.fill_subtree_0(node, filled_list)
             if not self._can_set(filled_list):
-                raise BadPathConflict(node)
-            return
+                raise BadPathConflict(node, cant_set=node_value)
+            return filled_list, []
 
         '''otherwise, current node is required, then assign the value of its children'''
         m_child = [c for c in node.children if c.node_type in ['r', 'm', 'g']]
@@ -102,8 +103,9 @@ class MutateWithSurrogateEngine(Discoverer):
         o_child = [c for c in node.children if c.node_type == 'o']
         filled_list_copy = deepcopy(filled_list)
 
+        tol = 20  # TODO how to set this?
         while True:
-            filled_list = filled_list_copy
+            filled_list = deepcopy(filled_list_copy)
             for m in m_child:
                 m_i = self.ft_tree.features.index(m)
                 filled_list[m_i] = 1
@@ -123,15 +125,11 @@ class MutateWithSurrogateEngine(Discoverer):
                 filled_list[g_i] = assign
 
             if self._can_set(filled_list):
-                return m_child+g_child+o_child
-                # # pdb.set_trace()
-                # try:
-                #     for c in m_child + o_child:
-                #         self.mutate_node(c, filled_list)
-                #         print 'after mutate' + str(c) + str(filled_list)
-                #     return filled_list
-                # except BadPathConflict:
-                #     print 'fail at', filled_list
+                return filled_list, m_child+g_child+o_child
+
+            tol -= 1
+            if not tol:
+                raise BadPathConflict(node, cant_set=node_value)
 
     def gen_valid_one(self):
         filled_list = [-1] * self.ft_tree.featureNum
@@ -141,12 +139,32 @@ class MutateWithSurrogateEngine(Discoverer):
         return filled_list
         # pdb.set_trace()
 
+    # def for_testing_bad_paths(self):
+    #     all_p = [
+    #         [1, 1, 1, 1, 0, 0, 1, 1, 1, 0],
+    #         [1, 1, 1, 0, 1, 0, 1, 1, 1, 0],
+    #         [1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
+    #
+    #         [1, 1, 1, 1, 0, 0, 1, 1, 0, 1],
+    #         [1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
+    #         [1, 1, 1, 0, 0, 1, 1, 1, 0, 1],
+    #
+    #         [1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    #         [1, 1, 1, 0, 1, 0, 0, 0, 0, 0],
+    #         [1, 1, 1, 0, 0, 1, 0, 0, 0, 0],
+    #
+    #     ]
+    #
+    #     for i in all_p:
+    #         print self._can_set(i)
+
 
 def test_one_model(model):
     UNIVERSE.FT_EVAL_COUNTER = 0
     engine = MutateWithSurrogateEngine(FTModel(model))
-    alpha = engine.gen_valid_one()
-    pdb.set_trace()
+    # pdb.set_trace()
+    # alpha = engine.gen_valid_one()
+    # pdb.set_trace()
 
 
 if __name__ == '__main__':
@@ -155,12 +173,12 @@ if __name__ == '__main__':
         to_test_models = ['simple',
                           'webportal',
                           # 'cellphone',
-                          # 'eshop',
-                          # 'eis',
+                          'eshop',
+                          'eis',
                           ]
         for model in to_test_models:
             test_one_model(model)
-            pdb.set_trace()
+            # pdb.set_trace()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
