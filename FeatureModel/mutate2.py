@@ -142,8 +142,8 @@ class mutateEngine(Discoverer):
                 return
 
             for m in m_child:
-               self.setFulfill(m,1)
-               self.mutateChild(m)
+                self.setFulfill(m,1)
+                self.mutateChild(m)
 
             for o in o_child:
                 self.setFulfill(o,randint(0,1))

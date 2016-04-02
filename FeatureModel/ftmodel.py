@@ -1,8 +1,9 @@
 import pdb
+import bruteDiscover
 import mutate2  # v2 mutate engine
 from parser import load_ft_url
 from os import sys, path
-from bruteDiscover import BruteDiscoverer
+import UNIVERSE
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
 
@@ -34,11 +35,9 @@ class FTModel(model):
         if num_of_attached_objs >= 2:
             obj.append(Has(name='time', lo=0, hi=sum(self.ft.time), goal=lt))
 
-        self.eval_count = 0
-
         self.mutateEngines = {
-            'brute': BruteDiscoverer(self),
-            'v2'   : BruteDiscoverer(self),
+            'brute': bruteDiscover.BruteDiscoverer(self),
+            'v2'   : mutate2.mutateEngine(self),
         }
 
         model.__init__(self, dec, obj)
@@ -66,7 +65,7 @@ class FTModel(model):
 
             # fill other tree elements
             t.fill_form4all_fea(fulfill)
-            self.eval_count += 1
+            UNIVERSE.FT_EVAL_COUNTER += 1
         else:
             fulfill = candidate.fulfill
 

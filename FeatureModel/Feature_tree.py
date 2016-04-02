@@ -19,9 +19,10 @@ class Node(object):
         self.children.append(node)
 
     def __repr__(self):
-        return '\n id: %s\n type:%s \n' % (
-            self.id,
-            self.node_type)
+        # return '\n id: %s\n type:%s \n' % (
+        #     self.id,
+        #     self.node_type)
+        return '%s|%s' % (self.node_type, self.id)
 
 
 class Constraint(object):
@@ -130,6 +131,18 @@ class FeatureTree(object):
             return
 
         self.post_order(self.root, filling)
+
+    def fill_subtree_0(self, subtree_root, fulfill):
+        """
+        Setting the subtree rooted by node zeros.
+        Fulfill vector will be modified
+        NOTHING WILL BE RETURNED
+        """
+        def fill_zero(node, fill_vec):
+            node_index = self.features.index(node)
+            fill_vec[node_index] = 0
+
+        self.post_order(subtree_root, fill_zero, [fulfill])
 
     def get_feature_num(self):
         return len(self.features) - len(self.groups)

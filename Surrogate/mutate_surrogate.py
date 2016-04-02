@@ -1,23 +1,40 @@
 from __future__ import division
 import pre_surrogate
 import learner
-from cart import *
+import logging
+import pdb
+import traceback
+import time
+from cart import CART
+from random import choice, randint, shuffle
+from operator import itemgetter
+from copy import deepcopy
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from FeatureModel.ftmodel import FTModel
-from FeatureModel.parser import *
 from FeatureModel.discoverer import Discoverer
+from FeatureModel.ftmodel import FTModel
+import UNIVERSE
+
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.0"
+__version__ = "1.2"
 __email__ = "jchen37@ncsu.edu"
+
+
+class BadPathConflict(Exception):
+    def __init__(self, node):
+        self.node = node
+
+    def __str__(self):
+        return repr(self.node)
 
 
 class MutateWithSurrogateEngine(Discoverer):
     def __init__(self, feature_model):
+        time_init = time.time()
         # load the model
         self.ft_model = feature_model
         self.ft_tree = self.ft_model.ft
@@ -32,7 +49,7 @@ class MutateWithSurrogateEngine(Discoverer):
 
         self.carts = [CART(name, obj_index) for obj_index, _ in enumerate(self.ft_model.obj)]
         map(lambda cart: cart.prune(remaining_rate=0.3), self.carts)
-        logging.info("carts for model %s load successfully." % name)
+        logging.info("carts for model %s load successfully.\nTIME CONSUMING: %d\n" % (name, time.time()-time_init))
 
         self.avoid_paths = self._get_avoid_paths()
         # pdb.set_trace()
@@ -51,57 +68,99 @@ class MutateWithSurrogateEngine(Discoverer):
     def _can_set(self, after_set_filled_list):
         # checking basing on the avoiding paths
         for avoid_path in self.avoid_paths:
-            for i, j in zip(avoid_path, after_set_filled_list):
-                if i == 0 and j == 1:
-                    return False
-                if i == 1 and j == 0:
-                    return False
+            checking = [index for index, path_point in enumerate(avoid_path) if path_point != -1]
+            if itemgetter(*checking)(avoid_path) == itemgetter(*checking)(after_set_filled_list):
+                return False
         return True
 
-    def mutateNode(self, node, filled_list):
+    def bfs(self, filled_list):
+        visited, queue = set(), [self.ft_tree.root]
+        while queue:
+            vertex = queue.pop(0)
+            print filled_list
+            print vertex
+            if vertex not in visited:
+                childs = self.mutate_node(vertex, filled_list)
+                queue.extend(childs)
+        return filled_list
+
+    def mutate_node(self, node, filled_list):
         node_loc = self.ft_tree.features.index(node)
         node_type = node.node_type
         node_value = filled_list[node_loc]
 
-        if node_type in ['r', 'm']:
-            1
-            # setting children of a mandatory node
-            # TODO
-        elif node_type == 'g':
-            1
-            # TODO children of a group node
-        elif node_type == 'o':
-            1
-            # TODO children of optional node
-        else:  # leaves
-            1
-            # TODO we have arrived a leaf
-        pdb.set_trace()
-        pass
+        if node_value == 0:
+            # pdb.set_trace()
+            self.ft_tree.fill_subtree_0(node, filled_list)
+            if not self._can_set(filled_list):
+                raise BadPathConflict(node)
+            return
+
+        '''otherwise, current node is required, then assign the value of its children'''
+        m_child = [c for c in node.children if c.node_type in ['r', 'm', 'g']]
+        g_child = [c for c in node.children if c.node_type == '']
+        o_child = [c for c in node.children if c.node_type == 'o']
+        filled_list_copy = deepcopy(filled_list)
+
+        while True:
+            filled_list = filled_list_copy
+            for m in m_child:
+                m_i = self.ft_tree.features.index(m)
+                filled_list[m_i] = 1
+            for o in o_child:
+                # TODO for next version: the orders matter
+                o_i = self.ft_tree.features.index(o)
+                filled_list[o_i] = choice([0, 1])
+
+            alpha = []
+            if node_type == 'g':
+                r = randint(node.g_d, node.g_u)
+                alpha = [1] * r + [0] * (len(g_child)-r)
+                shuffle(alpha)
+
+            for assign, g in zip(alpha, g_child):
+                g_i = self.ft_tree.features.index(g)
+                filled_list[g_i] = assign
+
+            if self._can_set(filled_list):
+                return m_child+g_child+o_child
+                # # pdb.set_trace()
+                # try:
+                #     for c in m_child + o_child:
+                #         self.mutate_node(c, filled_list)
+                #         print 'after mutate' + str(c) + str(filled_list)
+                #     return filled_list
+                # except BadPathConflict:
+                #     print 'fail at', filled_list
 
     def gen_valid_one(self):
         filled_list = [-1] * self.ft_tree.featureNum
         filled_list[0] = 1  # let root be 1
-        self.mutateNode(self.ft_tree.root, filled_list)
-
-        pdb.set_trace()
-        # TODO ...
+        self.bfs(filled_list)
+        # self.mutate_node(self.ft_tree.root, filled_list)
+        return filled_list
+        # pdb.set_trace()
 
 
 def test_one_model(model):
-    engine = MutateWithSurrogateEngine(model)
-    print 'Decision num: %d' % engine.ft_model.decNum
-    print 'Bad paths num: %d' % len(engine.avoid_paths)
-    print '*' * 8
-    engine.genValidOne()
+    UNIVERSE.FT_EVAL_COUNTER = 0
+    engine = MutateWithSurrogateEngine(FTModel(model))
+    alpha = engine.gen_valid_one()
+    pdb.set_trace()
 
 
 if __name__ == '__main__':
-    # logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO)
     try:
-        to_test_models = ['simple', 'webportal', 'cellphone', 'eshop', 'eis']
+        to_test_models = ['simple',
+                          'webportal',
+                          # 'cellphone',
+                          # 'eshop',
+                          # 'eis',
+                          ]
         for model in to_test_models:
             test_one_model(model)
+            pdb.set_trace()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()

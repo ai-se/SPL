@@ -18,7 +18,7 @@ def write_random_individuals(name, num_of_individuals=100, contain_non_leaf=Fals
     spl_addr = [i for i in sys.path if i.endswith('SPL')][0]
     with open(spl_addr+'/surrogate_data/' + name + '.raw', 'w+') as f:
         if contain_non_leaf:
-            dec_head = ['>'+ i.id for i in ft_model.ft.features]
+            dec_head = ['>' + i.id for i in ft_model.ft.features]
         else:
             dec_head = ['>' + i.name for i in ft_model.dec]
         obj_head = ['$' + i.name for i in ft_model.obj]
