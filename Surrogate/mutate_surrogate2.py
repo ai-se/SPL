@@ -1,12 +1,11 @@
 from __future__ import division
 from __init__ import *
 from random import choice, randint, shuffle
-from operator import itemgetter
 from os import sys
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
+import itertools
 import copy
-import pre_surrogate
 import learner
 import pareto
 import logging
@@ -23,7 +22,7 @@ __version__ = "1.4"
 __email__ = "jchen37@ncsu.edu"
 
 
-class BadPathConflict(Exception):
+class ConstraintConflict(Exception):
     def __init__(self, node, cant_set):
         self.node = node
         self.cant_set = cant_set
@@ -42,42 +41,30 @@ class MutateSurrogateEngine2(Discoverer):
         self.var_rank_dict = dict()
         logging.info("model %s load successfully." % self.name)
 
-        # get one decision tree for each objective and prune them.
-        # We are using V2 engine here!! (guarantee valid)
-        pre_surrogate.write_random_individuals(self.name, 100, contain_non_leaf=True)  # TODO Turn off here when testing
-        # for obj_index, _ in enumerate(self.ft_model.obj):
-        #     clf = learner.get_cart(name, obj_index)
-        #     learner.drawTree(name, clf, obj_index)
+        '''We are using V2 engine here!! (guarantee valid)'''
+        # TODO Turn off here when testing
+        # pre_surrogate.write_random_individuals(self.name, 100, contain_non_leaf=True)
 
-        # self.carts = [CART(name, obj_index) for obj_index, _ in enumerate(self.ft_model.obj)]
-        # map(lambda cart: cart.prune(remaining_rate=0.3), self.carts)
         logging.info("carts preparation for model %s load successfully.\nTIME CONSUMING: %d\n" %
                      (self.name, time.time() - time_init))
 
-        # self.avoid_paths = self._get_avoid_paths()
-        # pdb.set_trace()
-
-    def _get_avoid_paths(self):
-        result_set = []
-        for cart in self.carts:
-            avoid_paths = cart.translate_into_binary_list(cart.get_bad_paths(), len(self.ft_tree.features))
-            result_set.extend(avoid_paths)
-
-        # remove the duplicate
-        import itertools
-        result_set.sort()
-        return list(result_set for result_set, _ in itertools.groupby(result_set))
-
     def _can_set(self, after_set_filled_list):
-        # checking basing on the avoiding paths
-        for avoid_path in self.avoid_paths:
-            checking = [index for index, path_point in enumerate(avoid_path) if path_point != -1]
-            if itemgetter(*checking)(avoid_path) == itemgetter(*checking)(after_set_filled_list):
+        # checking basing on the feature constraints
+        for constraint in self.ft_tree.con:
+            if constraint.is_violated(self.ft_tree, after_set_filled_list):
                 return False
         return True
 
-    # @contextmanager
-    def best_attr_setting(self, curious_indices, rebuild=False):
+    def best_attr_setting(self, curious_indices, g_d=0, g_u=0, rebuild=False):
+
+        """
+        what is the best settings for a flexible clusters? Answer this using the CART learner
+        :param curious_indices: indices of the flexible cluster
+        :param g_d: for groups only
+        :param g_u: for groups only
+        :param rebuild: build the learner again?
+        :return: a generator
+        """
         sn = hash(tuple(curious_indices))
 
         def _get_clf4_one_obj(obj_index):
@@ -96,12 +83,22 @@ class MutateSurrogateEngine2(Discoverer):
             # TODO how to rank this? -- using pareto first. then using the second layer...
             n = len(curious_indices)
             all_possibilities = []
-            for decimal in range(2**n):  # enumerate all possibilities
-                instance = [0] * self.ft_tree.featureNum
-                trying = _dec2bin_list(decimal, n)
-                for ts, t in zip(trying, curious_indices):
-                    instance[t] = ts
-                all_possibilities.append(instance)
+            if g_d == 0 and g_u == 0:  # not group clusters
+                for decimal in range(2 ** n):  # enumerate all possibilities TODO for the groups handing more here
+                    instance = [0] * self.ft_tree.featureNum
+                    trying = _dec2bin_list(decimal, n)
+                    for ts, t in zip(trying, curious_indices):
+                        instance[t] = ts
+                    all_possibilities.append(instance)
+            else:
+                # flexible group
+                bit_indicator = range(len(curious_indices))
+                for select_bit_len in range(g_d, g_u+1):
+                    for select_bit in itertools.combinations(bit_indicator, select_bit_len):
+                        instance = [0] * self.ft_tree.featureNum
+                        for bit in select_bit:
+                            instance[curious_indices[bit]] = 1
+                        all_possibilities.append(instance)
 
             predict_os = []
             for clf in clfs:
@@ -136,7 +133,7 @@ class MutateSurrogateEngine2(Discoverer):
             if vertex not in visited:
                 try:
                     filled_list, childs = self.mutate_node(vertex, filled_list)
-                except BadPathConflict as bb:
+                except ConstraintConflict as bb:
                     pdb.set_trace()
                 queue.extend(childs)
         return filled_list
@@ -147,14 +144,11 @@ class MutateSurrogateEngine2(Discoverer):
         node_value = filled_list[node_loc]
 
         if node_value == 0:
-            pass
-            # TODO
-            return
-            # # pdb.set_trace()
-            # self.ft_tree.fill_subtree_0(node, filled_list)
-            # if not self._can_set(filled_list):
-            #     raise BadPathConflict(node, cant_set=node_value)
-            # return filled_list, []
+            # pdb.set_trace()
+            self.ft_tree.fill_subtree_0(node, filled_list)
+            if not self._can_set(filled_list):
+                raise ConstraintConflict(node, cant_set=0)
+            return filled_list, []
 
         '''otherwise, current node is required, then assign the value of its children'''
         m_child = [c for c in node.children if c.node_type in ['r', 'm', 'g']]
@@ -164,56 +158,38 @@ class MutateSurrogateEngine2(Discoverer):
 
         '''
         children setting sorting
-        using decision tree technique. Tranining data from the valid candidates
+        using decision tree technique. Train data from the valid candidates
         '''
         if node_type is 'g':
-            g_c = node.g_u - node.g_d
+            g_u, g_d = node.g_u, node.g_d
         else:
-            g_c = 0
+            g_u = g_d = 0
 
-        if o_child or g_c:
-            # the children assignment is flexible
-            curious_indices = map(self.ft_tree.find_fea_index, g_child + o_child)
-            # with self.best_attr_setting(curious_indices) as best_var:
-            #     for i in best_var:
-            #         print i
-            gen = self.best_attr_setting(curious_indices)
-            while 1:
-                print gen.next()
-
-            # self.best_attr_setting(curious_indices).next()
-            pdb.set_trace()
-            pass
-
-
+        if o_child or g_child:
+            curious_indices = map(self.ft_tree.find_fea_index, o_child+g_child)
+            best_gen = self.best_attr_setting(curious_indices, g_d, g_u)
 
         # TODO all possible ?
         while True:
             filled_list = [flc for flc in filled_list_copy]  # recover
+
             for m in m_child:
                 m_i = self.ft_tree.find_fea_index(m)
                 filled_list[m_i] = 1
-            for o in o_child:
-                # TODO for next version: the orders matter
-                o_i = self.ft_tree.find_fea_index(o)
-                filled_list[o_i] = choice([0, 1])
 
-            alpha = []
-            if node_type is 'g':
-                r = randint(node.g_d, node.g_u)
-                alpha = [1] * r + [0] * (len(g_child) - r)
-                shuffle(alpha)
+            # we have flexible choices here
+            if o_child or g_child:
+                # TODO support for both o_child and g_child...
+                try:
+                    bit_setting = best_gen.next()
+                except Exception:
+                    raise ConstraintConflict(node, cant_set=1)
 
-            for assign, g in zip(alpha, g_child):
-                g_i = self.ft_tree.find_fea_index(g)
-                filled_list[g_i] = assign
+                for index, bit in zip(curious_indices, bit_setting):
+                    filled_list[index] = bit
 
             if self._can_set(filled_list):
                 return filled_list, m_child + g_child + o_child
-
-            tol -= 1
-            if not tol:
-                raise BadPathConflict(node, cant_set=node_value)
 
     def gen_valid_one(self):
         filled_list = [-1] * self.ft_tree.featureNum
@@ -228,7 +204,6 @@ def test_one_model(model):
     UNIVERSE.FT_EVAL_COUNTER = 0
     engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
     alpha = engine.gen_valid_one()
-    # pdb.set_trace()
 
 
 if __name__ == '__main__':
@@ -243,7 +218,6 @@ if __name__ == '__main__':
         ]
         for model in to_test_models:
             test_one_model(model)
-            # pdb.set_trace()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()

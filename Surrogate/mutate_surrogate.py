@@ -22,6 +22,8 @@ __license__ = "MIT"
 __version__ = "1.2"
 __email__ = "jchen37@ncsu.edu"
 
+# engine abandoned. Apr 4, 2016
+
 
 class BadPathConflict(Exception):
     def __init__(self, node, cant_set):

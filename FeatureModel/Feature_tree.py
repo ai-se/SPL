@@ -35,11 +35,23 @@ class Constraint(object):
         return self.id + '\n' + str(self.literals) + '\n' + str(self.li_pos)
 
     def is_correct(self, ft, filled_form):
-        for (li, pos) in zip(self.literals, self.li_pos):
+        """
+        not supported for filled_form containing -1
+        try to apply is_violate if needed.
+        """
+        for li, pos in zip(self.literals, self.li_pos):
             i = ft.find_fea_index(li)
             if int(pos) == filled_form[i]:
                 return True
         return False
+
+    def is_violated(self, ft, filled_form):
+        for li, pos in zip(self.literals, self.li_pos):
+            i = ft.find_fea_index(li)
+            filled = filled_form[i]
+            if filled == -1 or int(pos) == filled_form[i]:
+                return False
+        return True
 
 
 class FeatureTree(object):
