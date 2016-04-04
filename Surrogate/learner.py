@@ -1,6 +1,7 @@
 from __future__ import division
 import csv
 import pdb
+import cStringIO
 from sklearn import tree
 from os import sys, path
 import os
@@ -59,11 +60,10 @@ def get_cart(name, object_index, index_subset=[]):
     if not index_subset:
         index_subset = range(dec_num)
 
-    x = [i for i in all_data]
+    x = [i[:dec_num] for i in all_data]
     y = [i[dec_num+object_index] for i in all_data]
 
     map(lambda i: _masking(i, index_subset), x)  # masking
-
     clf = tree.DecisionTreeRegressor()
     clf = clf.fit(x, y)
 
@@ -76,10 +76,10 @@ def drawTree(name, clf, obj_index=0, write_dot=True, drawPng=False, drawPdf=Fals
         with open(file2draw+'.dot', 'w+') as f:
             tree.export_graphviz(clf, out_file=f)
     else:
-        tree.export_graphviz(clf)
-        with open('tree.dot', 'r') as f:
-            tree_dot = f.read()
-        os.remove('tree.dot')
+        f = cStringIO.StringIO()
+        tree.export_graphviz(clf, out_file=f)
+        tree_dot = f.getvalue()
+        f.close()
         return tree_dot
 
     if drawPdf:
@@ -89,10 +89,11 @@ def drawTree(name, clf, obj_index=0, write_dot=True, drawPng=False, drawPdf=Fals
 
 
 if __name__ == '__main__':
-    name = 'eshop'
-    clf = get_cart(name, 2, [2, 14, 47, 103, 112, 188, 204])
+    name = 'eis'
+    clf = get_cart(name, 0)
+    # clf = get_cart(name, 2, [2, 14, 47, 103, 112, 188, 204])
     # clf = get_cart(name, 2, )
-    ew = drawTree(name, clf, 2, write_dot=False)
-    from cart import CART
-    eee = CART('eshop', 2, given_dot_source=ew)
+    ew = drawTree(name, clf, 0, write_dot=False)
+    # from cart import CART
+    # eee = CART('eshop', 2, given_dot_source=ew)
     pdb.set_trace()

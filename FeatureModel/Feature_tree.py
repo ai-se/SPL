@@ -36,7 +36,7 @@ class Constraint(object):
 
     def is_correct(self, ft, filled_form):
         for (li, pos) in zip(self.literals, self.li_pos):
-            i = ft.find_fea_index_by_id(li)
+            i = ft.find_fea_index(li)
             if int(pos) == filled_form[i]:
                 return True
         return False
@@ -59,7 +59,12 @@ class FeatureTree(object):
     def add_constraint(self, con):
         self.con.append(con)
 
-    def find_fea_index_by_id(self, identification):
+    def find_fea_index(self, id_or_nodeObj):
+        if type(id_or_nodeObj) is not str:
+            identification = id_or_nodeObj.id
+        else:
+            identification = id_or_nodeObj
+
         for i, x in enumerate(self.features):
             if x.id == identification:
                 return i

@@ -53,7 +53,7 @@ class mutateEngine(Discoverer):
                 con.li_pos.pop(location)
 
                 if len(con.literals) == 1: #have a try for the last literal
-                    last_i = self.ft.find_fea_index_by_id(con.literals[0])
+                    last_i = self.ft.find_fea_index(con.literals[0])
                     self.setFulfill(self.ft.features[last_i], int(con.li_pos[0]))
                     self.con_fulfill[i] = 1
                 if len(con.literals) == 0:
