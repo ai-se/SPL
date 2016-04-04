@@ -1,13 +1,13 @@
 from __future__ import division
-from cart import CART
+from __init__ import *
 from random import choice, randint, shuffle
 from operator import itemgetter
 from os import sys
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
+import copy
 import pre_surrogate
 import learner
-# import pandas
 import pareto
 import logging
 import pdb
@@ -15,12 +15,11 @@ import traceback
 import time
 import UNIVERSE
 
-project_path = [i for i in sys.path if i.endswith('SPL')][0]
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.2"
+__version__ = "1.4"
 __email__ = "jchen37@ncsu.edu"
 
 
@@ -40,7 +39,7 @@ class MutateSurrogateEngine2(Discoverer):
         self.ft_model = feature_model
         self.ft_tree = self.ft_model.ft
         self.name = self.ft_model.name
-        self.var_clf_dict = dict()
+        self.var_rank_dict = dict()
         logging.info("model %s load successfully." % self.name)
 
         # get one decision tree for each objective and prune them.
@@ -77,45 +76,58 @@ class MutateSurrogateEngine2(Discoverer):
                 return False
         return True
 
-    def yield_next_attr_setting(self, curious_indices, rebuild=False):
-
-        # def _get_cart4_one_obj(obj_index):
-        #     clf = learner.get_cart(self.name, obj_index, curious_indices)
-        #     tree_dot_data = learner.drawTree(self.name, clf, obj_index, write_dot=False)
-        #     return CART(self.name, obj_index, tree_dot_data)
-
-        # self.carts = map(_get_cart4_one_obj, range(self.ft_model.objNum))
+    # @contextmanager
+    def best_attr_setting(self, curious_indices, rebuild=False):
+        sn = hash(tuple(curious_indices))
 
         def _get_clf4_one_obj(obj_index):
             return learner.get_cart(self.name, obj_index, curious_indices)
 
+        def _dec2bin_list(decimal, total_bits):
+            return map(int, '{0:b}'.format(decimal).zfill(total_bits))
+
         if rebuild:
-            self.var_clf_dict.pop(hash(tuple(curious_indices)), None)
+            self.var_rank_dict.pop(sn, None)
 
-        if hash(tuple(curious_indices)) not in self.var_clf_dict:
+        if sn not in self.var_rank_dict:
             clfs = map(_get_clf4_one_obj, range(self.ft_model.objNum))
-        else:
-            clfs = self.var_clf_dict[hash(tuple(curious_indices))]
+            self.var_rank_dict[sn] = dict()
 
-        # TODO how to rank this? -- using pareto first. then using the second layer...
-        n = len(curious_indices)
-        all_possibilities = []
-        for i in range(2**n):  # enumerate all possibilities
-            instance = [0] * self.ft_tree.featureNum
-            tryset = map(int, '{0:b}'.format(i).zfill(n))
-            for ts, t in zip(tryset, curious_indices):
-                instance[t] = ts
-            all_possibilities.append(instance)
+            # TODO how to rank this? -- using pareto first. then using the second layer...
+            n = len(curious_indices)
+            all_possibilities = []
+            for decimal in range(2**n):  # enumerate all possibilities
+                instance = [0] * self.ft_tree.featureNum
+                trying = _dec2bin_list(decimal, n)
+                for ts, t in zip(trying, curious_indices):
+                    instance[t] = ts
+                all_possibilities.append(instance)
 
-        predict_os = []
-        for clf in clfs:
-            predict_os.append(map(lambda x: round(x, 1), clf.predict(all_possibilities).tolist()))  # FORCE TRUNK
+            predict_os = []
+            for clf in clfs:
+                predict_os.append(map(lambda x: round(x, 1), clf.predict(all_possibilities).tolist()))  # FORCE TRUNK
 
-        predict_os = map(list, zip(*predict_os))
-        nondominated = pareto.eps_sort(predict_os)
-        print len(predict_os)
-        print len(nondominated)
-        pdb.set_trace()
+            predict_os = map(list, zip(*predict_os))
+            non_dominated = pareto.eps_sort(predict_os)
+            self.var_rank_dict[sn]['all_os'] = predict_os
+            self.var_rank_dict[sn]['all_os_copy'] = copy.deepcopy(predict_os)
+            self.var_rank_dict[sn]['nd'] = non_dominated
+            self.var_rank_dict[sn]['used'] = []
+
+        if sn in self.var_rank_dict:
+            while True:
+                nd = self.var_rank_dict[sn]['nd']
+                all_os = self.var_rank_dict[sn]['all_os']
+                if nd[0] not in all_os:
+                    del nd[0]
+                if not nd:
+                    assert self.var_rank_dict[sn]['all_os'], "ERROR: no more candidates available :("
+                    self.var_rank_dict[sn]['nd'] = pareto.eps_sort(self.var_rank_dict[sn]['all_os'])
+                    nd = self.var_rank_dict[sn]['nd']
+                indices = [i for i,x in enumerate(self.var_rank_dict[sn]['all_os_copy']) if x == nd[0]]
+                for index in indices:
+                    all_os.remove(nd[0])
+                    yield _dec2bin_list(index, len(curious_indices))
 
     def bfs(self, filled_list):
         visited, queue = set(), [self.ft_tree.root]
@@ -162,8 +174,14 @@ class MutateSurrogateEngine2(Discoverer):
         if o_child or g_c:
             # the children assignment is flexible
             curious_indices = map(self.ft_tree.find_fea_index, g_child + o_child)
-            self.get_attr_setting_rank(curious_indices)
+            # with self.best_attr_setting(curious_indices) as best_var:
+            #     for i in best_var:
+            #         print i
+            gen = self.best_attr_setting(curious_indices)
+            while 1:
+                print gen.next()
 
+            # self.best_attr_setting(curious_indices).next()
             pdb.set_trace()
             pass
 
