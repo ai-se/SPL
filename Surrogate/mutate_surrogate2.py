@@ -40,6 +40,7 @@ class MutateSurrogateEngine2(Discoverer):
         self.ft_model = feature_model
         self.ft_tree = self.ft_model.ft
         self.name = self.ft_model.name
+        self.var_clf_dict = dict()
         logging.info("model %s load successfully." % self.name)
 
         # get one decision tree for each objective and prune them.
@@ -76,21 +77,27 @@ class MutateSurrogateEngine2(Discoverer):
                 return False
         return True
 
-    def get_attr_setting_rank(self, curious_indices):
+    def yield_next_attr_setting(self, curious_indices, rebuild=False):
 
-        def _get_cart4_one_obj(obj_index):
-            clf = learner.get_cart(self.name, obj_index, curious_indices)
-            tree_dot_data = learner.drawTree(self.name, clf, obj_index, write_dot=False)
-            return CART(self.name, obj_index, tree_dot_data)
+        # def _get_cart4_one_obj(obj_index):
+        #     clf = learner.get_cart(self.name, obj_index, curious_indices)
+        #     tree_dot_data = learner.drawTree(self.name, clf, obj_index, write_dot=False)
+        #     return CART(self.name, obj_index, tree_dot_data)
 
         # self.carts = map(_get_cart4_one_obj, range(self.ft_model.objNum))
 
         def _get_clf4_one_obj(obj_index):
             return learner.get_cart(self.name, obj_index, curious_indices)
 
-        self.clfs = map(_get_clf4_one_obj, range(self.ft_model.objNum))
+        if rebuild:
+            self.var_clf_dict.pop(hash(tuple(curious_indices)), None)
 
-        # TODO how to rank this?
+        if hash(tuple(curious_indices)) not in self.var_clf_dict:
+            clfs = map(_get_clf4_one_obj, range(self.ft_model.objNum))
+        else:
+            clfs = self.var_clf_dict[hash(tuple(curious_indices))]
+
+        # TODO how to rank this? -- using pareto first. then using the second layer...
         n = len(curious_indices)
         all_possibilities = []
         for i in range(2**n):  # enumerate all possibilities
@@ -101,11 +108,13 @@ class MutateSurrogateEngine2(Discoverer):
             all_possibilities.append(instance)
 
         predict_os = []
-        for clf in self.clfs:
-            predict_os.append(clf.predict(all_possibilities).tolist())
+        for clf in clfs:
+            predict_os.append(map(lambda x: round(x, 1), clf.predict(all_possibilities).tolist()))  # FORCE TRUNK
 
         predict_os = map(list, zip(*predict_os))
-        nondominated = pareto.eps_sort()
+        nondominated = pareto.eps_sort(predict_os)
+        print len(predict_os)
+        print len(nondominated)
         pdb.set_trace()
 
     def bfs(self, filled_list):
