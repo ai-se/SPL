@@ -33,7 +33,7 @@ class ConstraintConflict(Exception):
         return repr(self.node)
 
 
-class MutateSurrogateEngine2(Discoverer):
+class MutateSurrogateEngine3(Discoverer):
     def __init__(self, feature_model):
         time_init = time.time()
         # load the model
@@ -241,7 +241,7 @@ class MutateSurrogateEngine2(Discoverer):
 def test_one_model(model):
     UNIVERSE.FT_EVAL_COUNTER = 0
     while True:
-        engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
+        engine = MutateSurrogateEngine3(FTModel(model, setConVioAsObj=False))
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
         print alpha
