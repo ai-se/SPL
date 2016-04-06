@@ -33,22 +33,82 @@ class ConstraintConflict(Exception):
         return repr(self.node)
 
 
+class PreCanVar(object):
+    def __init__(self, var):
+        self.var = var
+
+    def __eq__(self, other):
+        others = other if type(other) is list else other.var
+        for i, j in zip(self.var, others):
+            if i == -1 or j == -1:
+                continue
+            if i != j:
+                return False
+        return True
+
+    def __repr__(self):
+        return str(self.var)
+
+    def __getitem__(self, item):
+        return self.var[item]
+
+    def __setitem__(self, i, v):
+        self.var[i] = v
+
+    def __iter__(self):
+        return iter(self.var)
+
+    def __hash__(self):
+        return hash(tuple(self.var))
+
+
 class MutateSurrogateEngine3(Discoverer):
-    def __init__(self, feature_model):
+    def __init__(self, feature_model, regenerate_init=False):
         time_init = time.time()
         # load the model
         self.ft_model = feature_model
         self.ft_tree = self.ft_model.ft
         self.name = self.ft_model.name
-        self.var_rank_dict = dict()
         logging.info("model %s load successfully." % self.name)
 
-        '''We are using V2 engine here!! (guarantee valid)'''
-        # TODO Turn off here when testing
-        # pre_surrogate.write_random_individuals(self.name, 100, contain_non_leaf=True)
+        if regenerate_init:
+            '''We are using V2 engine here!! (guarantee valid)'''
+            pre_surrogate.write_random_individuals(self.name, 100, contain_non_leaf=True)
 
+        # do the NSGA-II like non-dominated sort
+        with open(project_path+'/surrogate_data/'+self.name+'.raw', 'r') as f:
+            raw_data = f.read().splitlines()[1:]
+            raw_data = map(lambda x:x.split(','), raw_data)
+
+            def _str2num(x): return int(x) if x.isdigit() else float(x)
+
+            for r_i, r in enumerate(raw_data):
+                raw_data[r_i] = map(_str2num, r)
+
+            var_num = self.ft_tree.featureNum
+            var_table = [PreCanVar(r[:var_num]) for r in raw_data]
+            obj_table = [tuple(r[var_num:]) for r in raw_data]
+
+        self.pre_cans = dict(zip(var_table, obj_table))
         logging.info("carts preparation for model %s load successfully.\nTIME CONSUMING: %d\n" %
                      (self.name, time.time() - time_init))
+        pdb.set_trace()
+
+    @staticmethod
+    def non_dominate_sort(obj_table):
+        """
+        :param obj_table:
+        :return: list of index list [[layer0],[layer1],...]
+        """
+        # TODO using fast non-dominated sort in NSGA2 or import from the escpy
+        obj = copy.deepcopy(obj_table)
+        result = []
+        while obj:
+            ps = pareto.eps_sort(obj)
+            layer = [i for i, p in enumerate(obj_table) if p in ps]
+            result.append(layer)
+            obj = [i for i in obj if i not in ps]
+        return result
 
     def _can_set(self, after_set_filled_list):
         # checking basing on the feature constraints
@@ -252,10 +312,10 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     try:
         to_test_models = [
-            # 'simple',
+            'simple',
             # 'webportal',
             # 'cellphone',
-            'eshop',
+            # 'eshop',
             # 'eis',
         ]
         for model in to_test_models:
