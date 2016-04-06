@@ -4,11 +4,9 @@ from os import sys
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
 from GALE.model import candidate
-from random import shuffle
+from operator import itemgetter
 import pre_surrogate
-import itertools
 import copy
-import learner
 import pareto
 import logging
 import pdb
@@ -46,6 +44,9 @@ class PreCanVar(object):
                 return False
         return True
 
+    def is_compatible(self, other):
+        return self == other
+
     def __repr__(self):
         return str(self.var)
 
@@ -61,6 +62,9 @@ class PreCanVar(object):
     def __hash__(self):
         return hash(tuple(self.var))
 
+    def tolist(self):
+        return self.var
+
 
 class MutateSurrogateEngine3(Discoverer):
     def __init__(self, feature_model, regenerate_init=False):
@@ -75,7 +79,7 @@ class MutateSurrogateEngine3(Discoverer):
             '''We are using V2 engine here!! (guarantee valid)'''
             pre_surrogate.write_random_individuals(self.name, 100, contain_non_leaf=True)
 
-        # do the NSGA-II like non-dominated sort
+        # fetch pre_cans
         with open(project_path+'/surrogate_data/'+self.name+'.raw', 'r') as f:
             raw_data = f.read().splitlines()[1:]
             raw_data = map(lambda x:x.split(','), raw_data)
@@ -87,18 +91,17 @@ class MutateSurrogateEngine3(Discoverer):
 
             var_num = self.ft_tree.featureNum
             var_table = [PreCanVar(r[:var_num]) for r in raw_data]
-            obj_table = [tuple(r[var_num:]) for r in raw_data]
+            obj_table = [r[var_num:] for r in raw_data]
 
-        self.pre_cans = dict(zip(var_table, obj_table))
+        self.pre_cans = zip(var_table, obj_table)
         logging.info("carts preparation for model %s load successfully.\nTIME CONSUMING: %d\n" %
                      (self.name, time.time() - time_init))
-        pdb.set_trace()
 
     @staticmethod
     def non_dominate_sort(obj_table):
         """
         :param obj_table:
-        :return: list of index list [[layer0],[layer1],...]
+        :return: list of list list [[layer0],[layer1],...]
         """
         # TODO using fast non-dominated sort in NSGA2 or import from the escpy
         obj = copy.deepcopy(obj_table)
@@ -107,7 +110,7 @@ class MutateSurrogateEngine3(Discoverer):
             ps = pareto.eps_sort(obj)
             layer = [i for i, p in enumerate(obj_table) if p in ps]
             result.append(layer)
-            obj = [i for i in obj if i not in ps]
+            obj = [o for o in obj if o not in ps]
         return result
 
     def _can_set(self, after_set_filled_list):
@@ -117,78 +120,39 @@ class MutateSurrogateEngine3(Discoverer):
                 return False
         return True
 
-    def best_attr_setting(self, curious_indices, g_d=0, g_u=0, rebuild=False):
-
+    @staticmethod
+    def sorted_by_frequency(lst):
         """
-        what is the best settings for a flexible clusters? Answer this using the CART learner
-        :param curious_indices: indices of the flexible cluster
-        :param g_d: for groups only
-        :param g_u: for groups only
-        :param rebuild: build the learner again?
-        :return: a generator
+        group and sort the list by frequency
+        :param lst:
+        :return: sorted list. each element format by: e, frequency
         """
-        sn = hash(tuple(curious_indices))
+        hist = [(i, lst.count(i)) for i in set(lst)]
+        return sorted(hist, key=lambda x: x[1], reverse=True)
 
-        def _get_clf4_one_obj(obj_index):
-            return learner.get_cart(self.name, obj_index, curious_indices)
+    def best_attr_setting(self, curious_indices, filled_list):
+        """
+        which setting should be chosen basing on the curring filled_list?
+        :param curious_indices:
+        :param filled_list:
+        :return: the best setting
+        """
+        to_check_objs, correspond_settings = [], []
+        for settings, objs in self.pre_cans:
+            if settings.is_compatible(filled_list):
+                to_check_objs.append(objs)
+                correspond_settings.append(settings)
 
-        def _dec2bin_list(decimal, total_bits):
-            return map(int, '{0:b}'.format(decimal).zfill(total_bits))
+        indicates = self.non_dominate_sort(to_check_objs)
 
-        if rebuild:
-            self.var_rank_dict.pop(sn, None)
+        for rank_group in indicates:
+            # TODO yield order?!
+            samples_all = itemgetter(*rank_group)(correspond_settings)
+            samples_part = map(lambda x: itemgetter(*curious_indices)(x), samples_all)
 
-        if sn not in self.var_rank_dict:
-            clfs = map(_get_clf4_one_obj, range(self.ft_model.objNum))
-            self.var_rank_dict[sn] = dict()
-
-            # how to rank this? -- using pareto first. then using the second layer...
-            n = len(curious_indices)
-            all_possibilities = []
-            if g_d == 0 and g_u == 0:  # not group clusters
-                for decimal in range(2 ** n):  # enumerate all possibilities
-                    instance = [0] * self.ft_tree.featureNum
-                    trying = _dec2bin_list(decimal, n)
-                    for ts, t in zip(trying, curious_indices):
-                        instance[t] = ts
-                    all_possibilities.append(instance)
-            else:
-                # flexible group
-                bit_indicator = range(len(curious_indices))
-                for select_bit_len in range(g_d, g_u+1):
-                    for select_bit in itertools.combinations(bit_indicator, select_bit_len):
-                        instance = [0] * self.ft_tree.featureNum
-                        for bit in select_bit:
-                            instance[curious_indices[bit]] = 1
-                        all_possibilities.append(instance)
-                # pdb.set_trace()
-            predict_os = []
-            for clf in clfs:
-                predict_os.append(map(lambda x: round(x, 1), clf.predict(all_possibilities).tolist()))  # FORCE TRUNK
-
-            predict_os = map(list, zip(*predict_os))
-            non_dominated = pareto.eps_sort(predict_os)
-            shuffle(non_dominated)
-
-            self.var_rank_dict[sn]['all_os'] = predict_os
-            self.var_rank_dict[sn]['all_os_copy'] = copy.deepcopy(predict_os)
-            self.var_rank_dict[sn]['nd'] = non_dominated
-            self.var_rank_dict[sn]['used'] = []
-
-        if sn in self.var_rank_dict:
-            while True:
-                nd = self.var_rank_dict[sn]['nd']
-                all_os = self.var_rank_dict[sn]['all_os']
-                if nd[0] not in all_os:
-                    del nd[0]
-                if not nd:
-                    assert self.var_rank_dict[sn]['all_os'], "ERROR: no more candidates available :("
-                    self.var_rank_dict[sn]['nd'] = pareto.eps_sort(self.var_rank_dict[sn]['all_os'])
-                    nd = self.var_rank_dict[sn]['nd']
-                indices = [i for i,x in enumerate(self.var_rank_dict[sn]['all_os_copy']) if x == nd[0]]
-                for index in indices:
-                    all_os.remove(nd[0])
-                    yield _dec2bin_list(index, len(curious_indices))
+            for sp in self.sorted_by_frequency(samples_part):
+                settings, frequency = list(sp[0]), sp[1]
+                yield settings
 
     @staticmethod
     def _mutable_parent(node):
@@ -248,7 +212,7 @@ class MutateSurrogateEngine3(Discoverer):
 
         if o_child or g_child:
             curious_indices = map(self.ft_tree.find_fea_index, o_child+g_child)
-            best_gen = self.best_attr_setting(curious_indices, g_d, g_u)
+            best_gen = self.best_attr_setting(curious_indices, filled_list)
 
         # TODO all possible ?
         while True:
@@ -301,7 +265,7 @@ class MutateSurrogateEngine3(Discoverer):
 def test_one_model(model):
     UNIVERSE.FT_EVAL_COUNTER = 0
     while True:
-        engine = MutateSurrogateEngine3(FTModel(model, setConVioAsObj=False))
+        engine = MutateSurrogateEngine3(FTModel(model, setConVioAsObj=False), regenerate_init=False)
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
         print alpha
@@ -312,15 +276,15 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     try:
         to_test_models = [
-            'simple',
+            # 'simple',
             # 'webportal',
             # 'cellphone',
-            # 'eshop',
+            'eshop',
             # 'eis',
         ]
         for model in to_test_models:
             test_one_model(model)
     except:
         type, value, tb = sys.exc_info()
-        traceback.print_exc()
-        pdb.post_mortem(tb)
+        # traceback.print_exc()
+        # pdb.post_mortem(tb)
