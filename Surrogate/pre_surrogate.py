@@ -1,7 +1,7 @@
 import pdb
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from Parser.ftmodel import FTModel
+from FeatureModel.ftmodel import FTModel
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -11,14 +11,14 @@ __email__ = "jchen37@ncsu.edu"
 
 
 def write_random_individuals(name, num_of_individuals=100, contain_non_leaf=False):
-    ft_model = FTModel(name, num_of_attached_objs=2, setConVioAsObj=True)
-    cans = [ft_model.genRandomCanBrute() for _ in range(num_of_individuals)]
+    ft_model = FTModel(name, num_of_attached_objs=2, setConVioAsObj=False)
+    cans = [ft_model.genRandomCan('v2') for _ in range(num_of_individuals)]
     map(ft_model.eval, cans)
     # write the candidates to folder surrogate_testing
     spl_addr = [i for i in sys.path if i.endswith('SPL')][0]
     with open(spl_addr+'/surrogate_data/' + name + '.raw', 'w+') as f:
         if contain_non_leaf:
-            dec_head = ['>'+ i.id for i in ft_model.ft.features]
+            dec_head = ['>' + i.id for i in ft_model.ft.features]
         else:
             dec_head = ['>' + i.name for i in ft_model.dec]
         obj_head = ['$' + i.name for i in ft_model.obj]

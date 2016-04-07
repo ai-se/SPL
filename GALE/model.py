@@ -63,9 +63,9 @@ class model(object):
         for index,x in enumerate(can.decs):
             i.dec[index].norm(x)
 
-    def normObjs(i,can):
+    def normObjs(i, can):
         assert len(can.scores) == i.objNum
-        for index,f in enumerate(can.scores):
+        for index, f in enumerate(can.scores):
             can.scores[index] = i.obj[index].norm(f)
 
     def genRandomCan(i,guranteeOK = False):

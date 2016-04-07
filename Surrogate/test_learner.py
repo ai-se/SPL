@@ -13,6 +13,11 @@ __license__ = "MIT"
 __version__ = "1.0"
 __email__ = "jchen37@ncsu.edu"
 
+"""
+Testing file
+Not functional
+"""
+
 
 def mean_absolute_error(list1, list2):
     assert len(list1) == len(list2), "two arguments must have the same length"
@@ -87,9 +92,9 @@ def confirm_precise(name, writeReport=False):
 if __name__ == '__main__':
     from pre_surrogate import *
     from learner import *
-    name = 'webportal'
+    name = 'simple'
     write_random_individuals(name, 500, contain_non_leaf=True)
     clf = get_cart(name, 0)
-    drawTree(name, clf, drawPng=True)
+    drawTree(name, clf, drawPdf=True)
     confirm_precise(name, writeReport=True)
     # pdb.set_trace()

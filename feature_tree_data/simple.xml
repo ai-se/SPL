@@ -20,7 +20,7 @@
 			: Sec(sec)
 			: Min(min)
 	:o Persistence(persistence)
-		:g (_id_3) [1,1] 
+		:g (_id_3) [1,1]
 			: XML(xml)
 			: Database(database)
 </feature_tree>
