@@ -1,24 +1,23 @@
 from __future__ import division
-from __init__ import *
-from os import sys
+
+import copy
+import logging
+import pdb
+import time
+from operator import itemgetter
+
+import UNIVERSE
+import pre_surrogate
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
 from GALE.model import candidate
-from operator import itemgetter
-import pre_surrogate
-import copy
-import pareto
-import logging
-import pdb
-import traceback
-import time
-import UNIVERSE
-
+from __init__ import *
+from tools import pareto
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.4"
+__version__ = "1.0"
 __email__ = "jchen37@ncsu.edu"
 
 

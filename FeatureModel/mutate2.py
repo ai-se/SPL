@@ -1,13 +1,13 @@
+from __future__ import division
+
 import pdb
 from copy import deepcopy
 from random import randint, shuffle
-import ftmodel
-from discoverer import Discoverer
-from os import sys, path
-import traceback
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from GALE.model import candidate
 
+import ftmodel
+from GALE.model import candidate
+from candidatesMeasure import analysis_cans
+from discoverer import Discoverer
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -192,18 +192,24 @@ def demo(name):
     time1 = time.time()
 
     m = ftmodel.FTModel(name, setConVioAsObj=False)
-    print m
     engine = MutateEngine(m)
     R = []
-    for i in xrange(50):
+    c = 0
+    delta_time = 0
+    while True:
+        c += 1
         alpha = engine.gen_valid_one()
         R.append(alpha)
-
+        if c % 500 == 0:
+            delta_time += (time.time()-time1)
+            time1 = time.time()
+            hv = analysis_cans(R, False)
+            print delta_time, c, hv
     print name
     print 'running time:', time.time()-time1
-    # pdb.set_trace()
+    pdb.set_trace()
 
 if __name__ == '__main__':
-    name = ['webportal', 'eis', 'eshop']
+    name = ['webportal']
     for n in name:
         demo(n)

@@ -1,21 +1,20 @@
 from __future__ import division
-from __init__ import *
+
+import copy
+import itertools
+import logging
+import pdb
+import time
+import traceback
 from os import sys
+from random import shuffle
+
+import UNIVERSE
+import learner
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
 from GALE.model import candidate
-from random import shuffle
-import pre_surrogate
-import itertools
-import copy
-import learner
-import pareto
-import logging
-import pdb
-import traceback
-import time
-import UNIVERSE
-
+from tools import pareto
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
