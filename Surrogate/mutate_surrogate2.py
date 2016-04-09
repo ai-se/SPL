@@ -7,12 +7,13 @@ import logging
 import scipy
 import pdb
 import time
+import random
 import traceback
 import UNIVERSE
 import learner
 import pre_surrogate
 from os import sys
-from random import shuffle, randint, sample
+from operator import itemgetter
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
 from GALE.model import candidate
@@ -58,6 +59,25 @@ class MutateSurrogateEngine2(Discoverer):
                 return False
         return True
 
+    @staticmethod
+    def _stratify_list(lst):
+        """
+        stratify a list.
+        :param lst: Each element in the list should be a list containing N-dimension values
+        :return: layers
+        """
+        layers = []
+        not_used = map(tuple, lst)
+        not_used = list(set(not_used))
+        not_used = map(list, not_used)  # init as the lst, removing the unique ones
+
+        while not_used:
+            curr_layer = pareto.eps_sort(not_used)
+            for c in curr_layer:
+                not_used.remove(c)
+            layers.append(curr_layer)
+        return layers
+
     def best_attr_setting(self, curious_indices, g_d=0, g_u=0, rebuild=False):
 
         """
@@ -90,7 +110,7 @@ class MutateSurrogateEngine2(Discoverer):
                 if 2 ** n > 1000:
                     for _ in range(1000):
                         instance = [0] * self.ft_tree.featureNum
-                        selected = sample(curious_indices, randint(1,n))
+                        selected = random.sample(curious_indices, random.randint(1,n))
                         for s in selected:
                             instance[s] = 1
                         all_possibilities.append(instance)
@@ -115,7 +135,7 @@ class MutateSurrogateEngine2(Discoverer):
                 else:
                     for _ in range(1000):
                         instance = [0] * self.ft_tree.featureNum
-                        locs = sample(curious_indices, randint(g_d, g_u))
+                        locs = random.sample(curious_indices, random.randint(g_d, g_u))
                         for loc in locs:
                             instance[loc] = 1
                         all_possibilities.append(instance)
@@ -125,6 +145,37 @@ class MutateSurrogateEngine2(Discoverer):
                 predict_os.append(map(lambda x: round(x, 1), clf.predict(all_possibilities).tolist()))  # FORCE TRUNK
 
             predict_os = map(list, zip(*predict_os))
+            layers = self._stratify_list(predict_os)
+
+            self.var_rank_dict[sn] = []
+            for layer in layers:
+                layer_settings = []
+                for setting, obj in zip(all_possibilities, predict_os):
+                    if obj in layer:
+                        layer_settings.append(itemgetter(*curious_indices)(setting))
+                self.var_rank_dict[sn].append(layer_settings)
+
+        if sn in self.var_rank_dict:
+            settings_tower = self.var_rank_dict[sn]
+            layer_lens = [len(l) for l in settings_tower]
+
+            # TODO modify the sample strategy
+            # each element at first layer valued 1, second layer valued 1/2, third layer valued 1/4...
+
+            break_points = [0]
+            for i, l in enumerate(layer_lens):
+                break_points.append(l*0.5**i+break_points[-1])
+            while True:
+                die = random.uniform(0, break_points[-1])
+                sl = break_points.index(filter(lambda b: b >= die, break_points)[0])-1  # selected_layer
+                out = settings_tower[sl][random.randint(1, layer_lens[sl])-1]
+                if type(out) is int:
+                    yield [out]
+                else:
+                    yield list(out)
+
+        """
+            # comment till the end for an experiment
             non_dominated = pareto.eps_sort(predict_os)
             shuffle(non_dominated)
 
@@ -147,14 +198,15 @@ class MutateSurrogateEngine2(Discoverer):
                 for index in indices:
                     all_os.remove(nd[0])
                     yield _dec2bin_list(index, len(curious_indices))
+        """
 
-    @staticmethod
-    def _mutable_parent(node):
-        parent = node.parent
-        while parent:
-            if 'o' in [c.node_type for c in parent.children]:
-                return parent
-            parent = parent.parent
+    # @staticmethod
+    # def _mutable_parent(node):
+    #     parent = node.parent
+    #     while parent:
+    #         if 'o' in [c.node_type for c in parent.children]:
+    #             return parent
+    #         parent = parent.parent
 
     def bfs(self, filled_list):
         visited, queue = [], [self.ft_tree.root]
@@ -170,15 +222,13 @@ class MutateSurrogateEngine2(Discoverer):
                     # pdb.set_trace()
 
                 except ConstraintConflict as cc:
-                    pdb.set_trace()
-                    mutate_again_node = self._mutable_parent(cc.node)
+                    mutate_again_node = cc.node.parent
                     index1 = visited.index(mutate_again_node)
                     index2 = visited.index(mutate_again_node.children[0])
 
                     queue = visited[index1:index2+1]
                     visited = visited[:index1]
-                    print 'we are in trouble'
-                    cc.cant_set
+                    print cc.node, cc.cant_set
             # print visited
         return filled_list
 
@@ -242,6 +292,8 @@ class MutateSurrogateEngine2(Discoverer):
 
             if self._can_set(filled_list):
                 return filled_list, m_child + g_child + o_child
+            elif len(o_child) + len(g_child) == 0:
+                raise ConstraintConflict(node, cant_set=1)
 
     def _fetch_leaves(self, fulfill):
         r = []
@@ -264,9 +316,9 @@ class MutateSurrogateEngine2(Discoverer):
 def test_one_model(model):
     UNIVERSE.FT_EVAL_COUNTER = 0
     R = []
+    engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
     for i in range(100):
         print i
-        engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
         R.append(alpha)
