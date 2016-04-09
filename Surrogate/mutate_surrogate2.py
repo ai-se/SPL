@@ -1,16 +1,18 @@
 from __future__ import division
 
+import __init__
 import copy
 import itertools
 import logging
+import scipy
 import pdb
 import time
 import traceback
-from os import sys
-from random import shuffle
-
 import UNIVERSE
 import learner
+import pre_surrogate
+from os import sys
+from random import shuffle, randint, sample
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
 from GALE.model import candidate
@@ -19,7 +21,7 @@ from tools import pareto
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.4"
+__version__ = "1.6"
 __email__ = "jchen37@ncsu.edu"
 
 
@@ -85,22 +87,39 @@ class MutateSurrogateEngine2(Discoverer):
             n = len(curious_indices)
             all_possibilities = []
             if g_d == 0 and g_u == 0:  # not group clusters
-                for decimal in range(2 ** n):  # enumerate all possibilities
-                    instance = [0] * self.ft_tree.featureNum
-                    trying = _dec2bin_list(decimal, n)
-                    for ts, t in zip(trying, curious_indices):
-                        instance[t] = ts
-                    all_possibilities.append(instance)
+                if 2 ** n > 1000:
+                    for _ in range(1000):
+                        instance = [0] * self.ft_tree.featureNum
+                        selected = sample(curious_indices, randint(1,n))
+                        for s in selected:
+                            instance[s] = 1
+                        all_possibilities.append(instance)
+                else:
+                    for decimal in range(2 ** n):  # enumerate all possibilities
+                        instance = [0] * self.ft_tree.featureNum
+                        trying = _dec2bin_list(decimal, n)
+                        for ts, t in zip(trying, curious_indices):
+                            instance[t] = ts
+                        all_possibilities.append(instance)
             else:
                 # flexible group
-                bit_indicator = range(len(curious_indices))
-                for select_bit_len in range(g_d, g_u+1):
-                    for select_bit in itertools.combinations(bit_indicator, select_bit_len):
+                mid = int((g_d+g_u)/2)
+                if scipy.misc.comb(n, mid) < 1000:
+                    bit_indicator = range(n)
+                    for select_bit_len in range(g_d, g_u+1):
+                        for select_bit in itertools.combinations(bit_indicator, select_bit_len):
+                            instance = [0] * self.ft_tree.featureNum
+                            for bit in select_bit:
+                                instance[curious_indices[bit]] = 1
+                            all_possibilities.append(instance)
+                else:
+                    for _ in range(1000):
                         instance = [0] * self.ft_tree.featureNum
-                        for bit in select_bit:
-                            instance[curious_indices[bit]] = 1
+                        locs = sample(curious_indices, randint(g_d, g_u))
+                        for loc in locs:
+                            instance[loc] = 1
                         all_possibilities.append(instance)
-                # pdb.set_trace()
+
             predict_os = []
             for clf in clfs:
                 predict_os.append(map(lambda x: round(x, 1), clf.predict(all_possibilities).tolist()))  # FORCE TRUNK
@@ -133,7 +152,7 @@ class MutateSurrogateEngine2(Discoverer):
     def _mutable_parent(node):
         parent = node.parent
         while parent:
-            if parent.node_type is 'o':
+            if 'o' in [c.node_type for c in parent.children]:
                 return parent
             parent = parent.parent
 
@@ -146,8 +165,13 @@ class MutateSurrogateEngine2(Discoverer):
                     filled_list, children = self.mutate_node(vertex, filled_list)
                     visited.append(vertex)
                     queue.extend(children)
+                    # for f, i in zip(self.ft_tree.features, filled_list):
+                    #     print f, i
+                    # pdb.set_trace()
+
                 except ConstraintConflict as cc:
-                    mutate_again_node = self._mutable_parent(cc.node).parent
+                    pdb.set_trace()
+                    mutate_again_node = self._mutable_parent(cc.node)
                     index1 = visited.index(mutate_again_node)
                     index2 = visited.index(mutate_again_node.children[0])
 
@@ -210,7 +234,7 @@ class MutateSurrogateEngine2(Discoverer):
                             else:
                                 correct = True
                                 break
-                except Exception:
+                except ConstraintConflict:
                     raise ConstraintConflict(node, cant_set=1)
 
                 for index, bit in zip(curious_indices, bit_setting):
@@ -239,27 +263,28 @@ class MutateSurrogateEngine2(Discoverer):
 
 def test_one_model(model):
     UNIVERSE.FT_EVAL_COUNTER = 0
-    while True:
+    R = []
+    for i in range(100):
+        print i
         engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
-        print alpha
-
+        R.append(alpha)
     pdb.set_trace()
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.INFO)
     try:
         to_test_models = [
             # 'simple',
-            # 'webportal',
+            'webportal',
             # 'cellphone',
-            'eshop',
+            # 'eshop',
             # 'eis',
         ]
         for model in to_test_models:
             test_one_model(model)
-    except:
+    except Exception:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         pdb.post_mortem(tb)
