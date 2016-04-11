@@ -14,7 +14,7 @@ __version__ = "2.0"
 __email__ = "jchen37@ncsu.edu"
 
 
-class GADiscover(Discoverer):
+class NsgaIIDiscover(Discoverer):
     def __init__(self, feature_model):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
@@ -25,11 +25,11 @@ class GADiscover(Discoverer):
         self.ft = feature_model.ft
 
         self.ecs_model = EcsFTModel(self.feature_model)
-        self.ea = ecspy.ec.GA(random.Random())
+        self.ea = ecspy.emo.NSGA2(random.Random())
+        self.ea.variator = [ecspy.variators.bit_flip_mutation]
         self.ea.terminator = ecspy.terminators.generation_termination
 
     def gen_valid_one(self):
-        # problem = ecspy.benchmarks.Kursawe()
         problem = self.ecs_model
         self.ea.observer = [individuals_observer]
 
@@ -40,11 +40,11 @@ class GADiscover(Discoverer):
 
         final_pop = self.ea.evolve(generator=problem.generator,
                                    evaluator=problem.evaluator,
-                                   pop_size=500,
+                                   pop_size=100,
                                    maximize=problem.maximize,
                                    bounder=problem.bounder,
                                    num_selected=100,
-                                   max_generations=30,
+                                   max_generations=10,
                                    mutation_rate=0.3,
                                    individuals_file=ind_file,
                                    statistics_file=stat_file)
@@ -54,7 +54,7 @@ class GADiscover(Discoverer):
 
 
 def demo(name):
-    g = GADiscover(FTModel(name, setConVioAsObj=True))
+    g = NsgaIIDiscover(FTModel(name, setConVioAsObj=True))
     ff = g.gen_valid_one()
     qq = map(EcsFTModel.ecs_individual2ft_candidate, ff)
     pdb.set_trace()

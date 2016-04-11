@@ -171,6 +171,10 @@ class EcsFTModel(ecspy.benchmarks.Binary):
             fitness.append(ecspy.emo.Pareto(fit))
         return fitness
 
+    @staticmethod
+    def ecs_individual2ft_candidate(ecsi):
+        return o(decs=ecsi.candidate, scores=ecsi.fitness)
+
 
 def demo(name):
     m = FTModel(name, setConVioAsObj=True)

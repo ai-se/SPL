@@ -1,4 +1,8 @@
+from __future__ import division
 import time
+import pdb
+from candidatesMeasure import analysis_cans
+from FeatureModel.ftmodel import EcsFTModel
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -14,8 +18,24 @@ def individuals_observer(population, num_generations, num_evaluations, args):
         individuals_file = args['individuals_file']
     except KeyError:
         individuals_file = open('ecspy-individuals-file-' + time.strftime('%m%d%Y-%H%M%S') + '.csv', 'w')
+    try:
+        statistics_file = args['statistics_file']
+    except KeyError:
+        statistics_file = open('ecspy-statistics-file-' + time.strftime('%m%d%Y-%H%M%S') + '.csv', 'w')
 
     population = list(population)
     for i, p in enumerate(population):
         individuals_file.write('{0}, {1}, {2}, {3}\n'.format(num_generations, i, p.fitness, str(p.candidate)))
     individuals_file.flush()
+
+    valid_pop = [p for p in population if p.fitness[1] == 0]
+    valid_pop = map(EcsFTModel.ecs_individual2ft_candidate, valid_pop)
+    hv = analysis_cans(valid_pop, all_non_dominated=False)
+
+    valid_rate = len(valid_pop) / len(population)
+
+    if num_generations == 0:
+        statistics_file.write('generation, valid_rate, hypervolume\n')
+
+    statistics_file.write('{0}, {1}, {2}\n'.format(num_generations, valid_rate, hv))
+    statistics_file.flush()
