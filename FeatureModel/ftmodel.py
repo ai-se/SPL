@@ -3,6 +3,7 @@ import bruteDiscover
 import mutate2  # v2 mutate engine
 from parser import load_ft_url
 from os import sys, path
+import ecspy.benchmarks
 import UNIVERSE
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
@@ -138,15 +139,57 @@ class FTModel(model):
         return engine.gen_valid_one()
 
 
+
+
+"""
+#########
+Translate the FTModel into escpy library defined Benchmark model.
+"""
+
+
+class EcsFTModel(ecspy.benchmarks.Binary):
+    def __init__(self, ftmodel):
+        self.ftmodel = ftmodel
+        self.dimension_bits=1
+        dimensions = ftmodel.decNum
+        objectives = ftmodel.objNum
+        ecspy.benchmarks.Benchmark.__init__(self, dimensions, objectives)
+        if dimensions < objectives:
+            raise ValueError(
+                'dimensions (%d) must be greater than or equal to objectives (%d)' % (dimensions, objectives))
+        self.bounder = ecspy.ec.Bounder([0.0] * self.dimensions, [1.0] * self.dimensions)
+        self.maximize = False
+
+    def evaluator(self, candidates, args):
+        fitness = []
+        for c in candidates:
+            passed_candidate = o(decs=c)
+            self.ftmodel.eval(passed_candidate, doNorm=True, returnFulfill=False)
+            fit = passed_candidate.scores
+            fitness.append(ecspy.emo.Pareto(fit))
+        return fitness
+
+
 def demo(name):
-    m = FTModel(name, setConVioAsObj=False)
+    m = FTModel(name, setConVioAsObj=True)
+    pdb.set_trace()
+    test_m = EcsFTModel(m)
+    problem = test_m
+    ea = ecspy.ec.GA(random.Random())
+    final_pop = ea.evolve(generator=problem.generator,
+                          evaluator=problem.evaluator,
+                          pop_size=100,
+                          maximize=problem.maximize,
+                          bounder=problem.bounder,
+                          max_evaluations=300,
+                          num_elites=6)
+    pdb.set_trace()
     print m
 
     can = m.genRandomCan('v2')
     print m.ok(can)
     # m.eval(can,doNorm=False)
     pdb.set_trace()
-
 
 if __name__ == '__main__':
     demo('webportal')

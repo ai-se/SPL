@@ -22,12 +22,12 @@ from tools import pareto
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
 __license__ = "MIT"
-__version__ = "1.6"
+__version__ = "2.0"
 __email__ = "jchen37@ncsu.edu"
 
 
 class ConstraintConflict(Exception):
-    def __init__(self, node, cant_set):
+    def __init__(self, node=None, cant_set=0):
         self.node = node
         self.cant_set = cant_set
 
@@ -43,6 +43,7 @@ class MutateSurrogateEngine2(Discoverer):
         self.ft_tree = self.ft_model.ft
         self.name = self.ft_model.name
         self.var_rank_dict = dict()
+        self.overflow_indicator = dict()
         logging.info("model %s load successfully." % self.name)
 
         '''We are using V2 engine here!! (guarantee valid)'''
@@ -98,10 +99,12 @@ class MutateSurrogateEngine2(Discoverer):
 
         if rebuild:
             self.var_rank_dict.pop(sn, None)
+            self.overflow_indicator.pop(sn, None)
 
         if sn not in self.var_rank_dict:
             clfs = map(_get_clf4_one_obj, range(self.ft_model.objNum))
-            self.var_rank_dict[sn] = dict()
+            self.var_rank_dict[sn] = []
+            self.overflow_indicator[sn] = 0
 
             # how to rank this? -- using pareto first. then using the second layer...
             n = len(curious_indices)
@@ -147,7 +150,6 @@ class MutateSurrogateEngine2(Discoverer):
             predict_os = map(list, zip(*predict_os))
             layers = self._stratify_list(predict_os)
 
-            self.var_rank_dict[sn] = []
             for layer in layers:
                 layer_settings = []
                 for setting, obj in zip(all_possibilities, predict_os):
@@ -165,7 +167,12 @@ class MutateSurrogateEngine2(Discoverer):
             break_points = [0]
             for i, l in enumerate(layer_lens):
                 break_points.append(l*0.5**i+break_points[-1])
+
             while True:
+                if self.overflow_indicator[sn] > sum(layer_lens):
+                    self.overflow_indicator[sn] = 0
+                    raise ConstraintConflict
+
                 die = random.uniform(0, break_points[-1])
                 sl = break_points.index(filter(lambda b: b >= die, break_points)[0])-1  # selected_layer
                 out = settings_tower[sl][random.randint(1, layer_lens[sl])-1]
@@ -173,6 +180,8 @@ class MutateSurrogateEngine2(Discoverer):
                     yield [out]
                 else:
                     yield list(out)
+
+                self.overflow_indicator[sn] += 1
 
         """
             # comment till the end for an experiment
@@ -200,14 +209,6 @@ class MutateSurrogateEngine2(Discoverer):
                     yield _dec2bin_list(index, len(curious_indices))
         """
 
-    # @staticmethod
-    # def _mutable_parent(node):
-    #     parent = node.parent
-    #     while parent:
-    #         if 'o' in [c.node_type for c in parent.children]:
-    #             return parent
-    #         parent = parent.parent
-
     def bfs(self, filled_list):
         visited, queue = [], [self.ft_tree.root]
         while queue:
@@ -217,16 +218,18 @@ class MutateSurrogateEngine2(Discoverer):
                     filled_list, children = self.mutate_node(vertex, filled_list)
                     visited.append(vertex)
                     queue.extend(children)
-                    # for f, i in zip(self.ft_tree.features, filled_list):
-                    #     print f, i
-                    # pdb.set_trace()
 
                 except ConstraintConflict as cc:
-                    mutate_again_node = cc.node.parent
+                    if cc.node.node_type is 'g':
+                        mutate_again_node = cc.node.parent.parent
+                    else:
+                        mutate_again_node = cc.node.parent
+                    # TODO debug here~~~
+                    # pdb.set_trace()
                     index1 = visited.index(mutate_again_node)
                     index2 = visited.index(mutate_again_node.children[0])
 
-                    queue = visited[index1:index2+1]
+                    queue = visited[index1:index2]
                     visited = visited[:index1]
                     print cc.node, cc.cant_set
             # print visited
@@ -263,7 +266,6 @@ class MutateSurrogateEngine2(Discoverer):
             curious_indices = map(self.ft_tree.find_fea_index, o_child+g_child)
             best_gen = self.best_attr_setting(curious_indices, g_d, g_u)
 
-        # TODO all possible ?
         while True:
             filled_list = [flc for flc in filled_list_copy]  # recover
 
@@ -275,15 +277,7 @@ class MutateSurrogateEngine2(Discoverer):
             if o_child or g_child:
                 # TODO support for both o_child and g_child...
                 try:
-                    correct = False
-                    while not correct:
-                        bit_setting = best_gen.next()
-                        for ci, bs in zip(curious_indices, bit_setting):
-                            if ci in trap_dict and trap_dict[ci] == bs:
-                                pass
-                            else:
-                                correct = True
-                                break
+                    bit_setting = best_gen.next()
                 except ConstraintConflict:
                     raise ConstraintConflict(node, cant_set=1)
 
@@ -322,7 +316,6 @@ def test_one_model(model):
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
         R.append(alpha)
-    pdb.set_trace()
 
 if __name__ == '__main__':
     # logging.basicConfig(level=logging.INFO)
