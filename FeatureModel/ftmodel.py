@@ -166,6 +166,8 @@ class EcsFTModel(ecspy.benchmarks.Binary):
             passed_candidate = o(decs=c)
             self.ftmodel.eval(passed_candidate, doNorm=True, returnFulfill=False)
             fit = passed_candidate.scores
+            # if fit[1] != 0:
+            #     fit = [1] * len(fit)
             fitness.append(ecspy.emo.Pareto(fit))
         return fitness
 
@@ -192,4 +194,4 @@ def demo(name):
     pdb.set_trace()
 
 if __name__ == '__main__':
-    demo('webportal')
+    demo('eshop')
