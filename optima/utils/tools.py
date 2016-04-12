@@ -93,6 +93,7 @@ def poly_mutate(problem, one, **params):
       val = 2 * (1 - rand_no) + 2*(rand_no-0.5) * (xy ** (eta+1))
       del_q = 1 - val ** mut_pow
     mutant[i] = max(low, min(one[i] + del_q * (high-low) , high))
+    mutant = map(lambda x:int(bool(x>=0.5)), mutant)
   return mutant
 
 def binary_tournament_selection(problem, population, size, is_domination = True):
