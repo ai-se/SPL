@@ -3,7 +3,7 @@ import bruteDiscover
 import mutate2  # v2 mutate engine
 from parser import load_ft_url
 from os import sys, path
-import optima.problems.problem
+# import optima.problems.problem
 import ecspy.benchmarks
 import UNIVERSE
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
@@ -183,30 +183,30 @@ Translate the FTModel into optima library
 """
 
 
-class OptimaFTModel(optima.problems.problem.Problem):
-    def __init__(self, ftmodel):
-        optima.problems.problem.Problem.__init__(self)
-        self.ftmodel = ftmodel
-        self.name = ftmodel.name
-
-        self.decisions = []
-        for d in range(self.ftmodel.decNum):
-            od = optima.problems.problem.Decision('x'+str(d), 0, 1)
-            self.decisions.append(od)
-
-        self.objectives = []
-        for o in self.ftmodel.obj:
-            oo = optima.problems.problem.Objective(o.name, o.lo, o.hi)
-            self.objectives.append(oo)
-
-    def evaluate(self, decisions):
-        decisions = map(lambda x:int(bool(x >= 0.5)), decisions)
-        c = o(decs=decisions)
-        self.ftmodel.eval(c, doNorm=True, returnFulfill=False)
-        return c.scores
-
-    def get_pareto_front(self):
-        raise NotImplementedError
+# class OptimaFTModel(optima.problems.problem.Problem):
+#     def __init__(self, ftmodel):
+#         optima.problems.problem.Problem.__init__(self)
+#         self.ftmodel = ftmodel
+#         self.name = ftmodel.name
+#
+#         self.decisions = []
+#         for d in range(self.ftmodel.decNum):
+#             od = optima.problems.problem.Decision('x'+str(d), 0, 1)
+#             self.decisions.append(od)
+#
+#         self.objectives = []
+#         for o in self.ftmodel.obj:
+#             oo = optima.problems.problem.Objective(o.name, o.lo, o.hi)
+#             self.objectives.append(oo)
+#
+#     def evaluate(self, decisions):
+#         decisions = map(lambda x:int(bool(x >= 0.5)), decisions)
+#         c = o(decs=decisions)
+#         self.ftmodel.eval(c, doNorm=True, returnFulfill=False)
+#         return c.scores
+#
+#     def get_pareto_front(self):
+#         raise NotImplementedError
 
 
 def demo(name):

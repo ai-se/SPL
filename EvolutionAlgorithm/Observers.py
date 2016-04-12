@@ -35,7 +35,8 @@ def individuals_observer(population, num_generations, num_evaluations, args):
     valid_rate = len(valid_pop) / len(population)
 
     if num_generations == 0:
-        statistics_file.write('generation, valid_rate, hypervolume\n')
+        statistics_file.write('generation, evaluations, valid_rate, hypervolume, timestamp\n')
 
-    statistics_file.write('{0}, {1}, {2}\n'.format(num_generations, valid_rate, hv))
+    statistics_file.write('{0}, {1}, {2}, {3}, {4}\n'.
+                          format(num_generations, num_evaluations, valid_rate, hv, time.time()))
     statistics_file.flush()
