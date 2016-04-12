@@ -20,3 +20,6 @@ class Discoverer:
 
     @abstractmethod
     def gen_valid_one(self): pass
+
+    def run(self):
+        raise NotImplementedError

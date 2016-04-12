@@ -195,18 +195,15 @@ def demo(name):
     engine = MutateEngine(m)
     R = []
     c = 0
-    delta_time = 0
-    while True:
+    while c < 300:
         c += 1
         alpha = engine.gen_valid_one()
         R.append(alpha)
-        if c % 500 == 0:
-            delta_time += (time.time()-time1)
+        if c % 30 == 0:
+            delta_time = (time.time()-time1)
             time1 = time.time()
             hv = analysis_cans(R, False)
-            print delta_time, c, hv
-    print name
-    print 'running time:', time.time()-time1
+            print delta_time, delta_time, hv
     pdb.set_trace()
 
 if __name__ == '__main__':
