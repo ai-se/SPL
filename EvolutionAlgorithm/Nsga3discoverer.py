@@ -58,10 +58,10 @@ class Nsga3discover(Discoverer):
 
         final_pop = self.ea.evolve(generator=problem.generator,
                                    evaluator=problem.evaluator,
-                                   pop_size=300,
+                                   pop_size=1000,
                                    maximize=problem.maximize,
                                    bounder=problem.bounder,
-                                   max_generations=20,
+                                   max_generations=50,
                                    mutation_rate=0.3,
                                    individuals_file=ind_file,
                                    statistics_file=stat_file)
@@ -74,5 +74,13 @@ def demo(name):
     g.run()
 
 if __name__ == '__main__':
-    demo('eis')
-
+    import traceback
+    try:
+        # for n in ['webportal','eshop', 'eis']:
+        for n in ['eis']:
+            demo(n)
+            print n
+    except:
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        pdb.post_mortem(tb)
