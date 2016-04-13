@@ -5,6 +5,7 @@ from FeatureModel.discoverer import Discoverer
 from Observers import individuals_observer
 import random
 import ecspy
+import time
 import pdb
 
 __author__ = "Jianfeng Chen"
@@ -14,7 +15,7 @@ __version__ = "2.0"
 __email__ = "jchen37@ncsu.edu"
 
 
-class NsgaIIDiscover(Discoverer):
+class Nsga2Discover(Discoverer):
     def __init__(self, feature_model):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
@@ -31,34 +32,55 @@ class NsgaIIDiscover(Discoverer):
 
     def gen_valid_one(self):
         problem = self.ecs_model
+        final_pop = self.ea.evolve(generator=problem.generator,
+                                   evaluator=problem.evaluator,
+                                   pop_size=500,
+                                   maximize=problem.maximize,
+                                   bounder=problem.bounder,
+                                   num_selected=100,
+                                   max_generations=5,
+                                   mutation_rate=0.3)
+        valid_pop = filter(lambda p: p.fitness[1] == 0, final_pop)
+        return EcsFTModel.ecs_individual2ft_candidate(valid_pop[0])
+
+    def run(self):
+        problem = self.ecs_model
         self.ea.observer = [individuals_observer]
 
-        ind_file_name = 'inds.csv'
+        ind_file_name = '{0}/Records/NSGA2_{1}_{2}_inds.csv'.format(project_path, self.feature_model.name,
+                                                                    time.strftime('%y%m%d'))
+
         ind_file = open(ind_file_name, 'w')
-        stat_file_name = 'stat.csv'
+        stat_file_name = '{0}/Records/NSGA2_{1}_{2}_stat.csv'.format(project_path, self.feature_model.name,
+                                                                     time.strftime('%y%m%d'))
         stat_file = open(stat_file_name, 'w')
 
         final_pop = self.ea.evolve(generator=problem.generator,
                                    evaluator=problem.evaluator,
-                                   pop_size=100,
+                                   pop_size=1000,
                                    maximize=problem.maximize,
                                    bounder=problem.bounder,
-                                   num_selected=100,
-                                   max_generations=10,
+                                   max_generations=50,
                                    mutation_rate=0.3,
                                    individuals_file=ind_file,
                                    statistics_file=stat_file)
         ind_file.close()
-        valid_pop = filter(lambda p: p.fitness[1] == 0, final_pop)
-        return valid_pop
+        stat_file.close()
 
 
 def demo(name):
-    g = NsgaIIDiscover(FTModel(name, setConVioAsObj=True))
-    ff = g.gen_valid_one()
-    qq = map(EcsFTModel.ecs_individual2ft_candidate, ff)
-    pdb.set_trace()
+    g = Nsga2Discover(FTModel(name, setConVioAsObj=True))
+    g.run()
 
 if __name__ == '__main__':
-    demo('webportal')
+    import traceback
+    try:
+        # for n in ['webportal','eshop', 'eis']:
+        for n in ['eshop', 'eis']:
+            demo(n)
+            print n
+    except:
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        pdb.post_mortem(tb)
 
