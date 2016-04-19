@@ -5,6 +5,7 @@ from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
+from selIBEA import *
 import time
 import random
 import pdb
@@ -77,7 +78,7 @@ class IbeaDiscover(Discoverer):
             binMutate,
             mutate_rate=0.15)
 
-        toolbox.register("select", tools.selIBEA)
+        toolbox.register("select", selIBEA)
 
         self.toolbox = toolbox
 
