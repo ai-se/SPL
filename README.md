@@ -1,2 +1,2 @@
 # SPL
-qw Software Product Lines optimization
+Software Product Lines optimization
