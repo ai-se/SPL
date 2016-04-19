@@ -4,7 +4,7 @@ import sys, os
 from math import cos, pi
 
 sys.path.append(os.path.abspath("."))
-from Nsga3 import cover, DIVISIONS, rand_one
+from NSGA3 import cover, DIVISIONS, rand_one
 import matplotlib.pyplot as plt
 import time
 import random

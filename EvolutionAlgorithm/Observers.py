@@ -14,7 +14,6 @@ __email__ = "jchen37@ncsu.edu"
 def individuals_observer(population, num_generations, num_evaluations, args):
     # Import the necessary libraries here. Otherwise, they would have to be
     # installed even if this function is not called.
-    print '.'
     try:
         individuals_file = args['individuals_file']
     except KeyError:

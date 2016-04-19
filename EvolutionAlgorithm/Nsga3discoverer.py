@@ -3,7 +3,7 @@ from __init__ import *
 from FeatureModel.ftmodel import FTModel, EcsFTModel
 from FeatureModel.discoverer import Discoverer
 from Observers import individuals_observer
-from Nsga3 import NSGA3
+from NSGA3 import NSGA3
 import random
 import ecspy
 import time

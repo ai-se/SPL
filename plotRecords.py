@@ -42,7 +42,7 @@ def draw_valid_can_generate_rate(model):
             continue
         if model in f and contains(f, ['GA', 'NSGA3']):
             ea_records.append(f)
-        if model in f and contains(f, ['m2']):
+        if model in f and contains(f, ['m2', 'ms2']):
             fmm_records.append(f)
 
     for ear in ea_records:
@@ -108,7 +108,7 @@ def draw_hv_evolve(model):
             continue
         if model in f and contains(f, ['GA', 'NSGA3']):
             ea_records.append(f)
-        if model in f and contains(f, ['m2']):
+        if model in f and contains(f, ['m2', 'ms2']):
             fmm_records.append(f)
 
     for ear in ea_records:
@@ -154,6 +154,6 @@ def draw_hv_evolve(model):
     plt.savefig(project_path + '/report/' + model + '_can_hv_evolve')
     # plt.show()
 
-for model in ['eis']:
+for model in ['eshop']:
     draw_valid_can_generate_rate(model)
     draw_hv_evolve(model)
