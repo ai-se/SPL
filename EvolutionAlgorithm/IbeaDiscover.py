@@ -1,11 +1,12 @@
 from __future__ import division
 from __init__ import *
-from deap import base, creator, tools, algorithms
-from deap.benchmarks.tools import hypervolume
+from deap import base, creator, tools
+# from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
 from selIBEA import *
+import deap_algorithms
 import time
 import random
 import pdb
@@ -112,13 +113,13 @@ class IbeaDiscover(Discoverer):
         record = stats.compile(pop)
         logbook.record(gen=0, evals=len(invalid_ind), **record)
         print(logbook.stream)
-        algorithms.eaAlphaMuPlusLambda(pop, toolbox,
+        deap_algorithms.eaAlphaMuPlusLambda(pop, toolbox,
                                        MU, None, CXPB, 1.0 - CXPB, NGEN, stats)
 
-        print("Final population hypervolume is %f" % hypervolume(pop, [1] * ft.objNum))
+        # print("Final population hypervolume is %f" % hypervolume(pop, [1] * ft.objNum))
 
         return pop, logbook
 
-ed = IbeaDiscover(FTModel('Webportal'))
+ed = IbeaDiscover(FTModel('webportal'))
 pop, logbook=ed.run()
 pdb.set_trace()

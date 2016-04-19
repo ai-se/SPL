@@ -87,7 +87,7 @@ def _calc_fitness_components(
     components_matrix = numpy.zeros((pop_size, pop_size))
 
     # pylint: disable=F0401, E0611
-    import eps
+    import deap.tools.eps as eps
     # pylint: enable=F0401, E0611
 
     # Calculator the indicator value for every element in the matrix
@@ -147,4 +147,4 @@ def _environmental_selection(population, selection_size):
     # Return the first 'selection_size' elements
     return population[:selection_size]
 
-__all__ = ['selIBEA']
+
