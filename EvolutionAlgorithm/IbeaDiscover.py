@@ -118,8 +118,6 @@ class IbeaDiscover(Discoverer):
 
         return pop, logbook
 
-
-
 ed = IbeaDiscover(FTModel(sys.argv[1]))
 pop, logbook=ed.run()
 
