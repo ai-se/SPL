@@ -1,12 +1,10 @@
 from __future__ import division
 from __init__ import *
-from deap import base, creator, tools
-# from deap.benchmarks.tools import hypervolume
+from deap import base, creator, tools, algorithms
+from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
-from selIBEA import *
-import deap_algorithms
 import time
 import random
 import pdb
@@ -79,7 +77,7 @@ class IbeaDiscover(Discoverer):
             binMutate,
             mutate_rate=0.15)
 
-        toolbox.register("select", selIBEA)
+        toolbox.register("select", tools.selIBEA)
 
         self.toolbox = toolbox
 
@@ -98,7 +96,7 @@ class IbeaDiscover(Discoverer):
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
 
-        NGEN = 10
+        NGEN = 50
         MU = 1000
         CXPB = 0.9
 
@@ -113,13 +111,20 @@ class IbeaDiscover(Discoverer):
         record = stats.compile(pop)
         logbook.record(gen=0, evals=len(invalid_ind), **record)
         print(logbook.stream)
-        deap_algorithms.eaAlphaMuPlusLambda(pop, toolbox,
+        algorithms.eaAlphaMuPlusLambda(pop, toolbox,
                                        MU, None, CXPB, 1.0 - CXPB, NGEN, stats)
 
-        # print("Final population hypervolume is %f" % hypervolume(pop, [1] * ft.objNum))
+        print("Final population hypervolume is %f" % hypervolume(pop, [1] * ft.objNum))
 
         return pop, logbook
 
-ed = IbeaDiscover(FTModel('webportal'))
+
+
+ed = IbeaDiscover(FTModel(sys.argv[1]))
 pop, logbook=ed.run()
+
+import pickle
+with open('pop_ibda_'+sys.argv[1], 'wb') as f:
+    pickle.dump(pop, f)
+
 pdb.set_trace()
