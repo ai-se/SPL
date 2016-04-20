@@ -225,14 +225,17 @@ class MutateSurrogateEngine2(Discoverer):
                     else:
                         mutate_again_node = cc.node.parent
                     # TODO debug here~~~
-                    # pdb.set_trace()
-                    index1 = visited.index(mutate_again_node)
-                    index2 = visited.index(mutate_again_node.children[0])
+                    try:
+                        index1 = visited.index(mutate_again_node)
+                        index2 = visited.index(mutate_again_node.children[0])
 
-                    queue = visited[index1:index2]
-                    visited = visited[:index1]
-                    print cc.node, cc.cant_set
-            # print visited
+                        queue = visited[index1:index2]
+                        visited = visited[:index1]
+                    except (AttributeError, ValueError):
+                        visited = []
+                        queue = [self.ft_tree.root]
+                        filled_list = [-1] * self.ft_tree.featureNum
+                        filled_list[0] = 1  # let root be 1
         return filled_list
 
     def mutate_node(self, node, filled_list, trap_dict=dict()):
@@ -306,9 +309,9 @@ class MutateSurrogateEngine2(Discoverer):
         can.fulfill = filled_list
         return can
 
+def run():
 
 def test_one_model(model):
-    UNIVERSE.FT_EVAL_COUNTER = 0
     R = []
     engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
     for i in range(100):
@@ -316,16 +319,17 @@ def test_one_model(model):
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
         R.append(alpha)
+    pdb.set_trace()
 
 if __name__ == '__main__':
     # logging.basicConfig(level=logging.INFO)
     try:
         to_test_models = [
             # 'simple',
-            'webportal',
+            # 'webportal',
             # 'cellphone',
             # 'eshop',
-            # 'eis',
+            'eis',
         ]
         for model in to_test_models:
             test_one_model(model)

@@ -8,3 +8,4 @@ __license__ = "MIT"
 __version__ = "1.2"
 __email__ = "jchen37@ncsu.edu"
 
+project_path = [i for i in sys.path if i.endswith('SPL')][0]

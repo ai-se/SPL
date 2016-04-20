@@ -3,11 +3,12 @@ from __future__ import division
 import pdb
 from copy import deepcopy
 from random import randint, shuffle
-
+import time
 import ftmodel
 from GALE.model import candidate
 from candidatesMeasure import analysis_cans
 from discoverer import Discoverer
+from __init__ import project_path
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -186,6 +187,30 @@ class MutateEngine(Discoverer):
                 # pdb.post_mortem(tb)
                 pass
 
+    def run(self, one_gen_time=20):
+        GEN = 10
+
+        stat_file_name = '{0}/Records/m2_{1}_{2}_stat.csv'.format(project_path, self.feature_model.name,
+                                                                     time.strftime('%y%m%d'))
+        stat_file = open(stat_file_name, 'w')
+        stat_file.write('generation, generated_cans, valid_rate, hypervolume, timestamp\n')
+        t = time.time()
+        for i in range(GEN):
+            R = []
+            while True:
+                R.append(self.gen_valid_one())
+                if time.time() - t > one_gen_time:
+                    t = time.time()
+                    hv = analysis_cans(R, False)
+                    stat_file.write('{0},{1},{2},{3},{4}\n'.format(i, len(R), 1, hv, t))
+                    stat_file.flush()
+                    t = time.time()
+                    print i
+                    break
+        stat_file.close()
+
+
+
 
 def demo(name):
     import time
@@ -193,18 +218,20 @@ def demo(name):
 
     m = ftmodel.FTModel(name, setConVioAsObj=False)
     engine = MutateEngine(m)
-    R = []
-    c = 0
-    while c < 300:
-        c += 1
-        alpha = engine.gen_valid_one()
-        R.append(alpha)
-        if c % 30 == 0:
-            delta_time = (time.time()-time1)
-            time1 = time.time()
-            hv = analysis_cans(R, False)
-            print delta_time, delta_time, hv
+    engine.run()
     pdb.set_trace()
+
+    # R = []
+    # c = 0
+    # t = time.time()
+    # while True:
+    #     c += 1
+    #     alpha = engine.gen_valid_one()
+    #     R.append(alpha)
+    #     if time.time() - t > 20:
+    #         t = time.time()
+    #         hv = analysis_cans(R, False)
+    #         print len(R), time.time(), hv
 
 if __name__ == '__main__':
     name = ['webportal']

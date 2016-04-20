@@ -5,7 +5,7 @@ from parser import load_ft_url
 from os import sys, path
 # import optima.problems.problem
 import ecspy.benchmarks
-import UNIVERSE
+# import UNIVERSE
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
 
@@ -211,6 +211,8 @@ Translate the FTModel into optima library
 
 def demo(name):
     m = FTModel(name, setConVioAsObj=True)
+    print m
+    return
     pdb.set_trace()
     test_m = EcsFTModel(m)
     problem = test_m
@@ -232,3 +234,12 @@ def demo(name):
 
 if __name__ == '__main__':
     demo('eshop')
+    demo('eis')
+    demo('webportal')
+    demo('cellphone')
+    demo('fmtest')
+    demo('billing')
+    demo('greencar')
+    demo('marketplace')
+    demo('classicshell')
+    demo('carselection')

@@ -286,11 +286,11 @@ class MultiList:
 if __name__ == "__main__":
 
     # Example:
-    referencePoint = [2, 2, 2]
+    referencePoint = [2, 2]
     hv = HyperVolume(referencePoint)
-    front = [[1,0,1], [0,1,0]]
+    front = [[1,0], [0,1], [1.5,1.5]]
     volume = hv.compute(front)
-
+    print volume
 
 
 
