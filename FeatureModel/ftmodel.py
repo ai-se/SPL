@@ -5,7 +5,7 @@ from parser import load_ft_url
 from os import sys, path
 # import optima.problems.problem
 import ecspy.benchmarks
-# import UNIVERSE
+import universe
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from GALE.model import *
 
@@ -67,7 +67,7 @@ class FTModel(model):
 
             # fill other tree elements
             t.fill_form4all_fea(fulfill)
-            UNIVERSE.FT_EVAL_COUNTER += 1
+            universe.FT_EVAL_COUNTER += 1
         else:
             fulfill = candidate.fulfill
 
