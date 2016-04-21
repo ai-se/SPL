@@ -34,13 +34,13 @@ from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
 from tools.hv import HyperVolume
+import Nsga3Selc
 import time
 import random
-import pickle
 import pdb
 
 
-class IbeaDiscover(Discoverer):
+class Nsga3Discover(Discoverer):
     def __init__(self, feature_model):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
@@ -49,8 +49,8 @@ class IbeaDiscover(Discoverer):
         else:
             self.ft = feature_model
 
-        creator.create("EqWeiFitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
-        creator.create("Individual", list, fitness=creator.EqWeiFitnessMin)
+        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
+        creator.create("Individual", list, fitness=creator.FitnessMin)
 
         toolbox = base.Toolbox()
 
@@ -68,7 +68,7 @@ class IbeaDiscover(Discoverer):
             self.bin_mutate,
             mutate_rate=0.15)
 
-        toolbox.register("select", tools.selIBEA)
+        toolbox.register("select", Nsga3Selc.sel_nsga_iii)
 
         self.toolbox = toolbox
 
@@ -77,9 +77,9 @@ class IbeaDiscover(Discoverer):
         pass
 
     def eval_func(self, dec_l):
-        candidate = o(decs=dec_l)
-        self.ft.eval(candidate)
-        return tuple(candidate.scores)
+        can = o(decs=dec_l)
+        self.ft.eval(can)
+        return tuple(can.scores)
 
     @staticmethod
     def bin_mutate(individual, mutate_rate):
@@ -127,11 +127,45 @@ class IbeaDiscover(Discoverer):
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
+        ideal_point = Nsga3Selc.find_ideal_point(pop)
+        extremes = Nsga3Selc.find_extreme_points(pop)
+        intercepts = Nsga3Selc.construct_hyperplane(pop, extremes)
+        Nsga3Selc.normalize_objectives(pop, intercepts, ideal_point)
+
+        # rps = Nsga3Selc.generate_reference_points(self.ft.objNum)
+        rps = Nsga3Selc.generate_reference_points(self.ft.objNum, newref=True)
+        Nsga3Selc.associate(pop, rps)
+
         record = stats.compile(pop)
         logbook.record(gen=0, evals=len(invalid_ind), **record)
         print(logbook.stream)
-        algorithms.eaAlphaMuPlusLambda(pop, toolbox,
-                                       MU, None, CXPB, 1.0 - CXPB, NGEN, stats)
+
+        # algorithms.eaMuPlusLambda(pop, toolbox, MU, MU, CXPB, 1.0 - CXPB, NGEN, stats)
+        for gen in range(1, NGEN):
+            # vary the population
+            tools.emo.assignCrowdingDist(pop)
+            offspring = tools.selTournamentDCD(pop, len(pop))
+            offspring = [toolbox.clone(ind) for ind in offspring]
+
+            for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
+                if random.random() <= CXPB:
+                    toolbox.mate(ind1, ind2)
+
+                toolbox.mutate(ind1)
+                toolbox.mutate(ind2)
+                del ind1.fitness.values, ind2.fitness.values
+
+            # Evaluate the individuals with an invalid fitness
+            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
+
+            # Select the next generation population
+            pop = toolbox.select(pop + offspring, MU)
+            record = stats.compile(pop)
+            logbook.record(gen=gen, evals=len(invalid_ind), **record)
+            print(logbook.stream)
 
         print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
 
@@ -139,11 +173,8 @@ class IbeaDiscover(Discoverer):
 
 
 def demo():
-    ed = IbeaDiscover(FTModel(sys.argv[1]))
+    ed = Nsga3Discover(FTModel('webportal'))
     pop, logbook = ed.run()
-
-    with open('pop_ibda_' + sys.argv[1], 'wb') as f:
-        pickle.dump(pop, f)
 
     pdb.set_trace()
 
