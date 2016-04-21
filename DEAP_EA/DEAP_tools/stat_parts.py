@@ -25,6 +25,25 @@
 from __future__ import division
 import os.path
 import sys
+import time
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from tools.hv import HyperVolume
+
+
+def hv(front, obj_num):
+    reference_point = [1] * obj_num
+    hv = HyperVolume(reference_point)
+    return hv.compute(front)
+
+
+def valid_rate(individual_objs):
+    uniques = set(map(tuple, individual_objs))
+    n = len(uniques)
+    valid = len([1 for i in uniques if i[1] == 0])
+    return valid / n
+
+
+def timestamp(p, t=0):
+    return time.time() - t

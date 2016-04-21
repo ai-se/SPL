@@ -2,11 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="19437feb-3279-4340-841f-ed8e71020d68" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/MoeadSelc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/EvolutionAlgorithm/MOEAD.py" afterPath="$PROJECT_DIR$/EvolutionAlgorithm/MOEAD.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/DEAP_EA/MoeadSelc.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/Nsga3Selc.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/__init__.py" afterPath="$PROJECT_DIR$/DEAP_EA/__init__.py" />
     </list>
     <ignored path="SPL.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,64 +39,59 @@
     <favorites_list name="SPL" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.6591928">
-      <split-first>
-        <leaf>
-          <file leaf-file-name="MoeadSelc.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadSelc.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="546">
-                  <caret line="217" column="0" selection-start-line="217" selection-start-column="0" selection-end-line="217" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="MoeadDiscover.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="480">
-                  <caret line="146" column="27" selection-start-line="146" selection-start-column="27" selection-end-line="146" selection-end-column="27" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="MOEAD.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/MOEAD.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="501">
-                  <caret line="1311" column="40" selection-start-line="1311" selection-start-column="40" selection-end-line="1311" selection-end-column="40" />
-                  <folding>
-                    <element signature="e#28003#28804#0" expanded="false" />
-                    <element signature="e#28854#29815#0" expanded="false" />
-                    <element signature="e#32829#33189#0" expanded="false" />
-                    <element signature="e#33216#33606#0" expanded="false" />
-                    <element signature="e#33631#39524#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="NSGA3.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/NSGA3.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="15">
-                  <caret line="36" column="4" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
-                  <folding>
-                    <element signature="e#0#11#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file leaf-file-name="IbeaDiscover.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="345">
+              <caret line="95" column="29" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
+              <folding>
+                <element signature="e#1222#1253#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MoeadDiscover.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="367">
+              <caret line="97" column="72" selection-start-line="94" selection-start-column="8" selection-end-line="97" selection-end-column="72" />
+              <folding>
+                <element signature="e#1222#1253#0" expanded="true" />
+                <element signature="e#3008#3098#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Nsga2Discover.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-825">
+              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+              <folding>
+                <element signature="e#1222#1253#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Nsga3Discover.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+              <folding>
+                <element signature="e#2916#3006#0" expanded="false" />
+                <element signature="e#3048#3126#0" expanded="false" />
+                <element signature="e#3199#3355#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -111,9 +110,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/optima/utils/stat.py" />
-        <option value="$PROJECT_DIR$/optima/measures/convergence.py" />
-        <option value="$PROJECT_DIR$/optima/measures/diversity.py" />
         <option value="$PROJECT_DIR$/optima/measures/igd.py" />
         <option value="$PROJECT_DIR$/optima/problems/problem.py" />
         <option value="$PROJECT_DIR$/optima/problems/dtlz/dtlz1.py" />
@@ -152,16 +148,19 @@
         <option value="$PROJECT_DIR$/EvolutionAlgorithm/selIBEA.py" />
         <option value="$PROJECT_DIR$/EvolutionAlgorithm/IbeaDiscover.py" />
         <option value="$PROJECT_DIR$/FeatureModel/ftmodel.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/__init__.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/fsfd.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/fs.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py" />
         <option value="$PROJECT_DIR$/EvolutionAlgorithm/MOEAD.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/MoeadSelc.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/__init__.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
       </list>
     </option>
   </component>
@@ -295,6 +294,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SPL" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SPL" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DEAP_EA" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DEAP_tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scratches" />
@@ -310,6 +327,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/DEAP_EA/DEAP_tools" />
       <recent name="$PROJECT_DIR$/" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/surrogate_data" />
@@ -408,7 +426,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="SPL" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/Nsga3Selc.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -768,23 +786,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/report/eis_can_gen_speed.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/report/eis_can_hv_evolve.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/report/webportal_cart_precise_test.report">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/candidatesMeasure.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -938,14 +939,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="31" selection-start-line="11" selection-start-column="31" selection-end-line="11" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/fsfd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
@@ -1062,47 +1055,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-784">
-          <caret line="51" column="33" selection-start-line="51" selection-start-column="33" selection-end-line="51" selection-end-column="33" />
-          <folding>
-            <element signature="e#2892#2982#0" expanded="false" />
-            <element signature="e#3024#3102#0" expanded="false" />
-            <element signature="e#3175#3331#0" expanded="false" />
-            <element signature="e#3366#3479#0" expanded="false" />
-            <element signature="e#3544#3691#0" expanded="false" />
-            <element signature="e#3746#3768#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-255">
-          <caret line="36" column="11" selection-start-line="36" selection-start-column="11" selection-end-line="36" selection-end-column="11" />
-          <folding>
-            <element signature="e#1222#1253#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py">
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/Nsga3Selc.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
           <folding>
             <element signature="e#838#857#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/NSGA3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="36" column="4" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1115,29 +1073,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadSelc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="217" column="0" selection-start-line="217" selection-start-column="0" selection-end-line="217" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Records/NSGA3_eshop_160412_stat.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
           <caret line="31" column="34" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="125" column="56" selection-start-line="125" selection-start-column="56" selection-end-line="125" selection-end-column="56" />
-          <folding>
-            <element signature="e#1222#1253#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1155,11 +1095,98 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/NSGA3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="36" column="4" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="214" column="41" selection-start-line="214" selection-start-column="41" selection-end-line="214" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding>
+            <element signature="e#1222#1253#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="95" column="29" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
+          <folding>
+            <element signature="e#1222#1253#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-825">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding>
+            <element signature="e#1222#1253#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="146" column="27" selection-start-line="146" selection-start-column="27" selection-end-line="146" selection-end-column="27" />
-          <folding />
+        <state relative-caret-position="367">
+          <caret line="97" column="72" selection-start-line="94" selection-start-column="8" selection-end-line="97" selection-end-column="72" />
+          <folding>
+            <element signature="e#1222#1253#0" expanded="true" />
+            <element signature="e#3008#3098#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+          <folding>
+            <element signature="e#2916#3006#0" expanded="false" />
+            <element signature="e#3048#3126#0" expanded="false" />
+            <element signature="e#3199#3355#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

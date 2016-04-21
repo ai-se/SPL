@@ -23,24 +23,31 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
+
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import base, creator, tools, algorithms
+from deap import base, creator, tools
 from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
-from tools.hv import HyperVolume
-import MoeadSelc
+from DEAP_EA.DEAP_tools import MoeadSelc
+import DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pdb
 
 
 class MoeadDiscover(Discoverer):
+    def eval_func(self, dec_l):
+        can = o(decs=dec_l)
+        self.ft.eval(can)
+        return tuple(can.scores)
+
     def __init__(self, feature_model):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
@@ -75,41 +82,20 @@ class MoeadDiscover(Discoverer):
         assert False, "Do not use this function. Function not provided at this time."
         pass
 
-    def eval_func(self, dec_l):
-        can = o(decs=dec_l)
-        self.ft.eval(can)
-        return tuple(can.scores)
-
     @staticmethod
     def bin_mutate(individual, mutate_rate):
         for i in xrange(len(individual)):
             if random.random() < mutate_rate:
                 individual[i] = 1 - individual[i]
-        return individual,
-
-    def hv(self, front):
-        reference_point = [1] * self.ft.objNum
-        hv = HyperVolume(reference_point)
-        return hv.compute(front)
-
-    @staticmethod
-    def valid_rate(individual_objs):
-        uniques = set(map(tuple, individual_objs))
-        n = len(uniques)
-        valid = len([1 for i in uniques if i[1] == 0])
-        return valid / n
-
-    @staticmethod
-    def timestamp(p, t=0):
-        return time.time() - t
+        return individual
 
     def run(self):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", self.valid_rate)
-        stats.register("hv", self.hv)
-        stats.register("timestamp", self.timestamp, t=time.time())
+        stats.register("valid_rate", stat_parts.valid_rate)
+        stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
+        stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"

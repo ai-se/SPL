@@ -215,3 +215,5 @@ def update_neighbors(point, mutant, population):
         if mutant_distance < neighbor_distance:
             population[neighbor_id] = mutant
             population[neighbor_id].fitness.values = mutant.fitness.values
+
+

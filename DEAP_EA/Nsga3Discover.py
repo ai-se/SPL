@@ -23,18 +23,20 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
+
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import base, creator, tools, algorithms
+from deap import base, creator, tools
 from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
-from tools.hv import HyperVolume
-import Nsga3Selc
+from DEAP_EA.DEAP_tools import Nsga3Selc
+import DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pdb
@@ -88,29 +90,13 @@ class Nsga3Discover(Discoverer):
                 individual[i] = 1 - individual[i]
         return individual,
 
-    def hv(self, front):
-        reference_point = [1] * self.ft.objNum
-        hv = HyperVolume(reference_point)
-        return hv.compute(front)
-
-    @staticmethod
-    def valid_rate(individual_objs):
-        uniques = set(map(tuple, individual_objs))
-        n = len(uniques)
-        valid = len([1 for i in uniques if i[1] == 0])
-        return valid / n
-
-    @staticmethod
-    def timestamp(p, t=0):
-        return time.time() - t
-
     def run(self):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", self.valid_rate)
-        stats.register("hv", self.hv)
-        stats.register("timestamp", self.timestamp, t=time.time())
+        stats.register("valid_rate", stat_parts.valid_rate)
+        stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
+        stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
