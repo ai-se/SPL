@@ -2,15 +2,34 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="19437feb-3279-4340-841f-ed8e71020d68" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/DEAP_EA/MoeadSelc.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga3Selc.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/Nsga3Selc.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DEAP_EA/Spea2Discover.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Records/SPEA-II_webportal_042116.logboook" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/GA_eis_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/GA_eshop_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/GA_webportal_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/NSGA2_eis_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/NSGA2_eshop_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/NSGA2_webportal_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/NSGA3_eis_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/NSGA3_eshop_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/NSGA3_webportal_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/m2_eis_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/m2_eshop_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/m2_webportal_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/ms2_eshop_160412_stat.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/ms2_webportal_160412_stat.csv" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/jianfeng.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/jianfeng.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/__init__.py" afterPath="$PROJECT_DIR$/DEAP_EA/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/EvolutionAlgorithm/IbeaDiscover.py" afterPath="$PROJECT_DIR$/EvolutionAlgorithm/IbeaDiscover.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/EvolutionAlgorithm/Observers.py" afterPath="$PROJECT_DIR$/EvolutionAlgorithm/Observers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/EvolutionAlgorithm/stat.csv" afterPath="$PROJECT_DIR$/EvolutionAlgorithm/stat.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FeatureModel/mutate2.py" afterPath="$PROJECT_DIR$/FeatureModel/mutate2.py" />
     </list>
     <ignored path="SPL.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -40,11 +59,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="Spea2Discover.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/DEAP_EA/Spea2Discover.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="215">
+              <caret line="124" column="41" selection-start-line="124" selection-start-column="41" selection-end-line="124" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="IbeaDiscover.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="95" column="29" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
+            <state relative-caret-position="530">
+              <caret line="116" column="34" selection-start-line="116" selection-start-column="34" selection-end-line="116" selection-end-column="34" />
               <folding>
                 <element signature="e#1222#1253#0" expanded="true" />
               </folding>
@@ -55,8 +84,8 @@
       <file leaf-file-name="MoeadDiscover.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="367">
-              <caret line="97" column="72" selection-start-line="94" selection-start-column="8" selection-end-line="97" selection-end-column="72" />
+            <state relative-caret-position="320">
+              <caret line="128" column="33" selection-start-line="126" selection-start-column="12" selection-end-line="128" selection-end-column="33" />
               <folding>
                 <element signature="e#1222#1253#0" expanded="true" />
                 <element signature="e#3008#3098#0" expanded="false" />
@@ -65,27 +94,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Nsga2Discover.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
+      <file leaf-file-name="emo.py" pinned="false" current-in-tab="false">
+        <entry file="file:///Library/Python/2.7/site-packages/deap/tools/emo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-825">
-              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+            <state relative-caret-position="-75">
+              <caret line="471" column="29" selection-start-line="471" selection-start-column="29" selection-end-line="471" selection-end-column="29" />
               <folding>
-                <element signature="e#1222#1253#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Nsga3Discover.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
-              <folding>
-                <element signature="e#2916#3006#0" expanded="false" />
-                <element signature="e#3048#3126#0" expanded="false" />
-                <element signature="e#3199#3355#0" expanded="false" />
+                <element signature="e#0#31#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -110,7 +125,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/optima/measures/igd.py" />
         <option value="$PROJECT_DIR$/optima/problems/problem.py" />
         <option value="$PROJECT_DIR$/optima/problems/dtlz/dtlz1.py" />
         <option value="$PROJECT_DIR$/optima/algorithms/nsga3/reference.py" />
@@ -155,12 +169,13 @@
         <option value="$PROJECT_DIR$/DEAP_EA/MoeadSelc.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/__init__.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/Spea2Discover.py" />
       </list>
     </option>
   </component>
@@ -171,9 +186,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1920" />
-    <option name="width" value="1920" />
-    <option name="height" value="1080" />
+    <option name="width" value="1440" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -219,7 +233,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -276,20 +289,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="EvolutionAlgorithm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="SPL" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="SPL" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="DEAP_EA" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -315,6 +314,7 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -326,18 +326,18 @@
     <property name="FullScreen" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/DEAP_EA/DEAP_tools" />
-      <recent name="$PROJECT_DIR$/" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/surrogate_data" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/DEAP_EA" />
       <recent name="$PROJECT_DIR$/EvolutionAlgorithm" />
       <recent name="$PROJECT_DIR$/EvolutionAlgorithm/MOEAD" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/Surrogate" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/DEAP_EA/DEAP_tools" />
+      <recent name="$PROJECT_DIR$/" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/surrogate_data" />
     </key>
   </component>
   <component name="RunManager" selected="Python.Nsga3Selc">
@@ -700,29 +700,29 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1920" y="0" width="1920" height="1080" extended-state="0" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3111588" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20630081" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19410568" sideWeight="0.50905216" order="10" side_tool="true" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19651741" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32711443" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329602" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34044716" sideWeight="0.4909478" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1687966" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2571138" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19613822" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32711443" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26865673" sideWeight="0.4909478" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30099502" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329602" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30099502" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20630081" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -781,50 +781,15 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="28" />
+      <option name="time" value="29" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/candidatesMeasure.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="10" column="42" selection-start-line="10" selection-start-column="42" selection-end-line="10" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/IBEAdiscoverer.py" />
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/Nsga2discoverer.py" />
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/deap_exp.py" />
-    <entry file="file://$PROJECT_DIR$/plotRecords.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FeatureModel/mutate2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="166" column="32" selection-start-line="166" selection-start-column="32" selection-end-line="166" selection-end-column="32" />
-          <folding>
-            <element signature="e#0#31#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Surrogate/learner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="32" column="4" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/feature_tree_data/simple.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -832,7 +797,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -889,9 +853,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -900,16 +861,6 @@
         <state relative-caret-position="674">
           <caret line="251" column="36" selection-start-line="251" selection-start-column="36" selection-end-line="251" selection-end-column="36" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/IbeaDiscover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1860">
-          <caret line="124" column="17" selection-start-line="124" selection-start-column="17" selection-end-line="124" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -925,7 +876,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -934,19 +884,12 @@
         <state relative-caret-position="180">
           <caret line="69" column="20" selection-start-line="69" selection-start-column="20" selection-end-line="69" selection-end-column="20" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/fsfd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/fsfd.py" />
     <entry file="file://$PROJECT_DIR$/tools/hv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="185">
@@ -959,7 +902,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="367">
           <caret line="401" column="28" selection-start-line="401" selection-start-column="28" selection-end-line="401" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -967,7 +909,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="179">
           <caret line="12" column="17" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -976,16 +917,6 @@
         <state relative-caret-position="-1766">
           <caret line="120" column="6" selection-start-line="120" selection-start-column="6" selection-end-line="120" selection-end-column="6" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Library/Python/2.7/site-packages/deap/tools/emo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="142" column="4" selection-start-line="142" selection-start-column="4" selection-end-line="142" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#31#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -999,14 +930,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/fs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="55" column="42" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/fs.py" />
     <entry file="file:///Library/Python/2.7/site-packages/deap/tools/init.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
@@ -1015,27 +939,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///Library/Python/2.7/site-packages/deap/algorithms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="249" column="4" selection-start-line="249" selection-start-column="4" selection-end-line="249" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/Nsga3discoverer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="85" column="27" selection-start-line="85" selection-start-column="27" selection-end-line="85" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Records/NSGA3_webportal_160412_stat.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="615">
           <caret line="41" column="38" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="38" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1055,21 +962,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/Nsga3Selc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
-          <folding>
-            <element signature="e#838#857#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Library/Python/2.7/site-packages/deap/tools/crossover.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="207">
           <caret line="29" column="4" selection-start-line="29" selection-start-column="4" selection-end-line="29" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1077,7 +973,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
           <caret line="31" column="34" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1095,29 +990,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/NSGA3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="36" column="4" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools.py" />
     <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1125,22 +1002,139 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="214" column="41" selection-start-line="214" selection-start-column="41" selection-end-line="214" selection-end-column="41" />
+        <state relative-caret-position="1161">
+          <caret line="211" column="82" selection-start-line="211" selection-start-column="82" selection-end-line="211" selection-end-column="82" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Records/ms2_webportal_160412_stat.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Records/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plotRecords.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="14" column="14" selection-start-line="14" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/NSGA3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3167">
+          <caret line="36" column="4" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/Nsga3discoverer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="60" column="42" selection-start-line="60" selection-start-column="42" selection-end-line="60" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="157" column="54" selection-start-line="157" selection-start-column="54" selection-end-line="157" selection-end-column="54" />
+          <folding>
+            <element signature="e#1222#1253#0" expanded="true" />
+            <element signature="e#2916#3006#0" expanded="false" />
+            <element signature="e#3048#3126#0" expanded="false" />
+            <element signature="e#3199#3355#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/Nsga3Selc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="274" column="0" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Records/NSGA2_webportal_160421.pop">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Python/2.7/site-packages/deap/benchmarks/binary.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1515">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/EvolutionAlgorithm/IbeaDiscover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1290">
+          <caret line="124" column="17" selection-start-line="124" selection-start-column="17" selection-end-line="124" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Python/2.7/site-packages/deap/tools/selIBEA.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-414">
+          <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="140" column="33" selection-start-line="140" selection-start-column="33" selection-end-line="140" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Python/2.7/site-packages/deap/algorithms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="135" column="31" selection-start-line="135" selection-start-column="30" selection-end-line="135" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Python/2.7/site-packages/deap/tools/emo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-75">
+          <caret line="471" column="29" selection-start-line="471" selection-start-column="29" selection-end-line="471" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+        <state relative-caret-position="320">
+          <caret line="50" column="26" selection-start-line="50" selection-start-column="26" selection-end-line="50" selection-end-column="26" />
           <folding>
             <element signature="e#1222#1253#0" expanded="true" />
           </folding>
@@ -1149,18 +1143,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="95" column="29" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
-          <folding>
-            <element signature="e#1222#1253#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-825">
-          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+        <state relative-caret-position="530">
+          <caret line="116" column="34" selection-start-line="116" selection-start-column="34" selection-end-line="116" selection-end-column="34" />
           <folding>
             <element signature="e#1222#1253#0" expanded="true" />
           </folding>
@@ -1169,8 +1153,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="367">
-          <caret line="97" column="72" selection-start-line="94" selection-start-column="8" selection-end-line="97" selection-end-column="72" />
+        <state relative-caret-position="320">
+          <caret line="128" column="33" selection-start-line="126" selection-start-column="12" selection-end-line="128" selection-end-column="33" />
           <folding>
             <element signature="e#1222#1253#0" expanded="true" />
             <element signature="e#3008#3098#0" expanded="false" />
@@ -1178,15 +1162,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/Spea2Discover.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
-          <folding>
-            <element signature="e#2916#3006#0" expanded="false" />
-            <element signature="e#3048#3126#0" expanded="false" />
-            <element signature="e#3199#3355#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="215">
+          <caret line="124" column="41" selection-start-line="124" selection-start-column="41" selection-end-line="124" selection-end-column="41" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -25,10 +25,12 @@
 from __future__ import division
 import os.path
 import sys
+import pickle
 import time
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_path = filter(lambda x: x.endswith('SPL'), sys.path)[0]
 from tools.hv import HyperVolume
 
 
@@ -38,12 +40,23 @@ def hv(front, obj_num):
     return hv.compute(front)
 
 
-def valid_rate(individual_objs):
+def valids(individual_objs):
     uniques = set(map(tuple, individual_objs))
     n = len(uniques)
     valid = len([1 for i in uniques if i[1] == 0])
-    return valid / n
+    return n, round(valid / n, 3)
 
 
 def timestamp(p, t=0):
     return time.time() - t
+
+
+def pickle_results(model_name, alg_name, pop, logbook):
+    pop_file_name = '{0}/Records/{1}_{2}_{3}.pop'.format(project_path, alg_name, model_name, time.strftime('%m%d%y'))
+    log_file_name = '{0}/Records/{1}_{2}_{3}.logbook'.format(project_path, alg_name, model_name, time.strftime('%m%d%y'))
+
+    with open(pop_file_name, 'wb') as f:
+        pickle.dump(pop, f)
+
+    with open(log_file_name, 'wb') as f:
+        pickle.dump(logbook, f)

@@ -193,7 +193,7 @@ class MutateEngine(Discoverer):
         stat_file_name = '{0}/Records/m2_{1}_{2}_stat.csv'.format(project_path, self.feature_model.name,
                                                                      time.strftime('%y%m%d'))
         stat_file = open(stat_file_name, 'w')
-        stat_file.write('generation, generated_cans, valid_rate, hypervolume, timestamp\n')
+        stat_file.write('generation, generated_cans, valids, hypervolume, timestamp\n')
         t = time.time()
         for i in range(GEN):
             R = []

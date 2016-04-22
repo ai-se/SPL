@@ -94,12 +94,12 @@ class Nsga3Discover(Discoverer):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", stat_parts.valid_rate)
+        stats.register("uniques|VR", stat_parts.valids)
         stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
+        logbook.header = "gen", "evals", "uniques|VR", "hv", "timestamp"
 
         NGEN = 50
         MU = 1000
@@ -154,6 +154,8 @@ class Nsga3Discover(Discoverer):
             print(logbook.stream)
 
         print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
+
+        stat_parts.pickle_results(self.ft.name, 'NSGA3', pop, logbook)
 
         return pop, logbook
 

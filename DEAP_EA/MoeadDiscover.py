@@ -93,12 +93,12 @@ class MoeadDiscover(Discoverer):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", stat_parts.valid_rate)
+        stats.register("uniques|VR", stat_parts.valids)
         stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
+        logbook.header = "gen", "evals", "uniques|VR", "hv", "timestamp"
 
         NGEN = 50
         MU = 1000
@@ -115,7 +115,7 @@ class MoeadDiscover(Discoverer):
 
         record = stats.compile(pop)
         logbook.record(gen=0, evals=len(invalid_ind), **record)
-        print(logbook.stream)
+        # print(logbook.stream)
 
         for gen in range(1, NGEN):
             for point_id in MoeadSelc.shuffle(range(MU)):
@@ -130,14 +130,14 @@ class MoeadDiscover(Discoverer):
 
         print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
 
+        stat_parts.pickle_results(self.ft.name, 'MOEAd', pop, logbook)
+
         return pop, logbook
 
 
 def demo():
     ed = MoeadDiscover(FTModel('webportal'))
     pop, logbook = ed.run()
-
-    pdb.set_trace()
 
 if __name__ == '__main__':
     demo()

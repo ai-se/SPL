@@ -1,4 +1,4 @@
-generation, valid_rate, hypervolume
+generation, valids, hypervolume
 0, 0.23, 0.267584
 1, 0.35, 0.284923
 2, 0.37, 0.291767

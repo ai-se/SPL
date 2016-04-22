@@ -86,18 +86,18 @@ class IbeaDiscover(Discoverer):
         for i in xrange(len(individual)):
             if random.random() < mutate_rate:
                 individual[i] = 1 - individual[i]
-        return individual
+        return individual,
 
     def run(self):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", stat_parts.valid_rate)
+        stats.register("uniques|VR", stat_parts.valids)
         stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
+        logbook.header = "gen", "evals", "uniques|VR", "hv", "timestamp"
 
         NGEN = 50
         MU = 1000
@@ -113,11 +113,13 @@ class IbeaDiscover(Discoverer):
 
         record = stats.compile(pop)
         logbook.record(gen=0, evals=len(invalid_ind), **record)
-        print(logbook.stream)
+        # print(logbook.stream)
         algorithms.eaAlphaMuPlusLambda(pop, toolbox,
                                        MU, None, CXPB, 1.0 - CXPB, NGEN, stats)
 
         print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
+
+        stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
 
         return pop, logbook
 
@@ -125,9 +127,6 @@ class IbeaDiscover(Discoverer):
 def demo():
     ed = IbeaDiscover(FTModel(sys.argv[1]))
     pop, logbook = ed.run()
-
-    with open('pop_ibda_' + sys.argv[1], 'wb') as f:
-        pickle.dump(pop, f)
 
     pdb.set_trace()
 

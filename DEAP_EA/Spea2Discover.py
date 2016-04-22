@@ -28,7 +28,7 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import base, creator, tools
+from deap import base, creator, tools, algorithms
 from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
@@ -36,10 +36,11 @@ from GALE.model import *
 import DEAP_tools.stat_parts as stat_parts
 import time
 import random
+import pickle
 import pdb
 
 
-class Nsga2Discover(Discoverer):
+class Spea2Discover(Discoverer):
     def __init__(self, feature_model):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
@@ -48,8 +49,8 @@ class Nsga2Discover(Discoverer):
         else:
             self.ft = feature_model
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
-        creator.create("Individual", list, fitness=creator.FitnessMin)
+        creator.create("EqWeiFitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
+        creator.create("Individual", list, fitness=creator.EqWeiFitnessMin)
 
         toolbox = base.Toolbox()
 
@@ -67,7 +68,9 @@ class Nsga2Discover(Discoverer):
             self.bin_mutate,
             mutate_rate=0.15)
 
-        toolbox.register("select", tools.selNSGA2)
+        toolbox.register("select", tools.selSPEA2)
+
+        toolbox.register("selectTournament", tools.selTournament, tournsize=2)
 
         self.toolbox = toolbox
 
@@ -76,9 +79,9 @@ class Nsga2Discover(Discoverer):
         pass
 
     def eval_func(self, dec_l):
-        can = o(decs=dec_l)
-        self.ft.eval(can)
-        return tuple(can.scores)
+        candidate = o(decs=dec_l)
+        self.ft.eval(candidate)
+        return tuple(candidate.scores)
 
     @staticmethod
     def bin_mutate(individual, mutate_rate):
@@ -100,7 +103,8 @@ class Nsga2Discover(Discoverer):
 
         NGEN = 50
         MU = 1000
-        CXPB = 0.9
+        MuR = 0.06  # mutate rate
+        NBAR = 40  # archive size
 
         pop = toolbox.population(n=MU)
 
@@ -114,41 +118,49 @@ class Nsga2Discover(Discoverer):
         logbook.record(gen=0, evals=len(invalid_ind), **record)
         print(logbook.stream)
 
+        archive = []
         for gen in range(1, NGEN):
-            # vary the population
-            tools.emo.assignCrowdingDist(pop)
-            offspring = tools.selTournamentDCD(pop, len(pop))
-            offspring = [toolbox.clone(ind) for ind in offspring]
-
-            for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
-                if random.random() <= CXPB:
-                    toolbox.mate(ind1, ind2)
-
-                toolbox.mutate(ind1)
-                toolbox.mutate(ind2)
-                del ind1.fitness.values, ind2.fitness.values
-
-            # Evaluate the individuals with an invalid fitness
-            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+            # fitness assignment
+            invalid_ind = [ind for ind in pop if not ind.fitness.valid]
             fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
             for ind, fit in zip(invalid_ind, fitnesses):
                 ind.fitness.values = fit
 
-            # Select the next generation population
-            pop = toolbox.select(pop + offspring, MU)
+            invalid_ind = [ind for ind in archive if not ind.fitness.valid]
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
+
+            # environmental selection
+            pdb.set_trace()
+            archive = toolbox.select(pop + archive, k=NBAR)
+            pdb.set_trace()
+            # mating selection
+            mating_pool = toolbox.selectTournament(archive, k=MU)
+            offspring_pool = map(toolbox.clone, mating_pool)
+
+            # variation
+            for child1, child2 in zip(offspring_pool[::2], offspring_pool[1::2]):
+                toolbox.mate(child1, child2)
+
+            for mutant in offspring_pool:
+                if random.random() < MuR:
+                    toolbox.mutate(mutant)
+
+            pop = offspring_pool
             record = stats.compile(pop)
             logbook.record(gen=gen, evals=len(invalid_ind), **record)
             print(logbook.stream)
 
         print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
 
-        stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
+        stat_parts.pickle_results(self.ft.name, 'SPEA-II', pop, logbook)
 
         return pop, logbook
 
 
 def demo():
-    ed = Nsga2Discover(FTModel('webportal'))
+    ed = Spea2Discover(FTModel(sys.argv[1]))
     pop, logbook = ed.run()
 
     pdb.set_trace()

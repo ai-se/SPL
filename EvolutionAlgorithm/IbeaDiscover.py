@@ -89,12 +89,12 @@ class IbeaDiscover(Discoverer):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", valid_rate)
+        stats.register("valids", valid_rate)
         stats.register("hv", hv)
         stats.register("timestamp", timestamp, t=time.time())
 
         logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
+        logbook.header = "gen", "evals", "valids", "hv", "timestamp"
 
         NGEN = 50
         MU = 1000
