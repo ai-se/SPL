@@ -23,6 +23,8 @@
 
 
 from __future__ import division
+from deap.tools.emo import sortNondominated
+from deap.benchmarks.tools import diversity, convergence
 import os.path
 import sys
 import pickle
@@ -34,17 +36,50 @@ project_path = filter(lambda x: x.endswith('SPL'), sys.path)[0]
 from tools.hv import HyperVolume
 
 
-def hv(front, obj_num):
-    reference_point = [1] * obj_num
-    hv = HyperVolume(reference_point)
-    return hv.compute(front)
+def _get_frontier(pop):
+    """
+    return the pareto frontier of the given pop. No duplicate individuals in the returns
+    :param pop:
+    :return:
+    """
+    front = sortNondominated(pop, len(pop), True)[0]
+    uniques = []
+    for f in front:
+        if f not in uniques:
+            uniques.append(f)
+    return uniques
 
 
-def valids(individual_objs):
-    uniques = set(map(tuple, individual_objs))
-    n = len(uniques)
-    valid = len([1 for i in uniques if i[1] == 0])
-    return n, round(valid / n, 3)
+def stat_basing_on_pop(pop, optimal_in_theory=None):
+    """
+    return some statstics basing on the populations
+    :param pop:
+    :param optimal_in_theory:
+    :return:
+        * hyper_volume
+        * spread
+        * IGD
+        * frontier_size
+        * valid_frontier_size
+    """
+    front = _get_frontier(pop)
+
+    front_objs = [f.fitness.values for f in front]
+    reference_point = [1] * len(front_objs[0])
+    hv = HyperVolume(reference_point).compute(front_objs)  # did NOT use deap module calc
+
+    sort_front_by_obj0 = sorted(front, key=lambda f: f.fitness.values[0], reverse=True)
+    first, last = sort_front_by_obj0[0], sort_front_by_obj0[-1]
+    spread = diversity(front, first, last)
+
+    # TODO IGD
+    # IGD = convergence(front, optimal_in_theory)
+    IGD = 0.003
+
+    frontier_size = len(front)
+    valid_frontier_size = len([i for i in front if i.fitness.correct])
+
+    return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_frontier_size
 
 
 def timestamp(p, t=0):

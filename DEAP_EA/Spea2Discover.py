@@ -28,78 +28,35 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import base, creator, tools, algorithms
-from deap.benchmarks.tools import hypervolume
+from deap import tools
 from FeatureModel.ftmodel import FTModel
-from FeatureModel.discoverer import Discoverer
-from GALE.model import *
+from EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
-import time
 import random
-import pickle
 import pdb
 
 
-class Spea2Discover(Discoverer):
+class Spea2Discover(EADiscover):
     def __init__(self, feature_model):
-        # check whether 'conVio' set as an objective
-        if 'conVio' not in [o.name for o in feature_model.obj]:
-            name = feature_model.name
-            self.ft = FTModel(name, num_of_attached_objs=len(feature_model) - 2, setConVioAsObj=True)
-        else:
-            self.ft = feature_model
+        super(Spea2Discover, self).__init__(feature_model)
 
-        creator.create("EqWeiFitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
-        creator.create("Individual", list, fitness=creator.EqWeiFitnessMin)
-
-        toolbox = base.Toolbox()
-
-        toolbox.register("randBin", lambda: int(random.choice([0, 1])))
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.randBin, n=self.ft.decNum)
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("evaluate", self.eval_func)
-
-        toolbox.register(
+        self.toolbox.register(
             "mate",
             tools.cxTwoPoint)
 
-        toolbox.register(
+        self.toolbox.register(
             "mutate",
             self.bin_mutate,
             mutate_rate=0.15)
 
-        toolbox.register("select", tools.selSPEA2)
+        self.toolbox.register("select", tools.selSPEA2)
 
-        toolbox.register("selectTournament", tools.selTournament, tournsize=2)
-
-        self.toolbox = toolbox
-
-    def gen_valid_one(self):
-        assert False, "Do not use this function. Function not provided at this time."
-        pass
-
-    def eval_func(self, dec_l):
-        candidate = o(decs=dec_l)
-        self.ft.eval(candidate)
-        return tuple(candidate.scores)
-
-    @staticmethod
-    def bin_mutate(individual, mutate_rate):
-        for i in xrange(len(individual)):
-            if random.random() < mutate_rate:
-                individual[i] = 1 - individual[i]
-        return individual,
+        self.toolbox.register("selectTournament", tools.selTournament, tournsize=2)
 
     def run(self):
         toolbox = self.toolbox
-
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("uniques|VR", stat_parts.valids)
-        stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
-        stats.register("timestamp", stat_parts.timestamp, t=time.time())
-
-        logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "uniques|VR", "hv", "timestamp"
+        logbook = self.logbook
+        stats = self.stats
 
         NGEN = 50
         MU = 1000
@@ -108,33 +65,18 @@ class Spea2Discover(Discoverer):
 
         pop = toolbox.population(n=MU)
 
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+        _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
         record = stats.compile(pop)
-        logbook.record(gen=0, evals=len(invalid_ind), **record)
+        logbook.record(gen=0, evals=evals, **record)
         print(logbook.stream)
 
         archive = []
         for gen in range(1, NGEN):
-            # fitness assignment
-            invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
-
-            invalid_ind = [ind for ind in archive if not ind.fitness.valid]
-            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
-
             # environmental selection
-            pdb.set_trace()
             archive = toolbox.select(pop + archive, k=NBAR)
-            pdb.set_trace()
+            _, evals1 = self.evaluate_pop(archive)  # Evaluate the archive with an invalid fitness
+
             # mating selection
             mating_pool = toolbox.selectTournament(archive, k=MU)
             offspring_pool = map(toolbox.clone, mating_pool)
@@ -142,17 +84,19 @@ class Spea2Discover(Discoverer):
             # variation
             for child1, child2 in zip(offspring_pool[::2], offspring_pool[1::2]):
                 toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
 
             for mutant in offspring_pool:
                 if random.random() < MuR:
                     toolbox.mutate(mutant)
 
             pop = offspring_pool
+            _, evals2 = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
             record = stats.compile(pop)
-            logbook.record(gen=gen, evals=len(invalid_ind), **record)
-            print(logbook.stream)
+            logbook.record(gen=gen, evals=evals1 + evals2, **record)
 
-        print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
+            print(logbook.stream)
 
         stat_parts.pickle_results(self.ft.name, 'SPEA-II', pop, logbook)
 

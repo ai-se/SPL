@@ -28,75 +28,33 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import base, creator, tools
-from deap.benchmarks.tools import hypervolume
+from deap import tools
 from FeatureModel.ftmodel import FTModel
-from FeatureModel.discoverer import Discoverer
-from GALE.model import *
+from EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
-import time
 import random
 import pdb
 
 
-class Nsga2Discover(Discoverer):
+class Nsga2Discover(EADiscover):
     def __init__(self, feature_model):
-        # check whether 'conVio' set as an objective
-        if 'conVio' not in [o.name for o in feature_model.obj]:
-            name = feature_model.name
-            self.ft = FTModel(name, num_of_attached_objs=len(feature_model) - 2, setConVioAsObj=True)
-        else:
-            self.ft = feature_model
+        super(Nsga2Discover, self).__init__(feature_model)
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
-        creator.create("Individual", list, fitness=creator.FitnessMin)
-
-        toolbox = base.Toolbox()
-
-        toolbox.register("randBin", lambda: int(random.choice([0, 1])))
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.randBin, n=self.ft.decNum)
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("evaluate", self.eval_func)
-
-        toolbox.register(
+        self.toolbox.register(
             "mate",
             tools.cxTwoPoint)
 
-        toolbox.register(
+        self.toolbox.register(
             "mutate",
             self.bin_mutate,
             mutate_rate=0.15)
 
-        toolbox.register("select", tools.selNSGA2)
-
-        self.toolbox = toolbox
-
-    def gen_valid_one(self):
-        assert False, "Do not use this function. Function not provided at this time."
-        pass
-
-    def eval_func(self, dec_l):
-        can = o(decs=dec_l)
-        self.ft.eval(can)
-        return tuple(can.scores)
-
-    @staticmethod
-    def bin_mutate(individual, mutate_rate):
-        for i in xrange(len(individual)):
-            if random.random() < mutate_rate:
-                individual[i] = 1 - individual[i]
-        return individual,
+        self.toolbox.register("select", tools.selNSGA2)
 
     def run(self):
         toolbox = self.toolbox
-
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("uniques|VR", stat_parts.valids)
-        stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
-        stats.register("timestamp", stat_parts.timestamp, t=time.time())
-
-        logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "uniques|VR", "hv", "timestamp"
+        logbook = self.logbook
+        stats = self.stats
 
         NGEN = 50
         MU = 1000
@@ -104,14 +62,10 @@ class Nsga2Discover(Discoverer):
 
         pop = toolbox.population(n=MU)
 
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+        _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
         record = stats.compile(pop)
-        logbook.record(gen=0, evals=len(invalid_ind), **record)
+        logbook.record(gen=0, evals=evals, **record)
         print(logbook.stream)
 
         for gen in range(1, NGEN):
@@ -128,19 +82,13 @@ class Nsga2Discover(Discoverer):
                 toolbox.mutate(ind2)
                 del ind1.fitness.values, ind2.fitness.values
 
-            # Evaluate the individuals with an invalid fitness
-            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
+            _, evals = self.evaluate_pop(offspring)   # Evaluate the offspring with an invalid fitness
 
             # Select the next generation population
             pop = toolbox.select(pop + offspring, MU)
             record = stats.compile(pop)
-            logbook.record(gen=gen, evals=len(invalid_ind), **record)
+            logbook.record(gen=gen, evals=evals, **record)
             print(logbook.stream)
-
-        print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
 
         stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
 
@@ -148,10 +96,17 @@ class Nsga2Discover(Discoverer):
 
 
 def demo():
-    ed = Nsga2Discover(FTModel('webportal'))
+    from FeatureModel.SPLOT_dict import splot_dict
+    ed = Nsga2Discover(FTModel(splot_dict[0]))
     pop, logbook = ed.run()
 
     pdb.set_trace()
 
 if __name__ == '__main__':
-    demo()
+    try:
+        demo()
+    except:
+        import traceback
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        pdb.post_mortem(tb)

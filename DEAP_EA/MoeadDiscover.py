@@ -30,105 +30,59 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import base, creator, tools
-from deap.benchmarks.tools import hypervolume
 from FeatureModel.ftmodel import FTModel
-from FeatureModel.discoverer import Discoverer
-from GALE.model import *
+from EADiscover import EADiscover
 from DEAP_EA.DEAP_tools import MoeadSelc
 import DEAP_tools.stat_parts as stat_parts
-import time
-import random
-import pdb
 
 
-class MoeadDiscover(Discoverer):
-    def eval_func(self, dec_l):
-        can = o(decs=dec_l)
-        self.ft.eval(can)
-        return tuple(can.scores)
-
+class MoeadDiscover(EADiscover):
     def __init__(self, feature_model):
-        # check whether 'conVio' set as an objective
-        if 'conVio' not in [o.name for o in feature_model.obj]:
-            name = feature_model.name
-            self.ft = FTModel(name, num_of_attached_objs=len(feature_model) - 2, setConVioAsObj=True)
-        else:
-            self.ft = feature_model
+        super(MoeadDiscover, self).__init__(feature_model)
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
-        creator.create("Individual", list, fitness=creator.FitnessMin)
-
-        toolbox = base.Toolbox()
-
-        toolbox.register("randBin", lambda: int(random.choice([0, 1])))
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.randBin, n=self.ft.decNum)
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("evaluate", self.eval_func)
-
-        toolbox.register(
+        self.toolbox.register(
             "mate",
             MoeadSelc.cxSimulatedBinary,
             CXPB=0.4)
 
-        toolbox.register(
+        self.toolbox.register(
             "mutate",
             self.bin_mutate,
             mutate_rate=0.6)
 
-        self.toolbox = toolbox
-
-    def gen_valid_one(self):
-        assert False, "Do not use this function. Function not provided at this time."
-        pass
-
-    @staticmethod
-    def bin_mutate(individual, mutate_rate):
-        for i in xrange(len(individual)):
-            if random.random() < mutate_rate:
-                individual[i] = 1 - individual[i]
-        return individual
-
     def run(self):
         toolbox = self.toolbox
-
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("uniques|VR", stat_parts.valids)
-        stats.register("hv", stat_parts.hv, obj_num=self.ft.objNum)
-        stats.register("timestamp", stat_parts.timestamp, t=time.time())
-
-        logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "uniques|VR", "hv", "timestamp"
+        logbook = self.logbook
+        stats = self.stats
 
         NGEN = 50
         MU = 1000
 
         pop = toolbox.population(n=MU)
 
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+        _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
         MoeadSelc.setup(self.ft.objNum, pop, 20)
 
         record = stats.compile(pop)
-        logbook.record(gen=0, evals=len(invalid_ind), **record)
-        # print(logbook.stream)
+        logbook.record(gen=0, evals=evals, **record)
+        print(logbook.stream)
 
         for gen in range(1, NGEN):
+            evals = 0
             for point_id in MoeadSelc.shuffle(range(MU)):
                 child = toolbox.mate(pop[point_id], pop)  # crossover
                 toolbox.mutate(child)  # mutant
-                child.fitness.values = toolbox.evaluate(child)  # re-evaluate the mutant
+
+                if not child.fitness.valid:
+                    evals += 1
+                    child.fitness.values, child.fitness.correct = toolbox.evaluate(child)  # re-evaluate the mutant
+
                 MoeadSelc.update_neighbors(pop[point_id], child, pop)
 
             record = stats.compile(pop)
-            logbook.record(gen=gen, evals=len(invalid_ind), **record)
+            logbook.record(gen=gen, evals=evals, **record)
             print(logbook.stream)
-
-        print("Final population hypervolume is %f" % hypervolume(pop, [1] * self.ft.objNum))
 
         stat_parts.pickle_results(self.ft.name, 'MOEAd', pop, logbook)
 
