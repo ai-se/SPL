@@ -32,7 +32,7 @@ from deap import base, creator, tools
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
-import DEAP_tools.stat_parts as stat_parts
+import DEAP_EA.DEAP_tools.stat_parts as stat_parts
 import time
 import random
 
@@ -78,7 +78,7 @@ class EADiscover(Discoverer):
         return tuple(can.scores), is_valid_ind
 
     @staticmethod
-    def bin_mutate(individual, mutate_rate):
+    def bit_flip_mutate(individual, mutate_rate):
         for i in xrange(len(individual)):
             if random.random() < mutate_rate:
                 individual[i] = 1 - individual[i]

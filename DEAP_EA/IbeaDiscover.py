@@ -23,15 +23,17 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
+
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
 from deap.algorithms import varAnd
 from FeatureModel.ftmodel import FTModel
-from EADiscover import EADiscover
+from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
 import pdb
 
@@ -46,7 +48,7 @@ class IbeaDiscover(EADiscover):
 
         self.toolbox.register(
             "mutate",
-            self.bin_mutate,
+            self.bit_flip_mutate,
             mutate_rate=0.15)
 
         self.toolbox.register("select", tools.selIBEA)
@@ -57,7 +59,7 @@ class IbeaDiscover(EADiscover):
         stats = self.stats
 
         NGEN = 50
-        MU = 1000
+        MU = 50000
         CXPB = 0.9
 
         pop = toolbox.population(n=MU)
@@ -67,7 +69,7 @@ class IbeaDiscover(EADiscover):
         record = stats.compile(pop)
         logbook.record(gen=0, evals=evals, **record)
         print(logbook.stream)
-
+        pdb.set_trace()
         parents = pop[:]
 
         # Begin the generational process
@@ -100,8 +102,6 @@ class IbeaDiscover(EADiscover):
 def demo():
     ed = IbeaDiscover(FTModel(sys.argv[1]))
     pop, logbook = ed.run()
-
-    pdb.set_trace()
 
 if __name__ == '__main__':
     demo()

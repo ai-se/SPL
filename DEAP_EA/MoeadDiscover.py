@@ -31,7 +31,7 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from FeatureModel.ftmodel import FTModel
-from EADiscover import EADiscover
+from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 from DEAP_EA.DEAP_tools import MoeadSelc
 import DEAP_tools.stat_parts as stat_parts
 
@@ -47,7 +47,7 @@ class MoeadDiscover(EADiscover):
 
         self.toolbox.register(
             "mutate",
-            self.bin_mutate,
+            self.bit_flip_mutate,
             mutate_rate=0.6)
 
     def run(self):

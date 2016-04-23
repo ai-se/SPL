@@ -23,14 +23,16 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
+
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
 from FeatureModel.ftmodel import FTModel
-from EADiscover import EADiscover
+from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
 import random
 import pdb
@@ -46,7 +48,7 @@ class Spea2Discover(EADiscover):
 
         self.toolbox.register(
             "mutate",
-            self.bin_mutate,
+            self.bit_flip_mutate,
             mutate_rate=0.15)
 
         self.toolbox.register("select", tools.selSPEA2)
