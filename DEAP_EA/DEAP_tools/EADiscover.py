@@ -77,8 +77,6 @@ class EADiscover(Discoverer):
             'SPEAII_archive_size': 100
         }
 
-
-
     def gen_valid_one(self):
         assert False, "Do not use this function. Function not provided at this time."
         pass

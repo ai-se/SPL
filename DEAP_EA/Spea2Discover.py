@@ -89,7 +89,7 @@ class Spea2Discover(EADiscover):
                 del child2.fitness.values
 
             for mutant in offspring_pool:
-                if random.random() < MuR:
+                if random.random() < 0.4:
                     toolbox.mutate(mutant)
 
             pop = offspring_pool

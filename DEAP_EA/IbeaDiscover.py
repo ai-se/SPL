@@ -26,9 +26,11 @@ from __future__ import division
 
 import os.path
 import sys
+import pickle
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
 from deap import tools
 from deap.algorithms import varAnd
@@ -62,6 +64,7 @@ class IbeaDiscover(EADiscover):
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
 
+        hof = tools.HallOfFame(300)
         pop = toolbox.population(n=MU)
 
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
@@ -88,20 +91,28 @@ class IbeaDiscover(EADiscover):
             # Select the next generation parents
             parents[:] = toolbox.select(pop, MU)
 
-            # Update the statistics with the new population
-            record = stats.compile(pop) if stats is not None else {}
-            logbook.record(gen=gen, evals=evals, **record)
+            hof.update(pop)
 
-            print logbook.stream
+            # Update the statistics with the new population
+            if gen % 100 == 0:
+                record = stats.compile(pop) if stats is not None else {}
+                logbook.record(gen=gen, evals=evals, **record)
+
+                print logbook.stream
+
+                with open(spl_address+'/Records/'+self.ft.name+'.hof', 'w') as f:
+                    pickle.dump(hof, f)
 
         stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
 
         return pop, logbook
 
 
-def demo():
-    ed = IbeaDiscover(FTModel(sys.argv[1]))
+def record_hof():
+    from FeatureModel.SPLOT_dict import splot_dict
+    name = splot_dict[int(sys.argv[1])]
+    ed = IbeaDiscover(FTModel(name))
     pop, logbook = ed.run()
 
 if __name__ == '__main__':
-    demo()
+    record_hof()
