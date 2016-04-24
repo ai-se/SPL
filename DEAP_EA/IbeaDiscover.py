@@ -49,7 +49,7 @@ class IbeaDiscover(EADiscover):
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate,
-            mutate_rate=0.15)
+            mutate_rate=self.ea_configurations['cxMutateRate'])
 
         self.toolbox.register("select", tools.selIBEA)
 
@@ -58,9 +58,9 @@ class IbeaDiscover(EADiscover):
         logbook = self.logbook
         stats = self.stats
 
-        NGEN = 50
-        MU = 50000
-        CXPB = 0.9
+        NGEN = self.ea_configurations['NGEN']
+        MU = self.ea_configurations['MU']
+        CXPB = self.ea_configurations['CXPB']
 
         pop = toolbox.population(n=MU)
 
@@ -69,7 +69,7 @@ class IbeaDiscover(EADiscover):
         record = stats.compile(pop)
         logbook.record(gen=0, evals=evals, **record)
         print(logbook.stream)
-        pdb.set_trace()
+        # pdb.set_trace()
         parents = pop[:]
 
         # Begin the generational process

@@ -50,7 +50,7 @@ class Nsga3Discover(EADiscover):
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate,
-            mutate_rate=0.15)
+            mutate_rate=self.ea_configurations['cxMutateRate'])
 
         self.toolbox.register("select", Nsga3Selc.sel_nsga_iii)
 
@@ -59,9 +59,9 @@ class Nsga3Discover(EADiscover):
         logbook = self.logbook
         stats = self.stats
 
-        NGEN = 50
-        MU = 1000
-        CXPB = 0.9
+        NGEN = self.ea_configurations['NGEN']
+        MU = self.ea_configurations['MU']
+        CXPB = self.ea_configurations['CXPB']
 
         pop = toolbox.population(n=MU)
 

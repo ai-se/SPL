@@ -25,6 +25,7 @@
 from __future__ import division
 import os.path
 import sys
+
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -32,6 +33,7 @@ from deap import base, creator, tools
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
 from GALE.model import *
+from abc import abstractmethod
 import DEAP_EA.DEAP_tools.stat_parts as stat_parts
 import time
 import random
@@ -67,6 +69,16 @@ class EADiscover(Discoverer):
         self.stats = stats
         self.logbook = logbook
 
+        self.ea_configurations = {
+            'NGEN': 500,
+            'MU': 100,
+            'CXPB': 0.9,
+            'cxMutateRate': 0.05,
+            'spea2_archive_size': 100
+        }
+
+
+
     def gen_valid_one(self):
         assert False, "Do not use this function. Function not provided at this time."
         pass
@@ -74,7 +86,7 @@ class EADiscover(Discoverer):
     def eval_func(self, dec_l):
         can = o(decs=dec_l)
         self.ft.eval(can)
-        is_valid_ind = can.conVio == 0 and can.fulfill[0] == 1
+        is_valid_ind = self.ft.ok(can)
         return tuple(can.scores), is_valid_ind
 
     @staticmethod
