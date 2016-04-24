@@ -50,7 +50,7 @@ class Nsga3Discover(EADiscover):
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate,
-            mutate_rate=self.ea_configurations['cxMutateRate'])
+            mutate_rate=self.ea_configurations['MutateRate'])
 
         self.toolbox.register("select", Nsga3Selc.sel_nsga_iii)
 

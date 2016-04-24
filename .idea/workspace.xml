@@ -2,17 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="19437feb-3279-4340-841f-ed8e71020d68" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/Spea2Discover.py" afterPath="$PROJECT_DIR$/DEAP_EA/Spea2Discover.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FeatureModel/Feature_tree.py" afterPath="$PROJECT_DIR$/FeatureModel/Feature_tree.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FeatureModel/ftmodel.py" afterPath="$PROJECT_DIR$/FeatureModel/ftmodel.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Records/IBEA_simple_042316.logbook" afterPath="$PROJECT_DIR$/Records/IBEA_simple_042316.logbook" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Records/IBEA_simple_042316.pop" afterPath="$PROJECT_DIR$/Records/IBEA_simple_042316.pop" />
     </list>
     <ignored path="SPL.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,11 +38,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="IbeaDiscover.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="IbeaDiscover.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="54" column="0" selection-start-line="54" selection-start-column="0" selection-end-line="54" selection-end-column="0" />
+            <state relative-caret-position="420">
+              <caret line="45" column="19" selection-start-line="45" selection-start-column="19" selection-end-line="45" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -57,7 +52,7 @@
         <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="234">
-              <caret line="50" column="62" selection-start-line="50" selection-start-column="62" selection-end-line="50" selection-end-column="62" />
+              <caret line="50" column="60" selection-start-line="50" selection-start-column="60" selection-end-line="50" selection-end-column="60" />
               <folding />
             </state>
           </provider>
@@ -66,8 +61,8 @@
       <file leaf-file-name="EADiscover.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="549">
-              <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+            <state relative-caret-position="504">
+              <caret line="76" column="32" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="32" />
               <folding>
                 <element signature="e#1222#1253#0" expanded="true" />
               </folding>
@@ -79,7 +74,7 @@
         <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="234">
-              <caret line="51" column="62" selection-start-line="51" selection-start-column="62" selection-end-line="51" selection-end-column="62" />
+              <caret line="51" column="60" selection-start-line="51" selection-start-column="60" selection-end-line="51" selection-end-column="60" />
               <folding />
             </state>
           </provider>
@@ -89,17 +84,17 @@
         <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="234">
-              <caret line="52" column="62" selection-start-line="52" selection-start-column="62" selection-end-line="52" selection-end-column="62" />
+              <caret line="52" column="60" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="60" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Spea2Discover.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Spea2Discover.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/Spea2Discover.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1110">
-              <caret line="77" column="58" selection-start-line="77" selection-start-column="58" selection-end-line="77" selection-end-column="58" />
+            <state relative-caret-position="248">
+              <caret line="64" column="45" selection-start-line="64" selection-start-column="45" selection-end-line="64" selection-end-column="45" />
               <folding />
             </state>
           </provider>
@@ -169,11 +164,11 @@
         <option value="$PROJECT_DIR$/Records/m2_webportal_160423_stat.csv" />
         <option value="$PROJECT_DIR$/FeatureModel/Feature_tree.py" />
         <option value="$PROJECT_DIR$/FeatureModel/ftmodel.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/Spea2Discover.py" />
       </list>
     </option>
@@ -1184,20 +1179,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="549">
-          <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
-          <folding>
-            <element signature="e#1222#1253#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/MoeadDiscover.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
-          <caret line="50" column="62" selection-start-line="50" selection-start-column="62" selection-end-line="50" selection-end-column="62" />
+          <caret line="50" column="60" selection-start-line="50" selection-start-column="60" selection-end-line="50" selection-end-column="60" />
           <folding />
         </state>
       </provider>
@@ -1205,7 +1190,7 @@
     <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga2Discover.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
-          <caret line="51" column="62" selection-start-line="51" selection-start-column="62" selection-end-line="51" selection-end-column="62" />
+          <caret line="51" column="60" selection-start-line="51" selection-start-column="60" selection-end-line="51" selection-end-column="60" />
           <folding />
         </state>
       </provider>
@@ -1213,23 +1198,33 @@
     <entry file="file://$PROJECT_DIR$/DEAP_EA/Nsga3Discover.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
-          <caret line="52" column="62" selection-start-line="52" selection-start-column="62" selection-end-line="52" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/Spea2Discover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1110">
-          <caret line="77" column="58" selection-start-line="77" selection-start-column="58" selection-end-line="77" selection-end-column="58" />
+          <caret line="52" column="60" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="60" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="54" column="0" selection-start-line="54" selection-start-column="0" selection-end-line="54" selection-end-column="0" />
+        <state relative-caret-position="420">
+          <caret line="45" column="19" selection-start-line="45" selection-start-column="19" selection-end-line="45" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="76" column="32" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="32" />
+          <folding>
+            <element signature="e#1222#1253#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/Spea2Discover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="248">
+          <caret line="64" column="45" selection-start-line="64" selection-start-column="45" selection-end-line="64" selection-end-column="45" />
           <folding />
         </state>
       </provider>

@@ -49,7 +49,7 @@ class Nsga2Discover(EADiscover):
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate,
-            mutate_rate=self.ea_configurations['cxMutateRate'])
+            mutate_rate=self.ea_configurations['MutateRate'])
 
         self.toolbox.register("select", tools.selNSGA2)
 

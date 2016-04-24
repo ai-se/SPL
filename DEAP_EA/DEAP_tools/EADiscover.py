@@ -73,8 +73,8 @@ class EADiscover(Discoverer):
             'NGEN': 500,
             'MU': 100,
             'CXPB': 0.9,
-            'cxMutateRate': 0.05,
-            'spea2_archive_size': 100
+            'MutateRate': 0.05,
+            'SPEAII_archive_size': 100
         }
 
 
