@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="19437feb-3279-4340-841f-ed8e71020d68" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/billing.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/carselection.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/cellphone.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/classicshell.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/eis.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/eshop.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/fmtest.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/greencar.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/marketplace.hof" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Records/webportal.hof" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" afterPath="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
     </list>
     <ignored path="SPL.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -47,8 +36,8 @@
       <file leaf-file-name="IbeaDiscover.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="93" column="39" selection-start-line="93" selection-start-column="39" selection-end-line="93" selection-end-column="39" />
+            <state relative-caret-position="870">
+              <caret line="148" column="0" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
               <folding>
                 <element signature="e#1222#1253#0" expanded="true" />
               </folding>
@@ -59,8 +48,8 @@
       <file leaf-file-name="stat_parts.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="90" column="28" selection-start-line="90" selection-start-column="28" selection-end-line="90" selection-end-column="28" />
+            <state relative-caret-position="1350">
+              <caret line="96" column="31" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -124,7 +113,6 @@
         <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/MoeadSelc.py" />
         <option value="$PROJECT_DIR$/FeatureModel/SPLOT_dict.py" />
         <option value="$PROJECT_DIR$/tools/pareto.py" />
-        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/EADiscover.py" />
         <option value="$PROJECT_DIR$/Records/m2_webportal_160423_stat.csv" />
         <option value="$PROJECT_DIR$/FeatureModel/Feature_tree.py" />
@@ -136,6 +124,7 @@
         <option value="$PROJECT_DIR$/Records/webportal.hof" />
         <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/EADiscover.py" />
         <option value="$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py" />
+        <option value="$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py" />
       </list>
     </option>
   </component>
@@ -1029,14 +1018,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FeatureModel/ftmodel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FeatureModel/SPLOT_dict.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="297">
@@ -1072,16 +1053,8 @@
         <state relative-caret-position="600">
           <caret line="92" column="45" selection-start-line="92" selection-start-column="45" selection-end-line="92" selection-end-column="45" />
           <folding>
-            <element signature="e#1222#1253#0" expanded="true" />
+            <element signature="e#1222#1253#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="90" column="28" selection-start-line="90" selection-start-column="28" selection-end-line="90" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1093,10 +1066,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/DEAP_EA/DEAP_tools/stat_parts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1350">
+          <caret line="96" column="31" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FeatureModel/ftmodel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1725">
+          <caret line="119" column="30" selection-start-line="119" selection-start-column="30" selection-end-line="119" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/DEAP_EA/IbeaDiscover.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="93" column="39" selection-start-line="93" selection-start-column="39" selection-end-line="93" selection-end-column="39" />
+        <state relative-caret-position="870">
+          <caret line="148" column="0" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
           <folding>
             <element signature="e#1222#1253#0" expanded="true" />
           </folding>
