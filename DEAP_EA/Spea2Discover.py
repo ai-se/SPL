@@ -49,7 +49,7 @@ class Spea2Discover(EADiscover):
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate,
-            mutate_rate=0.15)
+            mutate_rate=self.ea_configurations['MutateRate'])
 
         self.toolbox.register("select", tools.selSPEA2)
 
@@ -60,10 +60,9 @@ class Spea2Discover(EADiscover):
         logbook = self.logbook
         stats = self.stats
 
-        NGEN = 50
-        MU = 1000
-        MuR = 0.06  # mutate rate
-        NBAR = 40  # archive size
+        NGEN = self.ea_configurations['NGEN']
+        MU = self.ea_configurations['MU']
+        NBAR = self.ea_configurations['SPEAII_archive_size']
 
         pop = toolbox.population(n=MU)
 
@@ -90,7 +89,7 @@ class Spea2Discover(EADiscover):
                 del child2.fitness.values
 
             for mutant in offspring_pool:
-                if random.random() < MuR:
+                if random.random() < 0.4:
                     toolbox.mutate(mutant)
 
             pop = offspring_pool

@@ -48,15 +48,15 @@ class MoeadDiscover(EADiscover):
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate,
-            mutate_rate=0.6)
+            mutate_rate=self.ea_configurations['MutateRate'])
 
     def run(self):
         toolbox = self.toolbox
         logbook = self.logbook
         stats = self.stats
 
-        NGEN = 50
-        MU = 1000
+        NGEN = self.ea_configurations['NGEN']
+        MU = self.ea_configurations['MU']
 
         pop = toolbox.population(n=MU)
 
