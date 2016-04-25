@@ -139,10 +139,10 @@ def load_dump_hof():
         if len(hh) == 0:
             continue
 
-        with open(spl_address+'/input/'+name+'.correctpf', 'w') as f:
+        with open(spl_address+'/input/'+name+'.pf', 'w') as f:
             correct_pf = map(list,[h.fitness.values for h in hh])
             pickle.dump(correct_pf, f)
 
 
 if __name__ == '__main__':
-    experiment()
+    load_dump_hof()
