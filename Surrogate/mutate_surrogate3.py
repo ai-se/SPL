@@ -7,11 +7,12 @@ import time
 from operator import itemgetter
 
 import UNIVERSE
+
 import pre_surrogate
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
-from GALE.model import candidate
 from __init__ import *
+from model import candidate
 from tools import pareto
 
 __author__ = "Jianfeng Chen"

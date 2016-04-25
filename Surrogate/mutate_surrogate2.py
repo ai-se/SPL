@@ -1,22 +1,20 @@
 from __future__ import division
 
-import __init__
-import copy
 import itertools
 import logging
-import scipy
 import pdb
-import time
 import random
+import time
 import traceback
-import UNIVERSE
-import learner
-import pre_surrogate
-from os import sys
 from operator import itemgetter
+from os import sys
+
+import scipy
+
+import learner
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
-from GALE.model import candidate
+from model import candidate
 from tools import pareto
 
 __author__ = "Jianfeng Chen"
