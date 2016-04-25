@@ -1,8 +1,10 @@
-from discoverer import Discoverer
-from random import choice
 from os import sys, path
+from random import choice
+
+from discoverer import Discoverer
+
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from GALE.model import candidate
+from model import candidate
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"

@@ -105,6 +105,44 @@ class FeatureTree(object):
                 self.post_order(c, func, extra_args)
         func(node, *extra_args)
 
+    def check_fulfill_valid(self, fill):
+        """
+        checking a given fulfill lst whether consistent with the feature model tree structure
+        :param fill:
+        :return:
+        """
+        def find(x):
+            return fill[self.find_fea_index(x)]
+
+        def check_node(node):
+            if not node.children:
+                return True
+
+            child_sum = sum([find(c) for c in node.children])
+
+            if node.node_type in ['m', 'r', 'o']:
+                if child_sum == 0:
+                    return False
+                for m_child in filter(lambda x: x.node_type in ['m', 'r', 'g'], node.children):
+                    if find(m_child) == 0:
+                        return False
+
+            if node.node_type is ['g']:
+                if not (node.g_d <= child_sum <= node.g_u):
+                    return False
+
+            for child in node.children:
+                if find(child) == 1:
+                    t = check_node(child)
+                    if not t:
+                        return False
+            return True
+
+        if fill[0] == 0:
+            return False
+
+        return check_node(self.root)
+
     # setting the form by the structure of feature tree
     # leaves should be filled in the form in advanced
     # all not filled feature should be -1 in the form

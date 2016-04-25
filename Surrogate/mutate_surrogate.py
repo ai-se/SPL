@@ -12,7 +12,7 @@ import logging
 import pdb
 import traceback
 import time
-import UNIVERSE
+import universe
 
 project_path = [i for i in sys.path if i.endswith('SPL')][0]
 
@@ -170,7 +170,7 @@ class MutateWithSurrogateEngine(Discoverer):
 
 
 def test_one_model(model):
-    UNIVERSE.FT_EVAL_COUNTER = 0
+    universe.FT_EVAL_COUNTER = 0
     engine = MutateWithSurrogateEngine(FTModel(model))
     # pdb.set_trace()
     # alpha = engine.gen_valid_one()

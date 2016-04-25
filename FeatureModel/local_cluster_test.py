@@ -1,7 +1,9 @@
-from ftmodel import FTModel
 from os import sys, path
+
+from ftmodel import FTModel
+
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from GALE.model import candidate
+from model import candidate
 
 
 def binaryCandidate(num, decSize):

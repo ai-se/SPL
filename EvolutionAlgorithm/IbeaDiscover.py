@@ -1,13 +1,16 @@
 from __future__ import division
-from __init__ import *
+
+import pdb
+import random
+import time
+
 from deap import base, creator, tools, algorithms
 from deap.benchmarks.tools import hypervolume
-from FeatureModel.ftmodel import FTModel
+
 from FeatureModel.discoverer import Discoverer
-from GALE.model import *
-import time
-import random
-import pdb
+from FeatureModel.ftmodel import FTModel
+from __init__ import *
+from model import *
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -89,12 +92,12 @@ class IbeaDiscover(Discoverer):
         toolbox = self.toolbox
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("valid_rate", valid_rate)
+        stats.register("valids", valid_rate)
         stats.register("hv", hv)
         stats.register("timestamp", timestamp, t=time.time())
 
         logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "valid_rate", "hv", "timestamp"
+        logbook.header = "gen", "evals", "valids", "hv", "timestamp"
 
         NGEN = 50
         MU = 1000
@@ -117,8 +120,6 @@ class IbeaDiscover(Discoverer):
         print("Final population hypervolume is %f" % hypervolume(pop, [1] * ft.objNum))
 
         return pop, logbook
-
-
 
 ed = IbeaDiscover(FTModel(sys.argv[1]))
 pop, logbook=ed.run()

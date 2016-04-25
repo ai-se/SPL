@@ -1,5 +1,6 @@
-from model import *
 import math
+
+from model import *
 
 
 class Schaffer(model):

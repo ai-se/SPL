@@ -1,0 +1,39 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@n2d1-7>
+Subject: Job 274115: </share/jchen37/miniconda/bin/python2.7 IbeaDiscover.py 3> Exited
+
+Job </share/jchen37/miniconda/bin/python2.7 IbeaDiscover.py 3> was submitted from host <login02.hpc.ncsu.edu> by user <jchen37> in cluster <henry2>.
+Job was executed on host(s) <n2d1-7>, in queue <serial>, as user <jchen37> in cluster <henry2>.
+</home/jchen37> was used as the home directory.
+</share/jchen37/SPL/DEAP_EA> was used as the working directory.
+Started at Sun Apr 24 21:39:27 2016
+Results reported at Mon Apr 25 02:39:33 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/share/jchen37/miniconda/bin/python2.7 IbeaDiscover.py 3
+------------------------------------------------------------
+
+TERM_RUNLIMIT: job killed after reaching LSF run time limit.
+Exited with exit code 140.
+
+Resource usage summary:
+
+    CPU time   :  17991.37 sec.
+    Max Memory :       127 MB
+    Max Swap   :       513 MB
+
+    Max Processes  :         3
+    Max Threads    :         4
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <./err/err.274115> for stderr output of this job.
+

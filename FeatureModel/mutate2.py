@@ -1,14 +1,15 @@
 from __future__ import division
 
 import pdb
+import time
 from copy import deepcopy
 from random import randint, shuffle
-import time
+
 import ftmodel
-from GALE.model import candidate
+from __init__ import project_path
 from candidatesMeasure import analysis_cans
 from discoverer import Discoverer
-from __init__ import project_path
+from model import candidate
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -193,7 +194,7 @@ class MutateEngine(Discoverer):
         stat_file_name = '{0}/Records/m2_{1}_{2}_stat.csv'.format(project_path, self.feature_model.name,
                                                                      time.strftime('%y%m%d'))
         stat_file = open(stat_file_name, 'w')
-        stat_file.write('generation, generated_cans, valid_rate, hypervolume, timestamp\n')
+        stat_file.write('generation, generated_cans, valids, hypervolume, timestamp\n')
         t = time.time()
         for i in range(GEN):
             R = []

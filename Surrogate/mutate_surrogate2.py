@@ -1,29 +1,45 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2016, Jianfeng Chen <jchen37@ncsu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+
+
 from __future__ import division
 
-import __init__
-import copy
 import itertools
 import logging
-import scipy
 import pdb
-import time
 import random
+import time
 import traceback
-import UNIVERSE
-import learner
-import pre_surrogate
-from os import sys
 from operator import itemgetter
+from os import sys
+
+import scipy
+
+import learner
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
-from GALE.model import candidate
+from model import candidate
 from tools import pareto
-
-__author__ = "Jianfeng Chen"
-__copyright__ = "Copyright (C) 2016 Jianfeng Chen"
-__license__ = "MIT"
-__version__ = "2.0"
-__email__ = "jchen37@ncsu.edu"
 
 
 class ConstraintConflict(Exception):
@@ -309,7 +325,10 @@ class MutateSurrogateEngine2(Discoverer):
         can.fulfill = filled_list
         return can
 
+
 def run():
+    raise NotImplementedError
+
 
 def test_one_model(model):
     R = []

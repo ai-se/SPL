@@ -1,13 +1,14 @@
-import pdb
+from os import sys, path
+
 import bruteDiscover
 import mutate2  # v2 mutate engine
 from parser import load_ft_url
-from os import sys, path
+
 # import optima.problems.problem
 import ecspy.benchmarks
-# import UNIVERSE
+
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from GALE.model import *
+from model import *
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
@@ -27,11 +28,11 @@ class FTModel(model):
 
         self.ft.load_cost(name)
         self.ft.load_time(name)
-        dec = [Has(l.id, 0, 1) for l in self.ft.leaves]
+        dec = [Has(l.id, 0, 1) for l in self.ft.features]
         # number of NOT included features
-        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum - len(self.ft.groups), goal=lt)]
+        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum, goal=lt)]
         if setConVioAsObj:
-            obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con), goal=lt))
+            obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con)+1, goal=lt))
         if num_of_attached_objs >= 1:
             obj.append(Has(name='cost', lo=0, hi=sum(self.ft.cost), goal=lt))
         if num_of_attached_objs >= 2:
@@ -54,35 +55,28 @@ class FTModel(model):
         s += '\n'
         return s
 
-    def eval(self, candidate, doNorm=True, returnFulfill=False):
+    def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False):
         t = self.ft  # abbr.
-        sol = candidate.decs
+        fulfill = candidate.decs
 
-        if not hasattr(candidate, 'fulfill'):
-            # obj1: features numbers
-            # initialize the fulfill list
-            fulfill = [-1] * t.featureNum
-            for i, l in zip(sol, t.leaves):
-                fulfill[t.features.index(l)] = i
-
-            # fill other tree elements
-            t.fill_form4all_fea(fulfill)
-            UNIVERSE.FT_EVAL_COUNTER += 1
-        else:
-            fulfill = candidate.fulfill
-
-        # here group should not count as feature
-        gsum = 0
-        for g in t.groups:
-            gsum += fulfill[t.features.index(g)]
-        obj1 = len(t.features)-len(t.groups) - (sum(fulfill) - gsum)  # LESS IS MORE!
+        obj1 = len(t.features) - sum(fulfill)  # LESS IS MORE!
         candidate.scores = [obj1]
 
         # constraint violation
-        conVio = len(t.con)
+        conVio = len(t.con) + 1
         for cc in t.con:
             if cc.is_correct(t, fulfill):
                 conVio -= 1
+
+        # another import constraint, the feature tree structure!
+        if checkTreeStructure:
+            if self.ft.check_fulfill_valid(fulfill):
+                candidate.correct_ft = True
+                conVio -= 1
+            else:
+                candidate.correct_ft = False
+        else:
+            conVio -= 1
 
         all_obj_names = [o.name for o in self.obj]
         if 'conVio' in all_obj_names:
@@ -93,7 +87,7 @@ class FTModel(model):
         if 'cost' in all_obj_names:
             total_cost = 0
             for i, f in enumerate(t.features):
-                if fulfill[i] == 1 and f.node_type != 'g':
+                if fulfill[i] == 1:
                     total_cost += t.cost[i]
             candidate.scores.append(total_cost)
 
@@ -101,15 +95,12 @@ class FTModel(model):
         if 'time' in all_obj_names:
             total_time = 0
             for i, f in enumerate(t.features):
-                if fulfill[i] == 1 and f.node_type != 'g':
+                if fulfill[i] == 1:
                     total_time += t.time[i]
             candidate.scores.append(total_time)
 
         if doNorm:
             self.normObjs(candidate)
-
-        # store the fulfill for convenience
-        candidate.fulfill = fulfill
 
         if returnFulfill:
             return fulfill
@@ -125,7 +116,14 @@ class FTModel(model):
             self.eval(c)
         elif not c.scores:
             self.eval(c)
-        return c.conVio <= con_vio_tol and c.fulfill[0] == 1
+
+        if not hasattr(c, 'correct_ft'):
+            c.correct_ft = self.ft.check_fulfill_valid(c.decs)
+
+        if not c.correct_ft:
+            return False
+        else:
+            return c.conVio <= con_vio_tol
 
     def genRandomCan(self, engine_version):
         """
@@ -233,13 +231,13 @@ def demo(name):
     pdb.set_trace()
 
 if __name__ == '__main__':
-    demo('eshop')
-    demo('eis')
-    demo('webportal')
+    # demo('eshop')
+    # demo('eis')
+    # demo('webportal')
     demo('cellphone')
-    demo('fmtest')
-    demo('billing')
-    demo('greencar')
-    demo('marketplace')
-    demo('classicshell')
-    demo('carselection')
+    # demo('fmtest')
+    # demo('billing')
+    # demo('greencar')
+    # demo('marketplace')
+    # demo('classicshell')
+    # demo('carselection')

@@ -1,10 +1,10 @@
-import math, random
-from numpy import *
-from ZDT4 import *
-from model import *
-from problem import *
 from time import time
-from o import *
+
+from numpy import *
+
+from problem import *
+
+
 #from result_stat import Stat
 #show = Stat.rdivDemo
 
