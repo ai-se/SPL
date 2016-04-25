@@ -91,9 +91,10 @@ class IbeaDiscover(EADiscover):
             # Select the next generation parents
             parents[:] = toolbox.select(pop, MU)
 
-            correct_pop = [p for p in pop if p.fitness.correct]
-            if correct_pop:
-                hof.update(correct_pop)
+            # correct_pop = [p for p in pop if p.fitness.correct]
+            # if correct_pop:
+            #     hof.update(correct_pop)
+            hof.update(pop)
 
             # Update the statistics with the new population
             if gen % 100 == 0:
@@ -113,11 +114,35 @@ class IbeaDiscover(EADiscover):
         return pop, logbook
 
 
+def experiment():
+    from FeatureModel.SPLOT_dict import splot_dict
+    name = splot_dict[int(sys.argv[1])]
+    ed = IbeaDiscover(FTModel(name))
+    pop, logbook = ed.run()
+
+
 def record_hof():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
     ed = IbeaDiscover(FTModel(name))
     pop, logbook = ed.run()
 
+
+def load_dump_hof():
+    from FeatureModel.SPLOT_dict import splot_dict
+    for i in range(10):
+        name = splot_dict[i]
+        ed = IbeaDiscover(FTModel(name))
+        with open(spl_address+'/input/hof_ibea/'+name+'.hof', 'r') as f:
+            hh = pickle.load(f)
+
+        if len(hh) == 0:
+            continue
+
+        with open(spl_address+'/input/'+name+'.correctpf', 'w') as f:
+            correct_pf = map(list,[h.fitness.values for h in hh])
+            pickle.dump(correct_pf, f)
+
+
 if __name__ == '__main__':
-    record_hof()
+    experiment()
