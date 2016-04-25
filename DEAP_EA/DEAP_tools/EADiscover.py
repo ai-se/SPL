@@ -70,8 +70,8 @@ class EADiscover(Discoverer):
         self.logbook = logbook
 
         self.ea_configurations = {
-            'NGEN': 500,
-            'MU': 100,
+            'NGEN': 50000,
+            'MU': 1000,
             'CXPB': 0.9,
             'MutateRate': 0.05,
             'SPEAII_archive_size': 100

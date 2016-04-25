@@ -91,7 +91,9 @@ class IbeaDiscover(EADiscover):
             # Select the next generation parents
             parents[:] = toolbox.select(pop, MU)
 
-            hof.update(pop)
+            correct_pop = [p for p in pop if p.fitness.correct]
+            if correct_pop:
+                hof.update(correct_pop)
 
             # Update the statistics with the new population
             if gen % 100 == 0:
@@ -102,6 +104,9 @@ class IbeaDiscover(EADiscover):
 
                 with open(spl_address+'/Records/'+self.ft.name+'.hof', 'w') as f:
                     pickle.dump(hof, f)
+
+            if len(hof) > 290 and gen > 5000:
+                break
 
         stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
 
