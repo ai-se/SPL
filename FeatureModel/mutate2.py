@@ -1,14 +1,15 @@
 from __future__ import division
 
 import pdb
+import time
 from copy import deepcopy
 from random import randint, shuffle
-import time
+
 import ftmodel
-from GALE.model import candidate
+from __init__ import project_path
 from candidatesMeasure import analysis_cans
 from discoverer import Discoverer
-from __init__ import project_path
+from model import candidate
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"

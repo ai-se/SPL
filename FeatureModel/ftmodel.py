@@ -1,13 +1,14 @@
-import pdb
+from os import sys, path
+
 import bruteDiscover
 import mutate2  # v2 mutate engine
 from parser import load_ft_url
-from os import sys, path
+
 # import optima.problems.problem
 import ecspy.benchmarks
-import universe
+
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from GALE.model import *
+from model import *
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"

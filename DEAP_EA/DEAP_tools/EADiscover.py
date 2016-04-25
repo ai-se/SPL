@@ -23,6 +23,7 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
 
@@ -32,8 +33,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from deap import base, creator, tools
 from FeatureModel.ftmodel import FTModel
 from FeatureModel.discoverer import Discoverer
-from GALE.model import *
-from abc import abstractmethod
+from model import *
 import DEAP_EA.DEAP_tools.stat_parts as stat_parts
 import time
 import random

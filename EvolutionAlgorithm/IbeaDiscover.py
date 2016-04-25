@@ -1,13 +1,16 @@
 from __future__ import division
-from __init__ import *
+
+import pdb
+import random
+import time
+
 from deap import base, creator, tools, algorithms
 from deap.benchmarks.tools import hypervolume
-from FeatureModel.ftmodel import FTModel
+
 from FeatureModel.discoverer import Discoverer
-from GALE.model import *
-import time
-import random
-import pdb
+from FeatureModel.ftmodel import FTModel
+from __init__ import *
+from model import *
 
 __author__ = "Jianfeng Chen"
 __copyright__ = "Copyright (C) 2016 Jianfeng Chen"
