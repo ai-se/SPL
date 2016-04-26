@@ -55,7 +55,7 @@ class IbeaDiscover(EADiscover):
 
         self.toolbox.register("select", tools.selIBEA)
 
-    def run(self):
+    def run(self, record_hof=False):
         toolbox = self.toolbox
         logbook = self.logbook
         stats = self.stats
@@ -64,7 +64,8 @@ class IbeaDiscover(EADiscover):
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
 
-        hof = tools.HallOfFame(300)
+        if record_hof:
+            hof = tools.HallOfFame(300)
         pop = toolbox.population(n=MU)
 
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
@@ -91,26 +92,31 @@ class IbeaDiscover(EADiscover):
             # Select the next generation parents
             parents[:] = toolbox.select(pop, MU)
 
-            # correct_pop = [p for p in pop if p.fitness.correct]
-            # if correct_pop:
-            #     hof.update(correct_pop)
-            hof.update(pop)
+            if record_hof:
+                hof.update(pop)
 
             # Update the statistics with the new population
-            if gen % 100 == 0:
+            # if gen % 100 == 0:
+            if True:
                 record = stats.compile(pop) if stats is not None else {}
                 logbook.record(gen=gen, evals=evals, **record)
 
                 print logbook.stream
 
-                with open(spl_address+'/Records/'+self.ft.name+'.hof', 'w') as f:
-                    pickle.dump(hof, f)
+                if record_hof:
+                    with open(spl_address+'/Records/'+self.ft.name+'.hof', 'w') as f:
+                        pickle.dump(hof, f)
 
-            if len(hof) > 290 and gen > 5000:
-                break
+            # # early termination control
+            # if len(hof) > 290 and gen > 5000:
+            #     break
+            if 'last_record_time' not in locals():
+                last_record_time = 0
+            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
+                last_record_time = logbook[-1]['timestamp']
+                stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
 
         stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
-
         return pop, logbook
 
 
@@ -121,11 +127,11 @@ def experiment():
     pop, logbook = ed.run()
 
 
-def record_hof():
+def run_with_hof():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
     ed = IbeaDiscover(FTModel(name))
-    pop, logbook = ed.run()
+    pop, logbook = ed.run(record_hof=False)
 
 
 def load_dump_hof():
@@ -145,4 +151,5 @@ def load_dump_hof():
 
 
 if __name__ == '__main__':
-    load_dump_hof()
+    # import debug
+    experiment()

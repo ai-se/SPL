@@ -29,6 +29,7 @@ import sys
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
 from deap import base, creator, tools
 from FeatureModel.ftmodel import FTModel
@@ -37,6 +38,7 @@ from model import *
 import DEAP_EA.DEAP_tools.stat_parts as stat_parts
 import time
 import random
+import pickle
 
 
 class EADiscover(Discoverer):
@@ -59,7 +61,15 @@ class EADiscover(Discoverer):
         toolbox.register("evaluate", self.eval_func)
 
         stats = tools.Statistics(lambda ind: ind)
-        stats.register("hv|spread|igd|frontier#|valid#", stat_parts.stat_basing_on_pop)
+
+        """load the optimal in theory (including the not valid individuals)"""
+        with open('{0}/input/hof_ibea/{1}.hof'.format(spl_address, self.ft.name), 'r') as f:
+            optimal_in_theory = pickle.load(f)
+            optimal_in_theory = [o.fitness.values for o in optimal_in_theory]
+        stats.register("hv|spread|igd|frontier#|valid#",
+                       stat_parts.stat_basing_on_pop,
+                       optimal_in_theory=optimal_in_theory)
+
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
@@ -70,7 +80,7 @@ class EADiscover(Discoverer):
         self.logbook = logbook
 
         self.ea_configurations = {
-            'NGEN': 50000,
+            'NGEN': 5000,
             'MU': 1000,
             'CXPB': 0.9,
             'MutateRate': 0.05,
