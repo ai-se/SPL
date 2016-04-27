@@ -6,7 +6,7 @@ from parser import load_ft_url
 
 # import optima.problems.problem
 import ecspy.benchmarks
-
+import pdb
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from model import *
 
@@ -60,7 +60,7 @@ class FTModel(model):
         fulfill = candidate.decs
 
         obj1 = len(t.features) - sum(fulfill)  # LESS IS MORE!
-        candidate.scores = [obj1]
+        candidate.fitness = [obj1]
 
         # constraint violation
         conVio = len(t.con) + 1
@@ -80,7 +80,7 @@ class FTModel(model):
 
         all_obj_names = [o.name for o in self.obj]
         if 'conVio' in all_obj_names:
-            candidate.scores.append(conVio)
+            candidate.fitness.append(conVio)
         candidate.conVio = conVio
 
         # total cost
@@ -89,7 +89,7 @@ class FTModel(model):
             for i, f in enumerate(t.features):
                 if fulfill[i] == 1:
                     total_cost += t.cost[i]
-            candidate.scores.append(total_cost)
+            candidate.fitness.append(total_cost)
 
         # total time
         if 'time' in all_obj_names:
@@ -97,7 +97,7 @@ class FTModel(model):
             for i, f in enumerate(t.features):
                 if fulfill[i] == 1:
                     total_time += t.time[i]
-            candidate.scores.append(total_time)
+            candidate.fitness.append(total_time)
 
         if doNorm:
             self.normObjs(candidate)
@@ -114,7 +114,7 @@ class FTModel(model):
     def ok(self, c, con_vio_tol=0):
         if not hasattr(c, 'scores'):
             self.eval(c)
-        elif not c.scores:
+        elif not c.fitness:
             self.eval(c)
 
         if not hasattr(c, 'correct_ft'):
@@ -137,8 +137,48 @@ class FTModel(model):
         engine = self.mutateEngines[engine_version]
         return engine.gen_valid_one()
 
+    def genRandomTree(self):
+        """get candidates which meets the tree structure. ignore the constraints"""
+        def rand_ones(lstLen, onesNum):
+            result = [0] * lstLen
+            l = range(lstLen)
+            random.shuffle(l)
+            for i in l[0:onesNum]:
+                result[i] = 1
+            return result
 
+        def genNode(node, fulfill):
+            checked = fulfill[self.ft.find_fea_index(node)]
+            if checked == 0:
+                self.ft.fill_subtree_0(node, fulfill)
+                return fulfill
 
+            if not node.children:
+                return fulfill
+
+            if node.node_type is not 'g':
+                for c in node.children:
+                    if c.node_type is 'o':
+                        fulfill[self.ft.find_fea_index(c)] = random.choice([0,1])
+                    else:
+                        fulfill[self.ft.find_fea_index(c)] = 1
+                child_sum = sum(fulfill[self.ft.find_fea_index(c)] for c in node.children)
+                if child_sum == 0:
+                    fulfill[self.ft.find_fea_index(random.choice(node.children))] = 1
+            else:  # deal with the groups
+                s_num = random.randint(node.g_d, node.g_u)
+                lst = rand_ones(len(node.children), s_num)
+                for l, c in zip(lst, node.children):
+                    fulfill[self.ft.find_fea_index(c)] = l
+
+            for c in node.children:
+                genNode(c, fulfill)
+            return fulfill
+
+        fulfill = [0] * self.decNum
+        fulfill[0] = 1
+        decs = genNode(self.ft.root, fulfill)
+        return o(decs=decs, correct_ft=True)
 
 """
 #########
@@ -164,7 +204,7 @@ class EcsFTModel(ecspy.benchmarks.Binary):
         for c in candidates:
             passed_candidate = o(decs=c)
             self.ftmodel.eval(passed_candidate, doNorm=True, returnFulfill=False)
-            fit = passed_candidate.scores
+            fit = passed_candidate.fitness
             # if fit[1] != 0:
             #     fit = [1] * len(fit)
             fitness.append(ecspy.emo.Pareto(fit))
@@ -172,7 +212,7 @@ class EcsFTModel(ecspy.benchmarks.Binary):
 
     @staticmethod
     def ecs_individual2ft_candidate(ecsi):
-        return o(decs=ecsi.candidate, scores=ecsi.fitness)
+        return o(decs=ecsi.candidate, fitness=ecsi.fitness)
 
 
 """
@@ -209,9 +249,10 @@ Translate the FTModel into optima library
 
 def demo(name):
     m = FTModel(name, setConVioAsObj=True)
-    print m
-    return
     pdb.set_trace()
+    return
+
+
     test_m = EcsFTModel(m)
     problem = test_m
     ea = ecspy.ec.GA(random.Random())
