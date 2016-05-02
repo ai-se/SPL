@@ -100,10 +100,18 @@ class FeatureTree(object):
         self.featureNum = len(self.features)
 
     def post_order(self, node, func, extra_args=[]):
+        """children, then the root"""
         if node.children:
             for c in node.children:
                 self.post_order(c, func, extra_args)
         func(node, *extra_args)
+
+    def pre_order(self, node, func, extra_args=[]):
+        """root, then children"""
+        func(node, *extra_args)
+        if node.children:
+            for c in node.children:
+                self.pre_order(c, func, extra_args)
 
     def check_fulfill_valid(self, fill):
         """
@@ -143,10 +151,10 @@ class FeatureTree(object):
 
         return check_node(self.root)
 
-    # setting the form by the structure of feature tree
-    # leaves should be filled in the form in advanced
-    # all not filled feature should be -1 in the form
     def fill_form4all_fea(self, form):
+        # setting the form by the structure of feature tree
+        # leaves should be filled in the form in advanced
+        # all not filled feature should be -1 in the form
         def filling(node):
             index = self.features.index(node)
             if form[index] != -1:
@@ -198,6 +206,14 @@ class FeatureTree(object):
             fill_vec[node_index] = 0
 
         self.post_order(subtree_root, fill_zero, [fulfill])
+
+    def get_subtree_index(self, subtree_root):
+        def fetch_indices(node, lst):
+            lst.append(self.find_fea_index(node))
+
+        lst = []
+        self.post_order(subtree_root, fetch_indices, [lst])
+        return lst
 
     def get_feature_num(self):
         return len(self.features) - len(self.groups)

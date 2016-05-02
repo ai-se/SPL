@@ -99,16 +99,23 @@ class Spea2Discover(EADiscover):
 
             print(logbook.stream)
 
+            if 'last_record_time' not in locals():
+                last_record_time = 0
+            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
+                last_record_time = logbook[-1]['timestamp']
+                stat_parts.pickle_results(self.ft.name, 'SPEA-II', pop, logbook)
+
         stat_parts.pickle_results(self.ft.name, 'SPEA-II', pop, logbook)
 
         return pop, logbook
 
 
-def demo():
-    ed = Spea2Discover(FTModel(sys.argv[1]))
+def experiment():
+    from FeatureModel.SPLOT_dict import splot_dict
+    name = splot_dict[int(sys.argv[1])]
+    ed = Spea2Discover(FTModel(name))
     pop, logbook = ed.run()
 
-    pdb.set_trace()
-
 if __name__ == '__main__':
-    demo()
+    # import debug
+    experiment()

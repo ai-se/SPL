@@ -41,7 +41,7 @@ import random
 import pickle
 
 
-class EADiscover(Discoverer):
+class MSDiscover(Discoverer):
     def __init__(self, feature_model):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
@@ -55,9 +55,6 @@ class EADiscover(Discoverer):
 
         toolbox = base.Toolbox()
 
-        toolbox.register("randBin", lambda: int(random.choice([0, 1])))
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.randBin, n=self.ft.decNum)
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         toolbox.register("evaluate", self.eval_func)
 
         stats = tools.Statistics(lambda ind: ind)
@@ -79,21 +76,23 @@ class EADiscover(Discoverer):
         self.stats = stats
         self.logbook = logbook
 
-        self.ea_configurations = {
+        self.ms_configurations = {
             'NGEN': 5000,
             'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,
-            'SPEAII_archive_size': 100
+            'MatingThreshold': 0.15,
         }
 
     def gen_valid_one(self):
         assert False, "Do not use this function. Function not provided at this time."
         pass
 
-    def eval_func(self, dec_l):
+    def eval_func(self, dec_l, NeedCheckTreeStructure=False):
         can = o(decs=dec_l)
         self.ft.eval(can)
+        if not NeedCheckTreeStructure:
+            can.correct_ft = True
         is_valid_ind = self.ft.ok(can)
         return tuple(can.fitness), is_valid_ind
 
@@ -111,9 +110,8 @@ class EADiscover(Discoverer):
         fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values, ind.fitness.correct = fit
+            ind.fitness.correct_ft = True
         return pop, len(invalid_ind)
 
     def run(self):
         raise NotImplementedError
-
-

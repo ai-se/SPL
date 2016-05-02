@@ -49,7 +49,7 @@ class BinGALE(GALE):
     def mutate1(self, old, c, east, west, gamma = 1.5, delta = 1):
         # east is better than the west
         if c == 0: return old
-        new = o(decs=old.decs[:],scores=[]) #copy the decisions and omit the score
+        new = o(decs=old.decs[:],fitness=[]) #copy the decisions and omit the score
         for i,(e,w) in enumerate(zip(east.decs, west.decs)):
             if e == w:
                 new.decs[i] = e

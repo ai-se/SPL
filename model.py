@@ -3,8 +3,8 @@ import random
 from o import *
 
 
-def candidate(decs = [], scores =[]):
-    return o(decs=decs, scores=scores)
+def candidate(decs = [], fitness =[]):
+    return o(decs=decs, fitness=fitness)
 
 r = random.random
 def within(lo,hi): return lo + (hi - lo)*r()
@@ -54,7 +54,7 @@ class model(object):
         for _ in range(tries):
             can = i.genRandomCan()
             i.eval(can,doNorm=False)
-            for index, y in enumerate(can.scores):
+            for index, y in enumerate(can.fitness):
                 if y > i.obj[index].hi: i.obj[index].hi = y
                 if y < i.obj[index].lo: i.obj[index].lo = y
         print '===== Base line study done! ===='
@@ -65,9 +65,9 @@ class model(object):
             i.dec[index].norm(x)
 
     def normObjs(i, can):
-        assert len(can.scores) == i.objNum
-        for index, f in enumerate(can.scores):
-            can.scores[index] = i.obj[index].norm(f)
+        assert len(can.fitness) == i.objNum
+        for index, f in enumerate(can.fitness):
+            can.fitness[index] = i.obj[index].norm(f)
 
     def genRandomCan(i,guranteeOK = False):
         can = candidate(decs=[x.any() for x in i.dec])
@@ -86,7 +86,7 @@ class model(object):
     """
 
     def eval(i, c, doNorm=True):
-        c.scores = [obj(c) for obj in i.objectives()]
+        c.fitness = [obj(c) for obj in i.objectives()]
         if doNorm:
             i.normObjs(c)
         return c

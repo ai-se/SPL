@@ -36,6 +36,7 @@ from os import sys
 import scipy
 
 import learner
+import pre_surrogate
 from FeatureModel.discoverer import Discoverer
 from FeatureModel.ftmodel import FTModel
 from model import candidate
@@ -56,25 +57,39 @@ class MutateSurrogateEngine2(Discoverer):
         time_init = time.time()
         # load the model
         self.ft_model = feature_model
-        self.ft_tree = self.ft_model.ft
+        self.ft = self.ft_model.ft
         self.name = self.ft_model.name
         self.var_rank_dict = dict()
         self.overflow_indicator = dict()
         logging.info("model %s load successfully." % self.name)
-
+        self.test_vo_rate()
+        pdb.set_trace()
         '''We are using V2 engine here!! (guarantee valid)'''
         # TODO Turn off here when testing
-        # pre_surrogate.write_random_individuals(self.name, 100, contain_non_leaf=True)
+        pre_surrogate.write_random_individuals(self.ft_model, 100, contain_non_leaf=True)
 
         logging.info("carts preparation for model %s load successfully.\nTIME CONSUMING: %d\n" %
                      (self.name, time.time() - time_init))
 
     def _can_set(self, after_set_filled_list):
         # checking basing on the feature constraints
-        for constraint in self.ft_tree.con:
-            if constraint.is_violated(self.ft_tree, after_set_filled_list):
+        for constraint in self.ft.con:
+            if constraint.is_violated(self.ft, after_set_filled_list):
                 return False
         return True
+
+    def test_vo_rate(self):
+        a1 = time.time()
+        candidates = [self.ft_model.genRandomTree()for _ in range(1000)]
+        VIO = []
+        for constraint in self.ft.con:
+            vios = 0
+            for can in candidates:
+                if constraint.is_violated(self.ft, can.decs):
+                    vios += 1
+            VIO.append(vios)
+        print time.time()-a1
+        pdb.set_trace()
 
     @staticmethod
     def _stratify_list(lst):
@@ -128,14 +143,14 @@ class MutateSurrogateEngine2(Discoverer):
             if g_d == 0 and g_u == 0:  # not group clusters
                 if 2 ** n > 1000:
                     for _ in range(1000):
-                        instance = [0] * self.ft_tree.featureNum
+                        instance = [0] * self.ft.featureNum
                         selected = random.sample(curious_indices, random.randint(1,n))
                         for s in selected:
                             instance[s] = 1
                         all_possibilities.append(instance)
                 else:
                     for decimal in range(2 ** n):  # enumerate all possibilities
-                        instance = [0] * self.ft_tree.featureNum
+                        instance = [0] * self.ft.featureNum
                         trying = _dec2bin_list(decimal, n)
                         for ts, t in zip(trying, curious_indices):
                             instance[t] = ts
@@ -147,13 +162,13 @@ class MutateSurrogateEngine2(Discoverer):
                     bit_indicator = range(n)
                     for select_bit_len in range(g_d, g_u+1):
                         for select_bit in itertools.combinations(bit_indicator, select_bit_len):
-                            instance = [0] * self.ft_tree.featureNum
+                            instance = [0] * self.ft.featureNum
                             for bit in select_bit:
                                 instance[curious_indices[bit]] = 1
                             all_possibilities.append(instance)
                 else:
                     for _ in range(1000):
-                        instance = [0] * self.ft_tree.featureNum
+                        instance = [0] * self.ft.featureNum
                         locs = random.sample(curious_indices, random.randint(g_d, g_u))
                         for loc in locs:
                             instance[loc] = 1
@@ -226,7 +241,7 @@ class MutateSurrogateEngine2(Discoverer):
         """
 
     def bfs(self, filled_list):
-        visited, queue = [], [self.ft_tree.root]
+        visited, queue = [], [self.ft.root]
         while queue:
             vertex = queue.pop(0)
             if vertex not in visited:
@@ -249,19 +264,19 @@ class MutateSurrogateEngine2(Discoverer):
                         visited = visited[:index1]
                     except (AttributeError, ValueError):
                         visited = []
-                        queue = [self.ft_tree.root]
-                        filled_list = [-1] * self.ft_tree.featureNum
+                        queue = [self.ft.root]
+                        filled_list = [-1] * self.ft.featureNum
                         filled_list[0] = 1  # let root be 1
         return filled_list
 
     def mutate_node(self, node, filled_list, trap_dict=dict()):
-        node_loc = self.ft_tree.find_fea_index(node)
+        node_loc = self.ft.find_fea_index(node)
         node_type = node.node_type
         node_value = filled_list[node_loc]
 
         if node_value == 0:
             # pdb.set_trace()
-            self.ft_tree.fill_subtree_0(node, filled_list)
+            self.ft.fill_subtree_0(node, filled_list)
             if not self._can_set(filled_list):
                 raise ConstraintConflict(node, cant_set=0)
             return filled_list, []
@@ -282,14 +297,14 @@ class MutateSurrogateEngine2(Discoverer):
             g_u = g_d = 0
 
         if o_child or g_child:
-            curious_indices = map(self.ft_tree.find_fea_index, o_child+g_child)
+            curious_indices = map(self.ft.find_fea_index, o_child + g_child)
             best_gen = self.best_attr_setting(curious_indices, g_d, g_u)
 
         while True:
             filled_list = [flc for flc in filled_list_copy]  # recover
 
             for m in m_child:
-                m_i = self.ft_tree.find_fea_index(m)
+                m_i = self.ft.find_fea_index(m)
                 filled_list[m_i] = 1
 
             # we have flexible choices here
@@ -310,13 +325,13 @@ class MutateSurrogateEngine2(Discoverer):
 
     def _fetch_leaves(self, fulfill):
         r = []
-        for x in self.ft_tree.leaves:
-            index = self.ft_tree.features.index(x)
+        for x in self.ft.leaves:
+            index = self.ft.features.index(x)
             r.append(fulfill[index])
         return r
 
     def gen_valid_one(self):
-        filled_list = [-1] * self.ft_tree.featureNum
+        filled_list = [-1] * self.ft.featureNum
         filled_list[0] = 1  # let root be 1
         filled_list = self.bfs(filled_list)
         leaves = self._fetch_leaves(filled_list)
@@ -325,9 +340,8 @@ class MutateSurrogateEngine2(Discoverer):
         can.fulfill = filled_list
         return can
 
-
-def run():
-    raise NotImplementedError
+    def run(self):
+        raise NotImplementedError
 
 
 def test_one_model(model):
@@ -342,17 +356,6 @@ def test_one_model(model):
 
 if __name__ == '__main__':
     # logging.basicConfig(level=logging.INFO)
-    try:
-        to_test_models = [
-            # 'simple',
-            # 'webportal',
-            # 'cellphone',
-            # 'eshop',
-            'eis',
-        ]
-        for model in to_test_models:
-            test_one_model(model)
-    except Exception:
-        type, value, tb = sys.exc_info()
-        traceback.print_exc()
-        pdb.post_mortem(tb)
+    import debug
+    test_one_model('cellphone')
+

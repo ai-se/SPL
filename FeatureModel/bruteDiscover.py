@@ -22,7 +22,7 @@ class BruteDiscoverer(Discoverer):
             return [choice([0, 1]) for _ in range(n)]
 
         while True:
-            can = candidate(decs=rand_list(len(self.ft_model.dec)), scores=[])
+            can = candidate(decs=rand_list(len(self.ft_model.dec)), fitness=[])
             if not valid_sure or self.ft_model.ok(can):
                 break
 

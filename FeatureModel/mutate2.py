@@ -50,7 +50,7 @@ class MutateEngine(Discoverer):
     @staticmethod
     def getShuffleList(l, cut = 'notset'):
         l2 = copy(l)
-        shuffle(l2)
+        shuffle(l2)d
         if cut != 'notset':
             return l2[0:cut]
         else:
@@ -183,8 +183,9 @@ class MutateEngine(Discoverer):
                 self.feature_model.eval(can)
                 return can
             except:
-                # type, value, tb = sys.exc_info()
-                # traceback.print_exc()
+                import traceback,sys
+                type, value, tb = sys.exc_info()
+                traceback.print_exc()
                 # pdb.post_mortem(tb)
                 pass
 
@@ -211,30 +212,19 @@ class MutateEngine(Discoverer):
         stat_file.close()
 
 
-
-
 def demo(name):
     import time
     time1 = time.time()
 
     m = ftmodel.FTModel(name, setConVioAsObj=False)
     engine = MutateEngine(m)
+    can = engine.gen_valid_one()
+    pdb.set_trace()
+    exit(0)
     engine.run()
     pdb.set_trace()
 
-    # R = []
-    # c = 0
-    # t = time.time()
-    # while True:
-    #     c += 1
-    #     alpha = engine.gen_valid_one()
-    #     R.append(alpha)
-    #     if time.time() - t > 20:
-    #         t = time.time()
-    #         hv = analysis_cans(R, False)
-    #         print len(R), time.time(), hv
-
 if __name__ == '__main__':
-    name = ['webportal']
+    name = ['eis']
     for n in name:
         demo(n)
