@@ -99,7 +99,7 @@ class GALE(object):
         return loss(canx, cany) > loss(cany, canx)
         """
         index = 0
-        for x, y, m in zip(canx.scores, cany.scores, self.model.obj):
+        for x, y, m in zip(canx.fitness, cany.fitness, self.model.obj):
             index += (x-y)/(m.hi-m.lo)
         #print index
         return index > 0.15
@@ -118,24 +118,24 @@ class GALE(object):
         goWest = len(left) > omega
         goEast = len(right) > omega
         if lvl < 1 or (not (goWest and goEast)):
-            return [west.scores, east.scores], data
+            return [west.fitness, east.fitness], data
         if prune:
             if goEast and self.better(west, east): goEast = False
             if goWest and self.better(east, west): goWest = False
         leafs = []
-        scores = []
+        fitness = []
         #if goWest and goEast: print "not comparable for data size = ", len(data)
         if goWest:
             sw, lw = self.where(left, lvl - 1, prune)
-            scores.extend(sw)
+            fitness.extend(sw)
             ll = [x for x in item(lw)]
             leafs.append(ll)
         if goEast:
             sr, lr = self.where(right, lvl - 1, prune)
-            scores.extend(sr)
+            fitness.extend(sr)
             rr = [x for x in item(lr)]
             leafs.append(rr)
-        return scores, leafs
+        return fitness, leafs
 
     ###############################################
     # Nudge the old towards east, but not too far #
@@ -151,7 +151,7 @@ class GALE(object):
     ###############################################
     def mutate1(self, old, c, east, west, gamma=1.5, delta=1.3):
         if c == 0: return old
-        new = o(decs=old.decs[:], scores=[])  # copy the decisions and omit the score
+        new = o(decs=old.decs[:], fitness=[])  # copy the decisions and omit the score
         index = 0
         for n, e, w, H in zip(new.decs, east.decs, west.decs, self.model.dec):
             d = sign(e - n)
@@ -173,8 +173,8 @@ class GALE(object):
         for leaf in leafs:
             r = []
             west, east, c = self.getPoles(leaf)
-            if west.scores == []: self.model.eval(west)
-            if east.scores == []: self.model.eval(east)
+            if west.fitness == []: self.model.eval(west)
+            if east.fitness == []: self.model.eval(east)
             if self.better(west, east): east, west = west, east
             for candidate in leaf:
                 r.append(self.mutate1(candidate, c, east, west))
@@ -215,9 +215,9 @@ class GALE(object):
         patience = lamb
         for generation in range(max):
             #print '-'*30, generation
-            scores = []
+            fitness = []
             t = time()
-            scores, leafs = self.where(pop)
+            fitness, leafs = self.where(pop)
             self.time_where += time()-t
             #print len(leafs),
             t = time()
@@ -232,7 +232,7 @@ class GALE(object):
             print float(valid)/(valid+invalid)
             self.time_mutate += time()-t
             if generation > 0:
-                if not improved(oldScores, scores):
+                if not improved(oldScores, fitness):
                     patience -= 1
                 if patience < 0 or generation == max - 1:
                     _, leafs = self.where(pop, prune=True)
@@ -240,7 +240,7 @@ class GALE(object):
                     for x in item(leafs):
                         r.append(x)
                     return r
-            oldScores = scores
+            oldScores = fitness
             pop = []
             for m in item(mutants): pop.append(m)
             required = self.np - len(pop)

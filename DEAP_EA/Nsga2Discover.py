@@ -92,23 +92,23 @@ class Nsga2Discover(EADiscover):
             logbook.record(gen=gen, evals=evals, **record)
             print(logbook.stream)
 
+            if 'last_record_time' not in locals():
+                last_record_time = 0
+            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
+                last_record_time = logbook[-1]['timestamp']
+                stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
+
         stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
 
         return pop, logbook
 
 
-def demo():
+def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
-    ed = Nsga2Discover(FTModel(splot_dict[0]))
+    name = splot_dict[int(sys.argv[1])]
+    ed = Nsga2Discover(FTModel(name))
     pop, logbook = ed.run()
 
-    pdb.set_trace()
-
 if __name__ == '__main__':
-    try:
-        demo()
-    except:
-        import traceback
-        type, value, tb = sys.exc_info()
-        traceback.print_exc()
-        pdb.post_mortem(tb)
+    # import debug
+    experiment()

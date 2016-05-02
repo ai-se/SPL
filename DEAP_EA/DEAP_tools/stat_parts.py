@@ -72,9 +72,7 @@ def stat_basing_on_pop(pop, optimal_in_theory=None):
     first, last = sort_front_by_obj0[0], sort_front_by_obj0[-1]
     spread = diversity(front, first, last)
 
-    # TODO IGD
-    # IGD = convergence(front, optimal_in_theory)
-    IGD = 0.003
+    IGD = convergence(front, optimal_in_theory)
 
     frontier_size = len(front)
     valid_frontier_size = len([i for i in front if i.fitness.correct])

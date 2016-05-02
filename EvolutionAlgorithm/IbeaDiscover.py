@@ -24,7 +24,7 @@ ft = FTModel("webportal")
 def eval_func(dec_l):
     candidate = o(decs=dec_l)
     ft.eval(candidate)
-    return tuple(candidate.scores)
+    return tuple(candidate.fitness)
 
 
 def binMutate(individual, mutate_rate):

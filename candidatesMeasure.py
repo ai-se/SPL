@@ -23,7 +23,7 @@ def analysis_cans(candidate_lst, all_non_dominated=True):
         assert hasattr(i, 'scores'), "ERROR! Candidates must be evaluated"
     map(_safety_check, candidate_lst)
 
-    objs = [tuple(c.scores) for c in candidate_lst]
+    objs = [tuple(c.fitness) for c in candidate_lst]
     if not all_non_dominated:
         front = eps_sort(objs)
     else:
