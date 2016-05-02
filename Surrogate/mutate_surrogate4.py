@@ -33,7 +33,7 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 from MSDiscover import MSDiscover
 from deap import tools, creator
 import DEAP_EA.DEAP_tools.stat_parts as stat_parts
@@ -155,7 +155,7 @@ class MSEngine4(MSDiscover):
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = MSEngine4(FTModel(name))
+    ed = MSEngine4(FeatureModel(name))
     ed.run()
 
 if __name__ == '__main__':

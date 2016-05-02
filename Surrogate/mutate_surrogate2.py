@@ -38,7 +38,7 @@ import scipy
 import learner
 import pre_surrogate
 from FeatureModel.discoverer import Discoverer
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 from model import candidate
 from tools import pareto
 
@@ -346,7 +346,7 @@ class MutateSurrogateEngine2(Discoverer):
 
 def test_one_model(model):
     R = []
-    engine = MutateSurrogateEngine2(FTModel(model, setConVioAsObj=False))
+    engine = MutateSurrogateEngine2(FeatureModel(model, setConVioAsObj=False))
     for i in range(100):
         print i
         alpha = engine.gen_valid_one()

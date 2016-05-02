@@ -5,7 +5,7 @@ import time
 from copy import deepcopy
 from random import randint, shuffle
 
-import ftmodel
+import FeatureModel
 from __init__ import project_path
 from candidatesMeasure import analysis_cans
 from discoverer import Discoverer
@@ -216,7 +216,7 @@ def demo(name):
     import time
     time1 = time.time()
 
-    m = ftmodel.FTModel(name, setConVioAsObj=False)
+    m = FeatureModel.FeatureModel(name, setConVioAsObj=False)
     engine = MutateEngine(m)
     can = engine.gen_valid_one()
     pdb.set_trace()

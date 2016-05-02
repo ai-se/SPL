@@ -31,7 +31,7 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 from DEAP_EA.DEAP_tools import Nsga3Selc
 import DEAP_tools.stat_parts as stat_parts
@@ -116,7 +116,7 @@ class Nsga3Discover(EADiscover):
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Nsga3Discover(FTModel(name))
+    ed = Nsga3Discover(FeatureModel(name))
     pop, logbook = ed.run()
 
 if __name__ == '__main__':

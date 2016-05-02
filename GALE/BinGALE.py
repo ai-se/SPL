@@ -11,7 +11,7 @@ from parser import *
 class BinGALE(GALE):
 
     def __init__(self, model, np=100):
-        self.model = model # FTModel is needed (FTModel is a binary model for SPL)
+        self.model = model # FeatureModel is needed (FeatureModel is a binary model for SPL)
         self.np = np # initial population size
         self.time_ran_pop = 0
         self.time_where = 0
@@ -61,7 +61,7 @@ class BinGALE(GALE):
 
 """
 def main_find_init_pop_passrate():
-    eis = FTModel('../feature_tree_data/cellphone.xml','cellphone')
+    eis = FeatureModel('../splot_data/cellphone.xml','cellphone')
     bingh = BinGALE(eis)
     bing.model.printModelInfo()
     count = 0
@@ -71,15 +71,15 @@ def main_find_init_pop_passrate():
         if bing.model.ok(e): count += 1
     print 'initial pop pass rate:', count/float(tries)*100, '%'
 
-    #eis = FTModel('../feature_tree_data/webportal.xml','web portal')
-    #eis = FTModel('../feature_tree_data/eshop.xml','e-shop')
+    #eis = FeatureModel('../splot_data/webportal.xml','web portal')
+    #eis = FeatureModel('../splot_data/eshop.xml','e-shop')
 
     #pdb.set_trace()
     #bing.gale()
 """
 
 def main_gale_with_spl(name):
-    m = FTModel('../feature_tree_data/'+name+'.xml',name, name+'.cost')
+    m = FTModel('../splot_data/'+name+'.xml',name, name+'.cost')
     # gale
     import time
     t = time.time()

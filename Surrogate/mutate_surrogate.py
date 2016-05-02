@@ -5,7 +5,7 @@ from operator import itemgetter
 from copy import deepcopy
 from os import sys
 from FeatureModel.discoverer import Discoverer
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 import pre_surrogate
 import learner
 import logging
@@ -171,7 +171,7 @@ class MutateWithSurrogateEngine(Discoverer):
 
 def test_one_model(model):
     universe.FT_EVAL_COUNTER = 0
-    engine = MutateWithSurrogateEngine(FTModel(model))
+    engine = MutateWithSurrogateEngine(FeatureModel(model))
     # pdb.set_trace()
     # alpha = engine.gen_valid_one()
     # pdb.set_trace()

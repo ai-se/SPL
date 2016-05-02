@@ -2,7 +2,7 @@ import pdb
 import time
 from copy import deepcopy, copy
 from random import randint, shuffle
-from ftmodel import FTModel
+from FeatureModel import FeatureModel
 from discoverer import Discoverer
 
 # file disable.
@@ -147,7 +147,7 @@ class mutateEngine(Discoverer):
 
 def comparePerformance():
     for name in ['cellphone','eshop','webportal','EIS']:
-        m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+        m = FeatureModel('../splot_data/' + name + '.xml', name, name + '.cost')
         m.printModelInfo()
         engine = mutateEngine(m.ft)
         start_time = time.time()
@@ -161,7 +161,7 @@ def comparePerformance():
 
 
 def unitTest(name):
-    m = FTModel('../feature_tree_data/'+name+'.xml', name, name+'.cost')
+    m = FeatureModel('../splot_data/' + name + '.xml', name, name + '.cost')
     m.printModelInfo()
     engine = mutateEngine(m.ft)
     a  = engine.genValidOne(True)

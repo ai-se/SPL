@@ -1,7 +1,4 @@
 import numpy as np
-import random
-import pickle
-import os
 
 
 class Node(object):
@@ -61,8 +58,6 @@ class FeatureTree(object):
         self.groups = []
         self.leaves = []
         self.con = []
-        self.cost = []
-        self.time = []
         self.featureNum = 0
 
     def set_root(self, root):
@@ -220,41 +215,3 @@ class FeatureTree(object):
 
     def get_cons_num(self):
         return len(self.con)
-
-    def _gen_random_cost(self, tofile):
-        tmp_list = [random.uniform(1, 10) * (i % 3+1) for i in range(len(self.features))]
-        # note to upper line: try to diverse the data
-        random.shuffle(tmp_list)
-        self.cost = tmp_list
-        with open(tofile, 'w+') as f:
-            pickle.dump(self.cost, f)
-
-    def _gen_random_time(self, target_file):
-        tmp_list = [random.uniform(5, 15) * (i % 4+1) for i in range(len(self.features))]
-        # note to upper line: try to diverse the data
-        random.shuffle(tmp_list)
-        self.time = tmp_list
-        with open(target_file, 'w+') as f:
-            pickle.dump(self.time, f)
-
-    def load_cost(self, model_name):
-        import sys
-        spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
-        fromfile = spl_address + "/input/" + model_name + ".cost"
-
-        if not os.path.isfile(fromfile):
-            self._gen_random_cost(fromfile)
-
-        with open(fromfile, 'r') as f:
-            self.cost = pickle.load(f)
-
-    def load_time(self, model_name):
-        import sys
-        spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
-        fromfile = spl_address + "/input/" + model_name + ".time"
-
-        if not os.path.isfile(fromfile):
-            self._gen_random_time(fromfile)
-
-        with open(fromfile, 'r') as f:
-            self.time = pickle.load(f)

@@ -1,6 +1,6 @@
 from os import sys, path
 
-from ftmodel import FTModel
+from FeatureModel import FeatureModel
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from model import candidate
@@ -13,7 +13,7 @@ def binaryCandidate(num, decSize):
 
 
 def test(name):
-    model = FTModel(name)
+    model = FeatureModel(name)
     n = len(model.dec)
     print n
     with open('temp_node.csv', 'w') as f:

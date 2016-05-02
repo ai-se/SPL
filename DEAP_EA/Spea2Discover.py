@@ -31,7 +31,7 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
 import random
@@ -113,7 +113,7 @@ class Spea2Discover(EADiscover):
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Spea2Discover(FTModel(name))
+    ed = Spea2Discover(FeatureModel(name))
     pop, logbook = ed.run()
 
 if __name__ == '__main__':

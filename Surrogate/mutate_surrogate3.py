@@ -34,7 +34,7 @@ import universe
 
 import pre_surrogate
 from FeatureModel.discoverer import Discoverer
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 from __init__ import *
 from model import candidate
 from tools import pareto
@@ -283,7 +283,7 @@ class MutateSurrogateEngine3(Discoverer):
 def test_one_model(model):
     universe.FT_EVAL_COUNTER = 0
     while True:
-        engine = MutateSurrogateEngine3(FTModel(model, setConVioAsObj=False), regenerate_init=False)
+        engine = MutateSurrogateEngine3(FeatureModel(model, setConVioAsObj=False), regenerate_init=False)
         alpha = engine.gen_valid_one()
         engine.ft_model.eval(alpha)
         print alpha

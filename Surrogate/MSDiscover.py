@@ -32,7 +32,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
 from deap import base, creator, tools
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.discoverer import Discoverer
 from model import *
 import DEAP_EA.DEAP_tools.stat_parts as stat_parts
@@ -46,7 +46,7 @@ class MSDiscover(Discoverer):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
             name = feature_model.name
-            self.ft = FTModel(name, num_of_attached_objs=len(feature_model) - 2, setConVioAsObj=True)
+            self.ft = FeatureModel(name, num_of_attached_objs=len(feature_model) - 2, setConVioAsObj=True)
         else:
             self.ft = feature_model
 

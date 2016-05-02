@@ -4,7 +4,7 @@ import glob
 import pdb
 import traceback
 from GALE.BinGALE import BinGALE
-from FeatureModel.ftmodel import FTModel
+from FeatureModel.FeatureModel import FeatureModel
 
 
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -41,17 +41,17 @@ def main_gale_with_spl(ftm, np):
 
 if __name__ == '__main__':
     rungale = True
-    model, modelName = './feature_tree_data/cellphone.xml','cell phone'
+    model, modelName = './splot_data/cellphone.xml','cell phone'
     np = None
     for i, arg in enumerate(sys.argv):
         if arg in ['-cellphone', '-S']:
-            model, modelName = './feature_tree_data/cellphone.xml','cell phone'
+            model, modelName = './splot_data/cellphone.xml','cell phone'
         if arg in ['-webportal', '-M']:
-            model, modelName = './feature_tree_data/Web_portal_FM.xml', 'web portal'
+            model, modelName = './splot_data/Web_portal_FM.xml', 'web portal'
         if arg in ['-eis', '-L']:
-            model, modelName = './feature_tree_data/EIS.xml', 'eis'
+            model, modelName = './splot_data/EIS.xml', 'eis'
         if arg in ['-eshop', '-XL']:
-            model, modelName = './feature_tree_data/eshop.xml', 'eshop'
+            model, modelName = './splot_data/eshop.xml', 'eshop'
         if arg in ['-nogale', '-ng']:
             rungale = False
         if arg == '-data':
@@ -65,7 +65,7 @@ if __name__ == '__main__':
             pdb.set_trace = pdb.set_trace = lambda: None
     try:
         if spl_data == None: spl_data = current_path + '/input/' + modelName.replace(" ", "") + '.cost'
-        ftm = FTModel(model, modelName, spl_data)
+        ftm = FeatureModel(model, modelName, spl_data)
         ftm.printModelInfo()
         if rungale: main_gale_with_spl(ftm, np)
         print 'end of running~~~~~'
