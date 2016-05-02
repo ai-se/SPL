@@ -124,6 +124,7 @@ def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
     ed = IbeaDiscover(FTModel(name))
+
     pop, logbook = ed.run()
 
 

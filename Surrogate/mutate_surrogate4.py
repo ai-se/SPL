@@ -36,7 +36,7 @@ spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 from FeatureModel.ftmodel import FTModel
 from MSDiscover import MSDiscover
 from deap import tools, creator
-import DEAP_tools.stat_parts as stat_parts
+import DEAP_EA.DEAP_tools.stat_parts as stat_parts
 
 
 class MSEngine4(MSDiscover):
@@ -55,7 +55,7 @@ class MSEngine4(MSDiscover):
         del ind1.fitness.values
         del ind2.fitness.values
         for i in indices:
-            ind2[i], ind1[i] = self.swap(ind1[i], ind2[i])
+            ind1[i], ind2[i] = self.swap(ind1[i], ind2[i])
         return ind1, ind2
 
     def gen_one_individual(self):
@@ -145,7 +145,7 @@ class MSEngine4(MSDiscover):
             _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
             record = stats.compile(pop)
-            logbook.record(gen=0, evals=evals, **record)
+            logbook.record(gen=gen, evals=evals, **record)
             print(logbook.stream)
             # pdb.set_trace()
 

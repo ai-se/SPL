@@ -81,7 +81,7 @@ class EADiscover(Discoverer):
 
         self.ea_configurations = {
             'NGEN': 5000,
-            'MU': 1000,
+            'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,
             'SPEAII_archive_size': 100
@@ -115,3 +115,5 @@ class EADiscover(Discoverer):
 
     def run(self):
         raise NotImplementedError
+
+
