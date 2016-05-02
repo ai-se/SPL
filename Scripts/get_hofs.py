@@ -34,6 +34,5 @@ from FeatureModel.bruteDiscover import get_hof, get_hof_all_valid
 from FeatureModel.SPLOT_dict import splot_dict
 
 name = splot_dict[int(sys.argv[1])]
-get_hof(name, 6, 1000000)
-get_hof_all_valid(name, 6, 1000000)
-
+get_hof(name, 6, 100000)
+get_hof_all_valid(name, 6, 10000)

@@ -38,11 +38,11 @@ def get_hof(name, obj_num, nums):
         fm.eval(can)
         e.add(tuple(can.fitness))
         if i % 1000 == 0:
-            e = list(e)
-            e = map(list, e)
+            es = list(e)
+            es = map(list, es)
             from tools.pareto import eps_sort
             with open(PROJECT_PATH+'/input/'+name+'/'+str(obj_num)+'_objs.hof', 'w') as f:
-                front = eps_sort(e)
+                front = eps_sort(es)
                 pickle.dump(front, f)
 
 
@@ -55,9 +55,9 @@ def get_hof_all_valid(name, obj_num, nums):
         fm.eval(can)
         e.add(tuple(can.fitness))
         if i % 1000 == 0:
-            e = list(e)
-            e = map(list, e)
+            es = list(e)
+            es = map(list, es)
             from tools.pareto import eps_sort
-            with open(PROJECT_PATH+'/input/'+name+'/'+str(obj_num)+'_objs.validhof', 'w') as f:
-                front = eps_sort(e)
+            with open(PROJECT_PATH+'/input/'+name+'/'+str(obj_num)+'_objs.hof', 'w') as f:
+                front = eps_sort(es)
                 pickle.dump(front, f)
