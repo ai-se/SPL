@@ -214,15 +214,3 @@ class FeatureModel(model):
         fulfill[0] = 1
         decs = genNode(self.ft.root, fulfill)
         return o(decs=decs, correct_ft=True)
-
-
-def demo(name):
-    m = FeatureModel(name, setConVioAsObj=True)
-    return
-
-
-if __name__ == '__main__':
-    from SPLOT_dict import splot_dict
-    for x in range(10):
-        name = splot_dict[x]
-        demo(name)
