@@ -63,9 +63,9 @@ class EADiscover(Discoverer):
         stats = tools.Statistics(lambda ind: ind)
 
         """load the optimal in theory (including the not valid individuals)"""
-        with open('{0}/input/hof_ibea/{1}.hof'.format(spl_address, self.ft.name), 'r') as f:
+        with open('{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.ft.name, len(feature_model.obj)), 'r') as f:
             optimal_in_theory = pickle.load(f)
-            optimal_in_theory = [o.fitness.values for o in optimal_in_theory]
+            optimal_in_theory = [o for o in optimal_in_theory]
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
                        optimal_in_theory=optimal_in_theory)

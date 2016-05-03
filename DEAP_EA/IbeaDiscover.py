@@ -34,7 +34,7 @@ spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
 from deap import tools
 from deap.algorithms import varAnd
-from FeatureModel.FeatureModel import FeatureModel
+from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
 from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
 import pdb
@@ -120,14 +120,6 @@ class IbeaDiscover(EADiscover):
         return pop, logbook
 
 
-def experiment():
-    from FeatureModel.SPLOT_dict import splot_dict
-    name = splot_dict[int(sys.argv[1])]
-    ed = IbeaDiscover(FeatureModel(name))
-
-    pop, logbook = ed.run()
-
-
 def run_with_hof():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
@@ -150,7 +142,14 @@ def load_dump_hof():
             correct_pf = map(list,[h.fitness.values for h in hh])
             pickle.dump(correct_pf, f)
 
+def experiment():
+    from FeatureModel.SPLOT_dict import splot_dict
+    name = splot_dict[int(sys.argv[1])]
+    # ed = IbeaDiscover(FTModelNovelRep(name))
+    ed = IbeaDiscover(FeatureModel(name))
 
+    pop, logbook = ed.run()
+    
 if __name__ == '__main__':
-    # import debug
+    import debug
     experiment()

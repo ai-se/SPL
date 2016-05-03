@@ -24,6 +24,7 @@
 
 from __future__ import division
 from os import sys, path
+from operator import itemgetter
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from universe import PROJECT_PATH as spl_addr
 from model import *
@@ -93,9 +94,10 @@ class FeatureModel(model):
         s += '\n'
         return s
 
-    def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False):
+    def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False, fulfill=None):
         t = self.ft  # abbr.
-        fulfill = candidate.decs
+        if not fulfill:
+            fulfill = candidate.decs
 
         obj1 = len(t.features) - sum(fulfill)  # LESS IS MORE!
         candidate.fitness = [obj1]
@@ -172,45 +174,155 @@ class FeatureModel(model):
         engine = self.mutateEngines[engine_version]
         return engine.gen_valid_one()
 
-    def genRandomTree(self):
-        """get candidates which meets the tree structure. ignore the constraints"""
-        def rand_ones(lstLen, onesNum):
-            result = [0] * lstLen
-            l = range(lstLen)
-            random.shuffle(l)
-            for i in l[0:onesNum]:
-                result[i] = 1
-            return result
+    def rand_ones(self,lstLen, onesNum):
+        result = [0] * lstLen
+        l = range(lstLen)
+        random.shuffle(l)
+        for i in l[0:onesNum]:
+            result[i] = 1
+        return result
 
-        def genNode(node, fulfill):
-            checked = fulfill[self.ft.find_fea_index(node)]
-            if checked == 0:
-                self.ft.fill_subtree_0(node, fulfill)
-                return fulfill
-
-            if not node.children:
-                return fulfill
-
-            if node.node_type is not 'g':
-                for c in node.children:
-                    if c.node_type is 'o':
-                        fulfill[self.ft.find_fea_index(c)] = random.choice([0,1])
-                    else:
-                        fulfill[self.ft.find_fea_index(c)] = 1
-                child_sum = sum(fulfill[self.ft.find_fea_index(c)] for c in node.children)
-                if child_sum == 0:
-                    fulfill[self.ft.find_fea_index(random.choice(node.children))] = 1
-            else:  # deal with the groups
-                s_num = random.randint(node.g_d, node.g_u)
-                lst = rand_ones(len(node.children), s_num)
-                for l, c in zip(lst, node.children):
-                    fulfill[self.ft.find_fea_index(c)] = l
-
-            for c in node.children:
-                genNode(c, fulfill)
+    def genNode(self, node, fulfill):
+        checked = fulfill[self.ft.find_fea_index(node)]
+        if checked == 0:
+            self.ft.fill_subtree_0(node, fulfill)
             return fulfill
 
+        if not node.children:
+            return fulfill
+
+        if node.node_type is not 'g':
+            for c in node.children:
+                if c.node_type is 'o':
+                    fulfill[self.ft.find_fea_index(c)] = random.choice([0, 1])
+                else:
+                    fulfill[self.ft.find_fea_index(c)] = 1
+            child_sum = sum(fulfill[self.ft.find_fea_index(c)] for c in node.children)
+            if child_sum == 0:
+                fulfill[self.ft.find_fea_index(random.choice(node.children))] = 1
+        else:  # deal with the groups
+            s_num = random.randint(node.g_d, node.g_u)
+            lst = self.rand_ones(len(node.children), s_num)
+            for l, c in zip(lst, node.children):
+                fulfill[self.ft.find_fea_index(c)] = l
+
+        for c in node.children:
+            self.genNode(c, fulfill)
+        return fulfill
+
+    def genRandomTree(self):
+        """get candidates which meets the tree structure. ignore the constraints"""
         fulfill = [0] * self.decNum
         fulfill[0] = 1
-        decs = genNode(self.ft.root, fulfill)
+        decs = self.genNode(self.ft.root, fulfill)
         return o(decs=decs, correct_ft=True)
+
+
+class FTModelNovelRep(FeatureModel):
+    def find_the_noncore_feas(self):
+        non_core = []
+        ft = self.ft
+
+        for feature in ft.features:
+            if not feature.children:
+                non_core.append(feature)
+                continue
+
+            # check whether the path to root are all mandatory
+            cursor = feature
+            core = True
+            while cursor.parent:
+                if cursor.node_type is 'o':
+                    core = False
+                cursor = cursor.parent
+            if not core:
+                non_core.append(feature)
+
+        for feature in ft.features:
+            core = True
+            childTypes = set([c.node_type for c in feature.children])
+            if len(childTypes) == 1 and 'o' in childTypes:
+                core = False
+            if not core:
+                non_core.append(feature)
+
+        return non_core
+
+    def get_fullfill_from_novel_rep(self, candidate):
+        fulfill = [-1] * self.ft.featureNum
+        for feature, d in zip(self.non_core_features, candidate.decs):
+            fulfill[self.ft.find_fea_index(feature)] = d
+
+        repeats = self.ft.get_tree_height()
+        if 'child_index_dict' not in locals():
+            child_index_dict = dict()
+
+        for repeat in range(0, repeats):
+            for feature_index, feature in enumerate(self.ft.features):
+                if feature not in child_index_dict:
+                    child_index_dict[feature] = []
+                    for child in feature.children:
+                        child_index_dict[feature].append(self.ft.find_fea_index(child))
+
+                if fulfill[feature_index] != -1:
+                    continue
+
+                childs_fulfill = itemgetter(*child_index_dict[feature])(fulfill)
+                if type(childs_fulfill) is int:
+                    childs_fulfill = [childs_fulfill]
+
+                if -1 in childs_fulfill:
+                    continue
+
+                # otherwise all children are filled
+                if sum(childs_fulfill) > 0:
+                    fulfill[feature_index] = 1
+                else:
+                    fulfill[feature_index] = 0
+
+        for i in range(len(fulfill)):
+            if fulfill[i] == -1:
+                fulfill[i] = 1
+
+        return fulfill
+
+    def __init__(self, name, num_of_attached_objs=4, setConVioAsObj=True):
+        self.name = name
+        url = spl_addr + '/splot_data/' + self.name + '.xml'
+        self.ft = load_ft_url(url)
+        self.append_value_dict = dict()
+
+        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum, goal=lt)]
+        if setConVioAsObj:
+            obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con) + 1, goal=lt))
+
+        attach_attrs = ['cost', 'time', 'familiarity', 'app1', 'app2', 'app3'][:num_of_attached_objs]
+        for a in attach_attrs:
+            self.append_value_dict[a] = self._load_appendix(a)
+            g = lt if append_attributes[a][2] else gt
+            obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
+
+        self.non_core_features = self.find_the_noncore_feas()
+        self.non_core_index = [self.ft.find_fea_index(i) for i in self.non_core_features]
+        dec = [Has(l.id, 0, 1) for l in self.non_core_features]
+
+        model.__init__(self, dec, obj)
+
+    def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False, fulfill=None):
+        if not fulfill:
+            fulfill = self.get_fullfill_from_novel_rep(candidate)
+        return FeatureModel.eval(self, candidate,doNorm, returnFulfill, checkTreeStructure, fulfill)
+
+    def genRandomCan(self, engine_version):
+        raise NotImplementedError
+
+    def genRandomTree(self):
+        fulfill = [0] * self.ft.featureNum
+        fulfill[0] = 1
+        fulfill = self.genNode(self.ft.root, fulfill)
+        decs = itemgetter(*self.non_core_index)(fulfill)
+        return o(decs=decs, correct_ft=True, fulfill=fulfill)
+
+ftnr = FTModelNovelRep('eshop')
+ftnr.genRandomTree()
+

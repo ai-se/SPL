@@ -215,3 +215,15 @@ class FeatureTree(object):
 
     def get_cons_num(self):
         return len(self.con)
+
+    def get_tree_height(self):
+        height = 1
+        for fea in self.features:
+            h = 0
+            cursor = fea
+            while cursor.parent:
+                h += 1
+                cursor = cursor.parent
+            height = max(height, h)
+
+        return height
