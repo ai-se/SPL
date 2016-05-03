@@ -1,0 +1,39 @@
+/gpfs_common/share/jchen37/SPL
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@n2d2-6>
+Subject: Job 50016: </share/jchen37/miniconda/bin/python2.7 get_hofs.py 6> Done
+
+Job </share/jchen37/miniconda/bin/python2.7 get_hofs.py 6> was submitted from host <login02.hpc.ncsu.edu> by user <jchen37> in cluster <henry2>.
+Job was executed on host(s) <n2d2-6>, in queue <serial>, as user <jchen37> in cluster <henry2>.
+</home/jchen37> was used as the home directory.
+</share/jchen37/SPL/Scripts> was used as the working directory.
+Started at Mon May  2 15:19:00 2016
+Results reported at Mon May  2 15:24:39 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/share/jchen37/miniconda/bin/python2.7 get_hofs.py 6
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time   :    336.04 sec.
+    Max Memory :        27 MB
+    Max Swap   :       613 MB
+
+    Max Processes  :         3
+    Max Threads    :        11
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <./err/err.50016> for stderr output of this job.
+

@@ -58,6 +58,6 @@ def get_hof_all_valid(name, obj_num, nums):
             es = list(e)
             es = map(list, es)
             from tools.pareto import eps_sort
-            with open(PROJECT_PATH+'/input/'+name+'/'+str(obj_num)+'_objs.hof', 'w') as f:
+            with open(PROJECT_PATH+'/input/'+name+'/'+str(obj_num)+'_objs.validhof', 'w') as f:
                 front = eps_sort(es)
                 pickle.dump(front, f)
