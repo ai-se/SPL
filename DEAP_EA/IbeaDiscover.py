@@ -78,6 +78,7 @@ class IbeaDiscover(EADiscover):
 
         # Begin the generational process
         for gen in range(1, NGEN):
+            # pdb.set_trace()
             # Vary the parents
             offspring = varAnd(parents, toolbox, CXPB, MU)
 
@@ -142,14 +143,15 @@ def load_dump_hof():
             correct_pf = map(list,[h.fitness.values for h in hh])
             pickle.dump(correct_pf, f)
 
+
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    # ed = IbeaDiscover(FTModelNovelRep(name))
-    ed = IbeaDiscover(FeatureModel(name))
+    ed = IbeaDiscover(FTModelNovelRep(name))
+    # ed = IbeaDiscover(FeatureModel(name))
 
     pop, logbook = ed.run()
-    
+
 if __name__ == '__main__':
     import debug
     experiment()

@@ -74,6 +74,7 @@ class EADiscover(Discoverer):
 
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "hv|spread|igd|frontier#|valid#", "timestamp"
+        # logbook.header = "gen", "timestamp"
 
         self.toolbox = toolbox
         self.stats = stats

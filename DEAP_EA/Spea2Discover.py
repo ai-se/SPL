@@ -94,7 +94,7 @@ class Spea2Discover(EADiscover):
 
             pop = offspring_pool
             _, evals2 = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-            record = stats.compile(pop)
+            record = stats.compile(archive)
             logbook.record(gen=gen, evals=evals1 + evals2, **record)
 
             print(logbook.stream)
@@ -103,9 +103,9 @@ class Spea2Discover(EADiscover):
                 last_record_time = 0
             if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
                 last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'SPEA-II', pop, logbook)
+                stat_parts.pickle_results(self.ft.name, 'SPEA-II', archive, logbook)
 
-        stat_parts.pickle_results(self.ft.name, 'SPEA-II', pop, logbook)
+        stat_parts.pickle_results(self.ft.name, 'SPEA-II', archive, logbook)
 
         return pop, logbook
 

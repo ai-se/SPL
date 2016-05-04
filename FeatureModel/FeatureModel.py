@@ -219,72 +219,93 @@ class FeatureModel(model):
 
 
 class FTModelNovelRep(FeatureModel):
-    def find_the_noncore_feas(self):
-        non_core = []
+    def coding_func(self):
         ft = self.ft
 
+        # find the must-1 features
+        must1 = []
         for feature in ft.features:
-            if not feature.children:
-                non_core.append(feature)
+            tmp = True
+            cursor = feature
+            while cursor.parent:
+                if cursor.node_type not in ['m', 'r']:
+                    tmp = False
+                    break
+                cursor = cursor.parent
+            if tmp:
+                must1.append(feature)
+
+        must1_index = []
+        for f_i, f in enumerate(ft.features):
+            if f in must1:
+                must1_index.append(f_i)
+
+        # get the reasonable features, i.e., at least one of the child are not optional or the feature itself is 'g'
+        reasonable = []
+        for feature in ft.features:
+            if feature in must1:
                 continue
 
-            # check whether the path to root are all mandatory
-            cursor = feature
-            core = True
-            while cursor.parent:
-                if cursor.node_type is 'o':
-                    core = False
-                cursor = cursor.parent
-            if not core:
-                non_core.append(feature)
+            if feature.node_type is 'g':
+                reasonable.append(feature)
+                continue
 
-        for feature in ft.features:
-            core = True
-            childTypes = set([c.node_type for c in feature.children])
-            if len(childTypes) == 1 and 'o' in childTypes:
-                core = False
-            if not core:
-                non_core.append(feature)
+            if [c for c in feature.children if c.node_type is not 'o']:
+                reasonable.append(feature)
 
-        return non_core
+        reasonable_child_dict = dict()
+        for r in reasonable:
+            child_index = [ft.find_fea_index(c) for c in r.children]
+            reasonable_child_dict[r] = (child_index, ft.find_fea_index(r))
 
-    def get_fullfill_from_novel_rep(self, candidate):
-        fulfill = [-1] * self.ft.featureNum
-        for feature, d in zip(self.non_core_features, candidate.decs):
-            fulfill[self.ft.find_fea_index(feature)] = d
+        # get the code func COMPLEX->SIMPLE
+        # used very rare
+        def novel_coding(lst):
+            res = []
+            for f, l in zip(ft.features, lst):
+                if f not in must1+reasonable:
+                    res.append(l)
+            return res
 
-        repeats = self.ft.get_tree_height()
-        if 'child_index_dict' not in locals():
-            child_index_dict = dict()
+        # get the core features
+        core = []
+        for f in ft.features:
+            if (f not in must1) or (f not in reasonable):
+                core.append(f)
 
-        for repeat in range(0, repeats):
-            for feature_index, feature in enumerate(self.ft.features):
-                if feature not in child_index_dict:
-                    child_index_dict[feature] = []
-                    for child in feature.children:
-                        child_index_dict[feature].append(self.ft.find_fea_index(child))
+        core_index = []
+        for f_i, f in enumerate(ft.features):
+            if f in core:
+                core_index.append(f_i)
 
-                if fulfill[feature_index] != -1:
-                    continue
+        # decode func SIMPLE->COMPLEX
+        # important!!
+        def novel_decoding(lst):
+            res = [-1] * ft.featureNum
 
-                childs_fulfill = itemgetter(*child_index_dict[feature])(fulfill)
-                if type(childs_fulfill) is int:
-                    childs_fulfill = [childs_fulfill]
+            # copy the cores
+            for i,l in zip(core_index, lst):
+                res[i] = l
 
-                if -1 in childs_fulfill:
-                    continue
+            # adding back the must-1 s
+            for i in must1_index:
+                res[i] = 1
 
-                # otherwise all children are filled
-                if sum(childs_fulfill) > 0:
-                    fulfill[feature_index] = 1
-                else:
-                    fulfill[feature_index] = 0
+            # adding back the reasonable features
+            for f in reversed(ft.features):
+                if f in reasonable:
+                    ll = itemgetter(*reasonable_child_dict[f][0])(lst)
+                    if type(ll) is int:
+                        ll = [ll]
+                    if f.node_type is not 'g':
+                        res[reasonable_child_dict[f][1]] = int(sum(ll) > 0)
+                    else:
+                        res[reasonable_child_dict[f][1]] = int(f.g_u >= sum(ll) >= f.g_d)
 
-        for i in range(len(fulfill)):
-            if fulfill[i] == -1:
-                fulfill[i] = 1
+            return res
 
-        return fulfill
+
+        return core, novel_coding, novel_decoding
 
     def __init__(self, name, num_of_attached_objs=4, setConVioAsObj=True):
         self.name = name
@@ -302,16 +323,17 @@ class FTModelNovelRep(FeatureModel):
             g = lt if append_attributes[a][2] else gt
             obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
 
-        self.non_core_features = self.find_the_noncore_feas()
-        self.non_core_index = [self.ft.find_fea_index(i) for i in self.non_core_features]
-        dec = [Has(l.id, 0, 1) for l in self.non_core_features]
+        self.core, self.novel_coding, self.novel_decoding = self.coding_func()
+
+        dec = [Has(l.id, 0, 1) for l in self.core]
 
         model.__init__(self, dec, obj)
 
     def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False, fulfill=None):
         if not fulfill:
-            fulfill = self.get_fullfill_from_novel_rep(candidate)
-        return FeatureModel.eval(self, candidate,doNorm, returnFulfill, checkTreeStructure, fulfill)
+            fulfill = self.novel_decoding(candidate.decs)
+            candidate.fulfill = fulfill
+        return FeatureModel.eval(self, candidate, doNorm, returnFulfill, checkTreeStructure, fulfill)
 
     def genRandomCan(self, engine_version):
         raise NotImplementedError
@@ -320,9 +342,24 @@ class FTModelNovelRep(FeatureModel):
         fulfill = [0] * self.ft.featureNum
         fulfill[0] = 1
         fulfill = self.genNode(self.ft.root, fulfill)
-        decs = itemgetter(*self.non_core_index)(fulfill)
+        decs = self.novel_coding(fulfill)
         return o(decs=decs, correct_ft=True, fulfill=fulfill)
 
+    def ok(self, c, con_vio_tol=0):
+        if not hasattr(c, 'scores'):
+            self.eval(c)
+        elif not c.fitness:
+            self.eval(c)
+
+        if not hasattr(c, 'correct_ft'):
+            c.correct_ft = self.ft.check_fulfill_valid(c.fulfill)
+
+        if not c.correct_ft:
+            return False
+        else:
+            return c.conVio <= con_vio_tol
+
+# import debug
 ftnr = FTModelNovelRep('eshop')
 ftnr.genRandomTree()
 
