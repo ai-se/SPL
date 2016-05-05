@@ -1,5 +1,5 @@
 import numpy as np
-
+import pdb
 
 class Node(object):
     def __init__(self, identification, parent=None, node_type='o'):
@@ -121,17 +121,21 @@ class FeatureTree(object):
             if not node.children:
                 return True
 
+            if find(node) == 0:
+                return True
+
             child_sum = sum([find(c) for c in node.children])
 
-            if node.node_type in ['m', 'r', 'o']:
-                if child_sum == 0:
+            for m_child in filter(lambda x: x.node_type in ['m', 'r', 'g'], node.children):
+                if find(m_child) == 0:
+                    # print m_child
+                    # pdb.set_trace()
                     return False
-                for m_child in filter(lambda x: x.node_type in ['m', 'r', 'g'], node.children):
-                    if find(m_child) == 0:
-                        return False
 
-            if node.node_type is ['g']:
+            if node.node_type is 'g':
                 if not (node.g_d <= child_sum <= node.g_u):
+                    # print node
+                    # pdb.set_trace()
                     return False
 
             for child in node.children:

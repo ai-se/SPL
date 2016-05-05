@@ -55,7 +55,7 @@ class IbeaDiscover(EADiscover):
 
         self.toolbox.register("select", tools.selIBEA)
 
-    def run(self, record_hof=False):
+    def run(self, record_hof=False, one_puls_n=False):
         toolbox = self.toolbox
         logbook = self.logbook
         stats = self.stats
@@ -91,15 +91,17 @@ class IbeaDiscover(EADiscover):
                 self.halloffame.update(offspring)
 
             # Select the next generation parents
-            parents[:] = toolbox.select(pop, MU)
+            if one_puls_n:
+                parents[:] = self.one_plus_n_engine(pop, MU, toolbox.select)
+            else:
+                parents[:] = toolbox.select(pop, MU)
 
             if record_hof:
                 hof.update(pop)
 
             # Update the statistics with the new population
-            # if gen % 100 == 0:
-            if True:
-                record = stats.compile(pop) if stats is not None else {}
+            if gen % 100 == 0:
+                record = stats.compile(parents) if stats is not None else {}
                 logbook.record(gen=gen, evals=evals, **record)
 
                 print logbook.stream
@@ -107,6 +109,9 @@ class IbeaDiscover(EADiscover):
                 if record_hof:
                     with open(spl_address+'/Records/'+self.ft.name+'.hof', 'w') as f:
                         pickle.dump(hof, f)
+            else:
+                pass
+                # print gen
 
             # # early termination control
             # if len(hof) > 290 and gen > 5000:
@@ -115,9 +120,9 @@ class IbeaDiscover(EADiscover):
                 last_record_time = 0
             if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
                 last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
+                stat_parts.pickle_results(self.ft.name, 'IBEA', parents, logbook)
 
-        stat_parts.pickle_results(self.ft.name, 'IBEA', pop, logbook)
+        stat_parts.pickle_results(self.ft.name, 'IBEA', parents, logbook)
         return pop, logbook
 
 
@@ -150,7 +155,7 @@ def experiment():
     ed = IbeaDiscover(FTModelNovelRep(name))
     # ed = IbeaDiscover(FeatureModel(name))
 
-    pop, logbook = ed.run()
+    pop, logbook = ed.run(one_puls_n=True)
 
 if __name__ == '__main__':
     import debug

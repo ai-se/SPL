@@ -75,7 +75,7 @@ def stat_basing_on_pop(pop, optimal_in_theory=None):
     IGD = convergence(front, optimal_in_theory)
 
     frontier_size = len(front)
-    valid_frontier_size = len([i for i in front if i.fitness.correct])
+    valid_frontier_size = len([i for i in pop if i.fitness.correct])
 
     return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_frontier_size
 

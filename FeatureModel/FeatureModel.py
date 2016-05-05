@@ -149,7 +149,7 @@ class FeatureModel(model):
     """
 
     def ok(self, c, con_vio_tol=0):
-        if not hasattr(c, 'scores'):
+        if not hasattr(c, 'snoncores'):
             self.eval(c)
         elif not c.fitness:
             self.eval(c)
@@ -228,7 +228,7 @@ class FTModelNovelRep(FeatureModel):
             tmp = True
             cursor = feature
             while cursor.parent:
-                if cursor.node_type not in ['m', 'r']:
+                if cursor.node_type not in ['m', 'r', 'g']:
                     tmp = False
                     break
                 cursor = cursor.parent
@@ -253,9 +253,20 @@ class FTModelNovelRep(FeatureModel):
             if [c for c in feature.children if c.node_type is not 'o']:
                 reasonable.append(feature)
 
+        # get the noncore features
+        noncore = []
+        for f in ft.features:
+            if f not in must1 + reasonable:
+                noncore.append(f)
+
+        noncore_index = []
+        for f_i, f in enumerate(ft.features):
+            if f in noncore:
+                noncore_index.append(f_i)
+
         reasonable_child_dict = dict()
         for r in reasonable:
-            child_index = [ft.find_fea_index(c) for c in r.children]
+            child_index = [self.ft.find_fea_index(c) for c in r.children]
             reasonable_child_dict[r] = (child_index, ft.find_fea_index(r))
 
         # get the code func COMPLEX->SIMPLE
@@ -267,24 +278,13 @@ class FTModelNovelRep(FeatureModel):
                     res.append(l)
             return res
 
-        # get the core features
-        core = []
-        for f in ft.features:
-            if (f not in must1) or (f not in reasonable):
-                core.append(f)
-
-        core_index = []
-        for f_i, f in enumerate(ft.features):
-            if f in core:
-                core_index.append(f_i)
-
         # decode func SIMPLE->COMPLEX
         # important!!
         def novel_decoding(lst):
             res = [-1] * ft.featureNum
 
-            # copy the cores
-            for i,l in zip(core_index, lst):
+            # copy the noncores
+            for i,l in zip(noncore_index, lst):
                 res[i] = l
 
             # adding back the must-1 s
@@ -294,18 +294,26 @@ class FTModelNovelRep(FeatureModel):
             # adding back the reasonable features
             for f in reversed(ft.features):
                 if f in reasonable:
-                    ll = itemgetter(*reasonable_child_dict[f][0])(lst)
+                    ll = itemgetter(*reasonable_child_dict[f][0])(res)
                     if type(ll) is int:
                         ll = [ll]
+
                     if f.node_type is not 'g':
-                        res[reasonable_child_dict[f][1]] = int(sum(ll) > 0)
+                        correct = True
+                        for c in f.children:
+                            if c.node_type in ['m', 'g'] and res[ft.find_fea_index(c)] == 0:
+                                correct = False
+                                break
+                        if correct:
+                            res[reasonable_child_dict[f][1]] = 1
+                        else:
+                            res[reasonable_child_dict[f][1]] = 0
+
                     else:
                         res[reasonable_child_dict[f][1]] = int(f.g_u >= sum(ll) >= f.g_d)
 
             return res
-
-
-        return core, novel_coding, novel_decoding
+        return noncore, novel_coding, novel_decoding
 
     def __init__(self, name, num_of_attached_objs=4, setConVioAsObj=True):
         self.name = name
@@ -323,9 +331,8 @@ class FTModelNovelRep(FeatureModel):
             g = lt if append_attributes[a][2] else gt
             obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
 
-        self.core, self.novel_coding, self.novel_decoding = self.coding_func()
-
-        dec = [Has(l.id, 0, 1) for l in self.core]
+        self.noncore, self.novel_coding, self.novel_decoding = self.coding_func()
+        dec = [Has(l.id, 0, 1) for l in self.noncore]
 
         model.__init__(self, dec, obj)
 
@@ -359,7 +366,7 @@ class FTModelNovelRep(FeatureModel):
         else:
             return c.conVio <= con_vio_tol
 
-# import debug
-ftnr = FTModelNovelRep('eshop')
-ftnr.genRandomTree()
+# # import debug
+# ftnr = FTModelNovelRep('eshop')
+# ftnr.genRandomTree()
 

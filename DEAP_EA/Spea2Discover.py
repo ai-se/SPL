@@ -31,7 +31,7 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
-from FeatureModel.FeatureModel import FeatureModel
+from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
 from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
 import random
@@ -94,10 +94,14 @@ class Spea2Discover(EADiscover):
 
             pop = offspring_pool
             _, evals2 = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-            record = stats.compile(archive)
-            logbook.record(gen=gen, evals=evals1 + evals2, **record)
+            if gen % 100 == 0:
+                record = stats.compile(archive)
+                logbook.record(gen=gen, evals=evals1 + evals2, **record)
 
-            print(logbook.stream)
+                print(logbook.stream)
+            else:
+                print gen
+                # pass
 
             if 'last_record_time' not in locals():
                 last_record_time = 0
@@ -113,7 +117,7 @@ class Spea2Discover(EADiscover):
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Spea2Discover(FeatureModel(name))
+    ed = Spea2Discover(FTModelNovelRep(name))
     pop, logbook = ed.run()
 
 if __name__ == '__main__':

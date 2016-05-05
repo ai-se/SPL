@@ -39,6 +39,7 @@ import DEAP_EA.DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pickle
+import pdb
 
 
 class EADiscover(Discoverer):
@@ -96,7 +97,7 @@ class EADiscover(Discoverer):
         can = o(decs=dec_l)
         self.ft.eval(can)
         is_valid_ind = self.ft.ok(can)
-        return tuple(can.fitness), is_valid_ind
+        return tuple(can.fitness), can.conVio, is_valid_ind
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
@@ -111,10 +112,26 @@ class EADiscover(Discoverer):
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values, ind.fitness.correct = fit
+            ind.fitness.values, ind.fitness.conVio, ind.fitness.correct = fit
         return pop, len(invalid_ind)
 
     def run(self):
         raise NotImplementedError
 
-
+    @staticmethod
+    def one_plus_n_engine(pop, MU, selector):
+        pop = sorted(pop, key=lambda p: p.fitness.conVio)
+        lst = [p.fitness.conVio for p in pop]
+        max_vio = pop[MU].fitness.conVio
+        if len(filter(lambda x: x<=max_vio, lst)) == MU:
+            return pop[0:MU]
+        else:
+            prioritized_select = pop[0:lst.index(max_vio)]
+            secondary = []
+            for l, p in zip(lst, pop):
+                if l == max_vio:
+                    secondary.append(p)
+            secondary = selector(secondary, MU-len(prioritized_select))
+            rst = prioritized_select+secondary
+            random.shuffle(rst)
+            return rst
