@@ -77,6 +77,7 @@ class EADiscover(Discoverer):
         logbook.header = "gen", "evals", "hv|spread|igd|frontier#|valid#", "timestamp"
         # logbook.header = "gen", "timestamp"
 
+        self.creator = creator
         self.toolbox = toolbox
         self.stats = stats
         self.logbook = logbook
@@ -97,7 +98,7 @@ class EADiscover(Discoverer):
         can = o(decs=dec_l)
         self.ft.eval(can)
         is_valid_ind = self.ft.ok(can)
-        return tuple(can.fitness), can.conVio, is_valid_ind
+        return tuple(can.fitness), can.conVio, can.correct_ft, is_valid_ind
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
@@ -112,7 +113,7 @@ class EADiscover(Discoverer):
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values, ind.fitness.conVio, ind.fitness.correct = fit
+            ind.fitness.values, ind.fitness.conVio, ind.fitness.correct_ft, ind.fitness.correct = fit
         return pop, len(invalid_ind)
 
     def run(self):
