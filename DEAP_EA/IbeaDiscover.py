@@ -156,6 +156,8 @@ def experiment():
     # ed = IbeaDiscover(FeatureModel(name))
 
     pop, logbook = ed.run(one_puls_n=True)
+    # pop, logbook = ed.run()
+
 
 if __name__ == '__main__':
     import debug

@@ -50,11 +50,12 @@ def _get_frontier(pop):
     return uniques
 
 
-def stat_basing_on_pop(pop, optimal_in_theory=None):
+def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     """
     return some statstics basing on the populations
     :param pop:
     :param optimal_in_theory:
+    :param record_valid_only:
     :return:
         * hyper_volume
         * spread
@@ -62,6 +63,12 @@ def stat_basing_on_pop(pop, optimal_in_theory=None):
         * frontier_size
         * valid_frontier_size
     """
+    if record_valid_only:
+        pop = filter(lambda p:p.fitness.correct, pop)
+
+    if len(pop) == 0:
+        return 'N/A', 'N/A', 'N/A', 0, 0
+
     front = _get_frontier(pop)
 
     front_objs = [f.fitness.values for f in front]

@@ -104,9 +104,12 @@ class FeatureModel(model):
 
         # constraint violation
         conVio = len(t.con) + 1
-        for cc in t.con:
+        conViolated_index = []
+        for cc_i, cc in enumerate(t.con):
             if cc.is_correct(t, fulfill):
                 conVio -= 1
+            else:
+                conViolated_index.append(cc_i)
 
         # another import constraint, the feature tree structure!
         if checkTreeStructure:
@@ -122,6 +125,7 @@ class FeatureModel(model):
         if 'conVio' in all_obj_names:
             candidate.fitness.append(conVio)
         candidate.conVio = conVio
+        candidate.conViolated_index = conViolated_index
 
         for o_name in all_obj_names:
             if o_name == 'fea' or o_name == 'conVio':

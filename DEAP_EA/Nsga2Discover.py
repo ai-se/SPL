@@ -31,7 +31,7 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
-from FeatureModel.FeatureModel import FeatureModel
+from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
 from DEAP_EA.DEAP_tools.EADiscover import EADiscover
 import DEAP_tools.stat_parts as stat_parts
 import random
@@ -53,7 +53,7 @@ class Nsga2Discover(EADiscover):
 
         self.toolbox.register("select", tools.selNSGA2)
 
-    def run(self):
+    def run(self, one_puls_n=False):
         toolbox = self.toolbox
         logbook = self.logbook
         stats = self.stats
@@ -87,13 +87,20 @@ class Nsga2Discover(EADiscover):
             _, evals = self.evaluate_pop(offspring)   # Evaluate the offspring with an invalid fitness
 
             # Select the next generation population
-            pop = toolbox.select(pop + offspring, MU)
-            record = stats.compile(pop)
-            logbook.record(gen=gen, evals=evals, **record)
-            print(logbook.stream)
+            # Select the next generation parents
+            if one_puls_n:
+                pop[:] = self.one_plus_n_engine(pop + offspring, MU, toolbox.select)
+            else:
+                pop[:] = toolbox.select(pop + offspring, MU)
+
+            if gen % 100 == 0:
+                record = stats.compile(pop)
+                logbook.record(gen=gen, evals=evals, **record)
+                print(logbook.stream)
 
             if 'last_record_time' not in locals():
                 last_record_time = 0
+
             if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
                 last_record_time = logbook[-1]['timestamp']
                 stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
@@ -102,13 +109,14 @@ class Nsga2Discover(EADiscover):
 
         return pop, logbook
 
-
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Nsga2Discover(FeatureModel(name))
-    pop, logbook = ed.run()
+    ed = Nsga2Discover(FTModelNovelRep(name))
+    # ed = IbeaDiscover(FeatureModel(name))
+
+    pop, logbook = ed.run(one_puls_n=True)
 
 if __name__ == '__main__':
-    # import debug
+    import debug
     experiment()

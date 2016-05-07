@@ -43,7 +43,7 @@ import pdb
 
 
 class EADiscover(Discoverer):
-    def __init__(self, feature_model):
+    def __init__(self, feature_model, stat_record_valid_only=False):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
             name = feature_model.name
@@ -64,12 +64,19 @@ class EADiscover(Discoverer):
         stats = tools.Statistics(lambda ind: ind)
 
         """load the optimal in theory (including the not valid individuals)"""
-        with open('{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.ft.name, len(feature_model.obj)), 'r') as f:
+        if stat_record_valid_only:
+            optimal_record_file = '{0}/input/{1}/{2}_objs.validhof'.format(
+                spl_address, self.ft.name, len(feature_model.obj))
+        else:
+            optimal_record_file = '{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.ft.name, len(feature_model.obj))
+
+        with open(optimal_record_file, 'r') as f:
             optimal_in_theory = pickle.load(f)
             optimal_in_theory = [o for o in optimal_in_theory]
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
-                       optimal_in_theory=optimal_in_theory)
+                       optimal_in_theory=optimal_in_theory,
+                       record_valid_only=stat_record_valid_only)
 
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
@@ -98,7 +105,7 @@ class EADiscover(Discoverer):
         can = o(decs=dec_l)
         self.ft.eval(can)
         is_valid_ind = self.ft.ok(can)
-        return tuple(can.fitness), can.conVio, can.correct_ft, is_valid_ind
+        return tuple(can.fitness), can.conVio, can.conViolated_index, can.correct_ft, is_valid_ind
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
@@ -113,7 +120,8 @@ class EADiscover(Discoverer):
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values, ind.fitness.conVio, ind.fitness.correct_ft, ind.fitness.correct = fit
+            ind.fitness.values, ind.fitness.conVio, ind.fitness.vioCons, \
+                ind.fitness.correct_ft, ind.fitness.correct = fit
         return pop, len(invalid_ind)
 
     def run(self):
