@@ -35,5 +35,3 @@ FT_EVAL_COUNTER = 0
 PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-print PROJECT_PATH
-

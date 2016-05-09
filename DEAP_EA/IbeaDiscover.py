@@ -152,11 +152,11 @@ def load_dump_hof():
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = IbeaDiscover(FTModelNovelRep(name))
-    # ed = IbeaDiscover(FeatureModel(name))
+    # ed = IbeaDiscover(FTModelNovelRep(name))
+    # pop, logbook = ed.run(one_puls_n=True)
 
-    pop, logbook = ed.run(one_puls_n=True)
-    # pop, logbook = ed.run()
+    ed = IbeaDiscover(FeatureModel(name))
+    pop, logbook = ed.run(one_puls_n=False)
 
 
 if __name__ == '__main__':
