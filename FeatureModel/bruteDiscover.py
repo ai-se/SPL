@@ -1,16 +1,35 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2016, Jianfeng Chen <jchen37@ncsu.edu>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+
+from __future__ import division
+
+import pickle
 from os import sys, path
 from random import choice
 from discoverer import Discoverer
 from FeatureModel import FeatureModel
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from universe import PROJECT_PATH
-import pickle
-
-__author__ = "Jianfeng Chen"
-__copyright__ = "Copyright (C) 2016 Jianfeng Chen"
-__license__ = "MIT"
-__version__ = "1.0"
-__email__ = "jchen37@ncsu.edu"
 
 
 class BruteDiscoverer(Discoverer):
@@ -18,9 +37,6 @@ class BruteDiscoverer(Discoverer):
         self.ft_model = ft_model
 
     def gen_valid_one(self, valid_sure=True):
-        def rand_list(n):
-            return [choice([0, 1]) for _ in range(n)]
-
         while True:
             can = self.ft_model.genRandomTree()
             if not valid_sure or self.ft_model.ok(can):

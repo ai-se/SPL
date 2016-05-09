@@ -75,19 +75,19 @@ class EADiscover(Discoverer):
             optimal_in_theory = [o for o in optimal_in_theory]
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
-                       optimal_in_theory=optimal_in_theory,
+                       # optimal_in_theory=optimal_in_theory,
                        record_valid_only=stat_record_valid_only)
 
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
 
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "hv|spread|igd|frontier#|valid#", "timestamp"
-        # logbook.header = "gen", "timestamp"
 
         self.creator = creator
         self.toolbox = toolbox
         self.stats = stats
         self.logbook = logbook
+        self.hof = tools.HallOfFame(300) # in case we need it
 
         self.ea_configurations = {
             'NGEN': 5000,
@@ -127,11 +127,33 @@ class EADiscover(Discoverer):
     def run(self):
         raise NotImplementedError
 
+    def record(self, pop, gen, evals, record_hof):
+        if record_hof:
+            self.hof.update(pop)
+
+        # Update the statistics with the new population
+        if gen % 100 == 0:
+            record = self.stats.compile(pop)
+            self.logbook.record(gen=gen, evals=evals, **record)
+
+            print self.logbook.stream
+
+            if record_hof:
+                with open(spl_address + '/Records/' + self.ft.name + '.hof', 'w') as f:
+                    pickle.dump(self.hof, f)
+
+        if 'last_record_time' not in locals():
+            last_record_time = 0
+
+        if self.logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
+            last_record_time = self.logbook[-1]['timestamp']
+            stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
+
     @staticmethod
     def one_plus_n_engine(pop, MU, selector):
         pop = sorted(pop, key=lambda p: p.fitness.conVio)
         lst = [p.fitness.conVio for p in pop]
-        max_vio = pop[MU].fitness.conVio
+        max_vio = pop[MU-1].fitness.conVio
         if len(filter(lambda x: x<=max_vio, lst)) == MU:
             return pop[0:MU]
         else:

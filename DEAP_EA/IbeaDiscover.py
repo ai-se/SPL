@@ -55,108 +55,73 @@ class IbeaDiscover(EADiscover):
 
         self.toolbox.register("select", tools.selIBEA)
 
+        self.alg_name = 'IBEA'
+
     def run(self, record_hof=False, one_puls_n=False):
         toolbox = self.toolbox
-        logbook = self.logbook
-        stats = self.stats
 
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
 
-        if record_hof:
-            hof = tools.HallOfFame(300)
         pop = toolbox.population(n=MU)
+        _, evals = self.evaluate_pop(pop)
+        self.record(pop, 0,evals, record_hof)
 
-        _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
+        parents = pop
 
-        record = stats.compile(pop)
-        logbook.record(gen=0, evals=evals, **record)
-        print(logbook.stream)
-        # pdb.set_trace()
-        parents = pop[:]
-
-        # Begin the generational process
         for gen in range(1, NGEN):
-            # pdb.set_trace()
             # Vary the parents
             offspring = varAnd(parents, toolbox, CXPB, MU)
 
-            pop[:] = parents + offspring
+            pop = parents + offspring
 
             _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
-            # Update the hall of fame with the generated individuals
-            if hasattr(self, 'halloffame'):
-                self.halloffame.update(offspring)
-
-            # Select the next generation parents
+            # environmental selection
             if one_puls_n:
-                parents[:] = self.one_plus_n_engine(pop, MU, toolbox.select)
+                parents = self.one_plus_n_engine(pop, MU, toolbox.select)
             else:
-                parents[:] = toolbox.select(pop, MU)
+                parents = toolbox.select(pop, MU)
 
-            if record_hof:
-                hof.update(pop)
+            self.record(parents, gen, evals, record_hof)
 
-            # Update the statistics with the new population
-            if gen % 100 == 0:
-                record = stats.compile(parents) if stats is not None else {}
-                logbook.record(gen=gen, evals=evals, **record)
-
-                print logbook.stream
-
-                if record_hof:
-                    with open(spl_address+'/Records/'+self.ft.name+'.hof', 'w') as f:
-                        pickle.dump(hof, f)
-            else:
-                pass
-                # print gen
-
-            # # early termination control
-            # if len(hof) > 290 and gen > 5000:
-            #     break
-            if 'last_record_time' not in locals():
-                last_record_time = 0
-            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-                last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'IBEA', parents, logbook)
-
-        stat_parts.pickle_results(self.ft.name, 'IBEA', parents, logbook)
-        return pop, logbook
+        stat_parts.pickle_results(self.ft.name, self.alg_name, parents, self.logbook)
+        return pop, self.logbook
 
 
-def run_with_hof():
-    from FeatureModel.SPLOT_dict import splot_dict
-    name = splot_dict[int(sys.argv[1])]
-    ed = IbeaDiscover(FeatureModel(name))
-    pop, logbook = ed.run(record_hof=False)
-
-
-def load_dump_hof():
-    from FeatureModel.SPLOT_dict import splot_dict
-    for i in range(10):
-        name = splot_dict[i]
-        ed = IbeaDiscover(FeatureModel(name))
-        with open(spl_address+'/input/hof_ibea/'+name+'.hof', 'r') as f:
-            hh = pickle.load(f)
-
-        if len(hh) == 0:
-            continue
-
-        with open(spl_address+'/input/'+name+'.pf', 'w') as f:
-            correct_pf = map(list,[h.fitness.values for h in hh])
-            pickle.dump(correct_pf, f)
+# def run_with_hof():
+#     from FeatureModel.SPLOT_dict import splot_dict
+#     name = splot_dict[int(sys.argv[1])]
+#     ed = IbeaDiscover(FeatureModel(name))
+#     pop, logbook = ed.run(record_hof=False)
+#
+#
+# def load_dump_hof():
+#     from FeatureModel.SPLOT_dict import splot_dict
+#     for i in range(10):
+#         name = splot_dict[i]
+#         ed = IbeaDiscover(FeatureModel(name))
+#         with open(spl_address+'/input/hof_ibea/'+name+'.hof', 'r') as f:
+#             hh = pickle.load(f)
+#
+#         if len(hh) == 0:
+#             continue
+#
+#         with open(spl_address+'/input/'+name+'.pf', 'w') as f:
+#             correct_pf = map(list,[h.fitness.values for h in hh])
+#             pickle.dump(correct_pf, f)
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    # ed = IbeaDiscover(FTModelNovelRep(name))
-    # pop, logbook = ed.run(one_puls_n=True)
+    pdb.set_trace()
+    ed = IbeaDiscover(FTModelNovelRep(name))
+    pop, logbook = ed.run(one_puls_n=True)
 
-    ed = IbeaDiscover(FeatureModel(name))
-    pop, logbook = ed.run(one_puls_n=False)
+    # ed = IbeaDiscover(FeatureModel(name))
+    # pop, logbook = ed.run(one_puls_n=False)
 
 
 if __name__ == '__main__':
