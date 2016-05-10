@@ -1,0 +1,38 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@n3n5-8>
+Subject: Job 298370: </share/jchen37/miniconda/bin/python2.7 get_hofs.py 9> Done
+
+Job </share/jchen37/miniconda/bin/python2.7 get_hofs.py 9> was submitted from host <login02.hpc.ncsu.edu> by user <jchen37> in cluster <henry2>.
+Job was executed on host(s) <n3n5-8>, in queue <serial>, as user <jchen37> in cluster <henry2>.
+</home/jchen37> was used as the home directory.
+</share/jchen37/SPL/Scripts> was used as the working directory.
+Started at Mon May  9 18:59:45 2016
+Results reported at Mon May  9 19:27:14 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/share/jchen37/miniconda/bin/python2.7 get_hofs.py 9
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time   :   1648.56 sec.
+    Max Memory :        26 MB
+    Max Swap   :       612 MB
+
+    Max Processes  :         3
+    Max Threads    :        11
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <./err/err.298370> for stderr output of this job.
+
