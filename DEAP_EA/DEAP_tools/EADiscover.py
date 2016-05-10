@@ -132,7 +132,7 @@ class EADiscover(Discoverer):
             self.hof.update(pop)
 
         # Update the statistics with the new population
-        if gen % 2 == 0:
+        if gen % 100 == 0:
             record = self.stats.compile(pop)
             self.logbook.record(gen=gen, evals=evals, **record)
 
