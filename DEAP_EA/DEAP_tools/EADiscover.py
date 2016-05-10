@@ -75,7 +75,7 @@ class EADiscover(Discoverer):
             optimal_in_theory = [o for o in optimal_in_theory]
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
-                       # optimal_in_theory=optimal_in_theory,
+                       optimal_in_theory=optimal_in_theory,
                        record_valid_only=stat_record_valid_only)
 
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
@@ -132,7 +132,7 @@ class EADiscover(Discoverer):
             self.hof.update(pop)
 
         # Update the statistics with the new population
-        if gen % 100 == 0:
+        if gen % 2 == 0:
             record = self.stats.compile(pop)
             self.logbook.record(gen=gen, evals=evals, **record)
 

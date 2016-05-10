@@ -50,57 +50,51 @@ class MoeadDiscover(EADiscover):
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-    def run(self):
+        self.alg_name = 'MOEAD'
+
+    def run(self, record_hof=False, one_puls_n=False):
         toolbox = self.toolbox
-        logbook = self.logbook
-        stats = self.stats
 
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
 
         pop = toolbox.population(n=MU)
-
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
+        self.record(pop, 0, evals, record_hof)
 
         MoeadSelc.setup(self.ft.objNum, pop, 20)
 
-        record = stats.compile(pop)
-        logbook.record(gen=0, evals=evals, **record)
-        print(logbook.stream)
-
         for gen in range(1, NGEN):
+            # print gen
             evals = 0
-            for point_id in MoeadSelc.shuffle(range(MU)):
-                child = toolbox.mate(pop[point_id], pop)  # crossover
+            prioritized_select = []
+            secondary = pop
+
+            for point_id in MoeadSelc.shuffle(range(len(secondary))):
+                child = toolbox.mate(secondary[point_id], pop)  # crossover
                 toolbox.mutate(child)  # mutant
 
                 if not child.fitness.valid:
                     evals += 1
-                    child.fitness.values, child.fitness.correct = toolbox.evaluate(child)  # re-evaluate the mutant
+                    child.fitness.values, child.fitness.conVio, child.fitness.vioCons, child.fitness.correct_ft, \
+                        child.fitness.correct = toolbox.evaluate(child)  # re-evaluate the mutant
 
-                MoeadSelc.update_neighbors(pop[point_id], child, pop)
+                MoeadSelc.update_neighbors(secondary[point_id], child, secondary)
 
-            record = stats.compile(pop)
-            logbook.record(gen=gen, evals=evals, **record)
-            print(logbook.stream)
+            pop = prioritized_select + secondary
+            self.record(pop, gen, evals, record_hof)
 
-            if 'last_record_time' not in locals():
-                last_record_time = 0
-            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-                last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'MOEAd', pop, logbook)
+        stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
 
-        stat_parts.pickle_results(self.ft.name, 'MOEAd', pop, logbook)
-
-        return pop, logbook
+        return pop, self.logbook
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = MoeadDiscover(FeatureModel(name))
-    pop, logbook = ed.run()
+    ed = MoeadDiscover(FeatureModel(name, 4))
+    pop, logbook = ed.run(one_puls_n=True)
 
 if __name__ == '__main__':
-    # import debug
+    import debug
     experiment()

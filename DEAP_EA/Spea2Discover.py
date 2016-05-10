@@ -55,27 +55,29 @@ class Spea2Discover(EADiscover):
 
         self.toolbox.register("selectTournament", tools.selTournament, tournsize=2)
 
-    def run(self):
+        self.alg_name = 'SPEA2'
+
+    def run(self, record_hof=False, one_puls_n=False):
         toolbox = self.toolbox
-        logbook = self.logbook
-        stats = self.stats
 
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
         NBAR = self.ea_configurations['SPEAII_archive_size']
 
         pop = toolbox.population(n=MU)
-
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-
-        record = stats.compile(pop)
-        logbook.record(gen=0, evals=evals, **record)
-        print(logbook.stream)
+        self.record(pop, 0, evals, record_hof)
 
         archive = []
         for gen in range(1, NGEN):
+            # print gen
+
             # environmental selection
-            archive = toolbox.select(pop + archive, k=NBAR)
+            if one_puls_n:
+                archive = self.one_plus_n_engine(pop+archive, NBAR, toolbox.select)
+            else:
+                archive = toolbox.select(pop + archive, k=NBAR)
+
             _, evals1 = self.evaluate_pop(archive)  # Evaluate the archive with an invalid fitness
 
             # mating selection
@@ -94,32 +96,20 @@ class Spea2Discover(EADiscover):
 
             pop = offspring_pool
             _, evals2 = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-            if gen % 100 == 0:
-                record = stats.compile(archive)
-                logbook.record(gen=gen, evals=evals1 + evals2, **record)
 
-                print(logbook.stream)
-            else:
-                print gen
-                # pass
+            self.record(archive, gen, evals1+evals2, record_hof)
 
-            if 'last_record_time' not in locals():
-                last_record_time = 0
-            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-                last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'SPEA-II', archive, logbook)
+        stat_parts.pickle_results(self.ft.name, self.alg_name, archive, self.logbook)
 
-        stat_parts.pickle_results(self.ft.name, 'SPEA-II', archive, logbook)
-
-        return pop, logbook
+        return pop, self.logbook
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Spea2Discover(FTModelNovelRep(name))
-    pop, logbook = ed.run()
+    ed = Spea2Discover(FTModelNovelRep(name, 4),)
+    pop, logbook = ed.run(one_puls_n=True)
 
 if __name__ == '__main__':
-    # import debug
+    import debug
     experiment()

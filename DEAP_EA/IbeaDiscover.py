@@ -66,7 +66,7 @@ class IbeaDiscover(EADiscover):
 
         pop = toolbox.population(n=MU)
         _, evals = self.evaluate_pop(pop)
-        self.record(pop, 0,evals, record_hof)
+        self.record(pop, 0, evals, record_hof)
 
         parents = pop
 
@@ -116,7 +116,6 @@ class IbeaDiscover(EADiscover):
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    pdb.set_trace()
     ed = IbeaDiscover(FTModelNovelRep(name))
     pop, logbook = ed.run(one_puls_n=True)
 

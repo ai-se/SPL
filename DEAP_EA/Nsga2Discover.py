@@ -53,24 +53,22 @@ class Nsga2Discover(EADiscover):
 
         self.toolbox.register("select", tools.selNSGA2)
 
-    def run(self, one_puls_n=False):
+        self.alg_name = 'NSGA2'
+
+    def run(self, record_hof=False, one_puls_n=False):
         toolbox = self.toolbox
-        logbook = self.logbook
-        stats = self.stats
 
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
 
         pop = toolbox.population(n=MU)
-
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-
-        record = stats.compile(pop)
-        logbook.record(gen=0, evals=evals, **record)
-        print(logbook.stream)
+        self.record(pop, 0, evals, record_hof)
 
         for gen in range(1, NGEN):
+            # print gen
+
             # vary the population
             tools.emo.assignCrowdingDist(pop)
             offspring = tools.selTournamentDCD(pop, len(pop))
@@ -93,27 +91,17 @@ class Nsga2Discover(EADiscover):
             else:
                 pop[:] = toolbox.select(pop + offspring, MU)
 
-            if gen % 100 == 0:
-                record = stats.compile(pop)
-                logbook.record(gen=gen, evals=evals, **record)
-                print(logbook.stream)
+            self.record(pop, gen, evals, record_hof)
 
-            if 'last_record_time' not in locals():
-                last_record_time = 0
+        stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
 
-            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-                last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
+        return pop, self.logbook
 
-        stat_parts.pickle_results(self.ft.name, 'NSGA2', pop, logbook)
-
-        return pop, logbook
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Nsga2Discover(FTModelNovelRep(name))
-    # ed = IbeaDiscover(FeatureModel(name))
+    ed = Nsga2Discover(FTModelNovelRep(name,4))
 
     pop, logbook = ed.run(one_puls_n=True)
 
