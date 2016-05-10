@@ -83,7 +83,7 @@ class RandomTreeDiscover(EADiscover):
             else:
                 set_con_obj(i, sum(itemgetter(*l)(weight_list)))
 
-    def run(self):
+    def run(self, record_hof=True):
         toolbox = self.toolbox
         logbook = self.logbook
         stats = self.stats
@@ -96,10 +96,8 @@ class RandomTreeDiscover(EADiscover):
 
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
         self.refresh_con_obj(pop)
+        self.record(pop, 0, evals, record_hof)
 
-        record = stats.compile(pop)
-        logbook.record(gen=0, evals=evals, **record)
-        print(logbook.stream)
         # pdb.set_trace()
         parents = pop[:]
 
@@ -117,31 +115,17 @@ class RandomTreeDiscover(EADiscover):
             # Select the next generation parents
             parents[:] = toolbox.select(pop, MU)
 
-            # Update the statistics with the new population
-            if gen % 1 == 0:
-                record = stats.compile(parents) if stats is not None else {}
-                logbook.record(gen=gen, evals=evals, **record)
+            self.record(pop, gen, evals, record_hof)
 
-                print logbook.stream
-
-            # # early termination control
-            # if len(hof) > 290 and gen > 5000:
-            #     break
-            if 'last_record_time' not in locals():
-                last_record_time = 0
-            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-                last_record_time = logbook[-1]['timestamp']
-                stat_parts.pickle_results(self.ft.name, 'IBEA', parents, logbook)
-
-        stat_parts.pickle_results(self.ft.name, 'IBEA', parents, logbook)
+        stat_parts.pickle_results(self.ft.name, 'rr', parents, logbook)
         return pop, logbook
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
-    name = splot_dict[int(sys.argv[1])]
+    # name = splot_dict[int(sys.argv[1])]
+    name = 'eshop'
     ed = RandomTreeDiscover(FTModelNovelRep(name))
-    # ed = RandomTreeDiscover(FeatureModel(name), stat_record_valid_only=False)
     ed.run()
 
 if __name__ == '__main__':

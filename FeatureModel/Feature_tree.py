@@ -72,9 +72,12 @@ class FeatureTree(object):
         else:
             identification = id_or_nodeObj
 
-        for i, x in enumerate(self.features):
-            if x.id == identification:
-                return i
+        if not hasattr(self, 'fea_index_dict'):
+            self.fea_index_dict = dict()
+            for f_i, f in enumerate(self.features):
+                self.fea_index_dict[f.id] = f_i
+
+        return self.fea_index_dict[identification]
 
     # fetch all the features in the tree basing on the children structure
     def set_features_list(self):

@@ -29,14 +29,27 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-splot_dict = {
-    0: "cellphone",
-    1: "webportal",
-    2: "marketplace",
-    3: "classicshell",
-    4: "carselection",
-    5: "greencar",
-    6: "fmtest",
-    7: "eshop",
-    8: "eis",
-}
+
+"""
+Experiment 1 on May 10
+Model: webportal, eshop
+Objectives dimension: 5
+Algorithms: (IBEA, SPEA2, NSGA2) * (1, SIP, penaltyControl)
+"""
+
+from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
+from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover
+from deap import base, creator, tools
+import pdb
+
+model_names = [ 'eshop']
+
+for name in model_names:
+    for dis in [IbeaDiscover.IbeaDiscover, Nsga2Discover.Nsga2Discover, Spea2Discover.Spea2Discover]:
+        model_org = FeatureModel(name)
+        model_nc = FTModelNovelRep(name)
+
+        pop, logbook = dis(model_org).run()
+        pdb.set_trace()
+        pop, logbook = dis(model_nc).run(one_puls_n=True)
+        pdb.set_trace()

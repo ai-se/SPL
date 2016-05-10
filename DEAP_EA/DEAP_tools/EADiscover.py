@@ -87,10 +87,10 @@ class EADiscover(Discoverer):
         self.toolbox = toolbox
         self.stats = stats
         self.logbook = logbook
-        self.hof = tools.HallOfFame(300) # in case we need it
+        self.hof = tools.HallOfFame(300)  # in case we need it
 
         self.ea_configurations = {
-            'NGEN': 5000,
+            'NGEN': 501,
             'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,

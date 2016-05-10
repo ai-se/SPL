@@ -64,7 +64,7 @@ class FeatureModel(model):
                 pickle.dump(values, f)
             return values
 
-    def __init__(self, name, num_of_attached_objs=4, setConVioAsObj=True):
+    def __init__(self, name, num_of_attached_objs=3, setConVioAsObj=True):
         self.name = name
         url = spl_addr + '/splot_data/' + self.name + '.xml'
         self.ft = load_ft_url(url)
