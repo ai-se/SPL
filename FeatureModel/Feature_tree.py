@@ -59,6 +59,7 @@ class FeatureTree(object):
         self.leaves = []
         self.con = []
         self.featureNum = 0
+        self.subtree_index_dict = dict()
 
     def set_root(self, root):
         self.root = root
@@ -216,6 +217,10 @@ class FeatureTree(object):
         lst = []
         self.post_order(subtree_root, fetch_indices, [lst])
         return lst
+
+    def get_subtree_index_dict(self):
+        for f_i, f in enumerate(self.features):
+            self.subtree_index_dict[f_i] = sorted(self.get_subtree_index(f))
 
     def get_feature_num(self):
         return len(self.features) - len(self.groups)

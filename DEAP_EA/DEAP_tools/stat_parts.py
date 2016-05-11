@@ -67,7 +67,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         pop = filter(lambda p:p.fitness.correct, pop)
 
     if len(pop) == 0:
-        return 'N/A', 'N/A', 'N/A', 0, 0
+        return 0, 0, 0, 0, 0
 
     front = _get_frontier(pop)
 

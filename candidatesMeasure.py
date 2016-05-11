@@ -20,7 +20,7 @@ def analysis_cans(candidate_lst, all_non_dominated=True):
     """
 
     def _safety_check(i):
-        assert hasattr(i, 'scores'), "ERROR! Candidates must be evaluated"
+        assert hasattr(i, 'fitness'), "ERROR! Candidates must be evaluated"
     map(_safety_check, candidate_lst)
 
     objs = [tuple(c.fitness) for c in candidate_lst]

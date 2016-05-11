@@ -26,6 +26,7 @@ from __future__ import division
 from operator import itemgetter
 import os.path
 import sys
+import random
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -39,7 +40,18 @@ import pdb
 
 
 class RandomTreeDiscover(EADiscover):
-    def __init__(self, feature_model, stat_record_valid_only=False):
+    def mate(self, ins1, ins2):
+        l = [i for i, (j, k) in enumerate(zip(ins1, ins2)) if j == k]
+        if len(l) == 0:
+            return ins1, ins2
+
+        ins1, ins2 = self.ft.swap_tree(ins1, ins2, random.choice(l))
+        return ins1, ins2
+
+    def mutate(self, ins):
+        pdb.set_trace()
+
+    def __init__(self, feature_model, stat_record_valid_only=True):
         super(RandomTreeDiscover, self).__init__(feature_model, stat_record_valid_only)
         toolbox = self.toolbox
         toolbox.unregister("individual")
@@ -51,6 +63,7 @@ class RandomTreeDiscover(EADiscover):
         toolbox.register(
             "mate",
             tools.cxTwoPoint)
+            # self.mate)
 
         toolbox.register(
             "mutate",
@@ -70,7 +83,7 @@ class RandomTreeDiscover(EADiscover):
             tmp_list.extend(i.fitness.vioCons)
         count_list = [tmp_list.count(i) for i in range(len(self.ft.ft.con))]
         s = sum(count_list)
-        weight_list = [i/s for i in count_list]
+        weight_list = [i/s*2 for i in count_list]
 
         for i in pop:
             l = i.fitness.vioCons
@@ -126,6 +139,7 @@ def experiment():
     # name = splot_dict[int(sys.argv[1])]
     name = 'eshop'
     ed = RandomTreeDiscover(FTModelNovelRep(name))
+    # ed = RandomTreeDiscover(FeatureModel(name))
     ed.run()
 
 if __name__ == '__main__':

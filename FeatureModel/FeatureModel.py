@@ -68,6 +68,7 @@ class FeatureModel(model):
         self.name = name
         url = spl_addr + '/splot_data/' + self.name + '.xml'
         self.ft = load_ft_url(url)
+        self.ft.get_subtree_index_dict()
         self.append_value_dict = dict()
 
         dec = [Has(l.id, 0, 1) for l in self.ft.features]
@@ -221,6 +222,16 @@ class FeatureModel(model):
         decs = self.genNode(self.ft.root, fulfill)
         return o(decs=decs, correct_ft=True)
 
+    def swap_tree(self, fulfill1, fulfill2, subroot):
+        if type(subroot) is int:
+            s = subroot
+        else:
+            s = self.ft.find_fea_index(subroot)
+        indices = self.ft.subtree_index_dict[s]
+        for i in indices:
+            fulfill1[i], fulfill2[i] = fulfill2[i], fulfill1[i]
+        return fulfill1, fulfill2
+
 
 class FTModelNovelRep(FeatureModel):
     def coding_func(self):
@@ -323,6 +334,7 @@ class FTModelNovelRep(FeatureModel):
         self.name = name
         url = spl_addr + '/splot_data/' + self.name + '.xml'
         self.ft = load_ft_url(url)
+        self.ft.get_subtree_index_dict()
         self.append_value_dict = dict()
 
         obj = [Has(name='fea', lo=0, hi=self.ft.featureNum, goal=lt)]
@@ -357,10 +369,14 @@ class FTModelNovelRep(FeatureModel):
         return o(decs=decs, correct_ft=True, fulfill=fulfill)
 
     def ok(self, c, con_vio_tol=0):
-        if not hasattr(c, 'scores'):
+        if not hasattr(c, 'fitness'):
             self.eval(c)
         elif not c.fitness:
             self.eval(c)
+
+        if c.conVio > con_vio_tol:
+            c.correct_ft = -1
+            return False
 
         if not hasattr(c, 'correct_ft'):
             c.correct_ft = self.ft.check_fulfill_valid(c.fulfill)
@@ -368,9 +384,13 @@ class FTModelNovelRep(FeatureModel):
         if not c.correct_ft:
             return False
         else:
-            return c.conVio <= con_vio_tol
+            return True
 
-# # import debug
-# ftnr = FTModelNovelRep('eshop')
-# ftnr.genRandomTree()
-
+    def swap_tree(self, ins1, ins2, subroot):
+        P = type(ins1)
+        f1 = self.novel_decoding(ins1)
+        f2 = self.novel_decoding(ins2)
+        if type(subroot) is int:
+            subroot = self.ft.find_fea_index(self.dec[subroot].name)
+        f1, f2 = FeatureModel.swap_tree(self, f1, f2, subroot)
+        return P(self.novel_coding(f1)), P(self.novel_coding(f2))

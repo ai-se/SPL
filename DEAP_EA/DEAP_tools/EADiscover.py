@@ -43,7 +43,7 @@ import pdb
 
 
 class EADiscover(Discoverer):
-    def __init__(self, feature_model, stat_record_valid_only=False):
+    def __init__(self, feature_model, stat_record_valid_only=True):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
             name = feature_model.name
