@@ -90,27 +90,14 @@ class IbeaDiscover(EADiscover):
         return pop, self.logbook
 
 
-# def run_with_hof():
-#     from FeatureModel.SPLOT_dict import splot_dict
-#     name = splot_dict[int(sys.argv[1])]
-#     ed = IbeaDiscover(FeatureModel(name))
-#     pop, logbook = ed.run(record_hof=False)
-#
-#
-# def load_dump_hof():
-#     from FeatureModel.SPLOT_dict import splot_dict
-#     for i in range(10):
-#         name = splot_dict[i]
-#         ed = IbeaDiscover(FeatureModel(name))
-#         with open(spl_address+'/input/hof_ibea/'+name+'.hof', 'r') as f:
-#             hh = pickle.load(f)
-#
-#         if len(hh) == 0:
-#             continue
-#
-#         with open(spl_address+'/input/'+name+'.pf', 'w') as f:
-#             correct_pf = map(list,[h.fitness.values for h in hh])
-#             pickle.dump(correct_pf, f)
+class IbeaDiscoverSIP(IbeaDiscover):
+    def __init__(self, feature_model):
+        if type(feature_model) is not FTModelNovelRep:
+            feature_model = FTModelNovelRep(feature_model.name)
+        super(IbeaDiscoverSIP, self).__init__(feature_model)
+
+    def run(self, record_hof=False, one_puls_n=True):
+        super(IbeaDiscoverSIP, self).run(record_hof, one_puls_n=True)
 
 
 def experiment():

@@ -45,7 +45,7 @@ for name in model_names:
     with open(PROJECT_PATH+'/Records/exp1/'+name+'.logbooks', 'r') as f:
         LOGBOOK = pickle.load(f)
 
-    for alg in ['IBEA', 'IBEA_SIP', 'NSGA2', 'NSGA2_SIP', 'SPEA2', 'SPEA2_SIP']:
+    for alg in ['IBEA', 'IbeaDiscover_SIP', 'NSGA2', 'NSGA2_SIP', 'SPEA2', 'SPEA2_SIP']:
         logbook = LOGBOOK[alg]
         print 'time', alg, logbook[-1]['timestamp']
 

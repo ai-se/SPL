@@ -136,11 +136,15 @@ class RandomTreeDiscover(EADiscover):
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
-    # name = splot_dict[int(sys.argv[1])]
-    name = 'eshop'
-    ed = RandomTreeDiscover(FTModelNovelRep(name))
-    # ed = RandomTreeDiscover(FeatureModel(name))
-    ed.run()
+    for i in range(6,9):
+        name = splot_dict[i]
+        print
+        print
+        print name
+        # name = 'webportal'
+        ed = RandomTreeDiscover(FTModelNovelRep(name))
+        # ed = RandomTreeDiscover(FeatureModel(name))
+        ed.run()
 
 if __name__ == '__main__':
     import debug

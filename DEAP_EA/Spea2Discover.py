@@ -104,6 +104,16 @@ class Spea2Discover(EADiscover):
         return pop, self.logbook
 
 
+class Spea2DiscoverSIP(Spea2Discover):
+    def __init__(self, feature_model):
+        if type(feature_model) is not FTModelNovelRep:
+            feature_model = FTModelNovelRep(feature_model.name)
+        super(Spea2DiscoverSIP, self).__init__(feature_model)
+
+    def run(self, record_hof=False, one_puls_n=True):
+        super(Spea2DiscoverSIP, self).run(record_hof, one_puls_n=True)
+
+
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]

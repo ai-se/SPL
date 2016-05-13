@@ -40,3 +40,10 @@ splot_dict = {
     7: "eshop",
     8: "eis",
 }
+
+
+def first_argv_name():
+    if sys.argv[1].isdigit():
+        return splot_dict[int(sys.argv[1])]
+    else:
+        return sys.argv[1]

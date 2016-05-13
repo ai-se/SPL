@@ -98,6 +98,16 @@ class Nsga2Discover(EADiscover):
         return pop, self.logbook
 
 
+class Nsga2DiscoverSIP(Nsga2Discover):
+    def __init__(self, feature_model):
+        if type(feature_model) is not FTModelNovelRep:
+            feature_model = FTModelNovelRep(feature_model.name)
+        super(Nsga2DiscoverSIP, self).__init__(feature_model)
+
+    def run(self, record_hof=False, one_puls_n=True):
+        super(Nsga2DiscoverSIP, self).run(record_hof, one_puls_n=True)
+
+
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]

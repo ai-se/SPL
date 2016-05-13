@@ -37,30 +37,26 @@ Objectives dimension: 5
 Algorithms: (IBEA, SPEA2, NSGA2) * (1, SIP, penaltyControl)
 """
 
-from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
-from FeatureModel.SPLOT_dict import splot_dict
+from FeatureModel.FeatureModel import FeatureModel
+from FeatureModel.SPLOT_dict import first_argv_name
 from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover
 from universe import PROJECT_PATH
-from deap import base, creator, tools
-import pdb
-import sys
 import pickle
 
-model_names = [splot_dict[i] for i in range(9)]
 LOGBOOK = dict()
+discovers = [IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
+             Nsga2Discover.Nsga2Discover, Nsga2Discover.Nsga2DiscoverSIP,
+             Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP]
 
 
-def exp1(name):
-    for dis in [IbeaDiscover.IbeaDiscover, Nsga2Discover.Nsga2Discover, Spea2Discover.Spea2Discover]:
-        dis_ins = dis(FeatureModel(name))
-        _, logbook = dis_ins.run()
-        LOGBOOK[str(dis_ins.alg_name)] = logbook
+def exp1(name, repeat_id=1):
+        for dis in discovers:
+            dis_ins = dis(FeatureModel(name))
+            _, logbook = dis_ins.run()
+            LOGBOOK[str(dis_ins.alg_name)] = logbook
 
-        dis_ins = dis(FTModelNovelRep(name))
-        _, logbook = dis_ins.run(one_puls_n=True)
-        LOGBOOK[str(dis_ins.alg_name+'_'+'SIP')] = logbook
+            # saving
+            with open('{0}/Records/exp1/{1}.{2}.logbooks'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
+                pickle.dump(LOGBOOK, f)
 
-        with open(PROJECT_PATH+'/Records/exp1/'+name+'.logbooks', 'w') as f:
-            pickle.dump(LOGBOOK, f)
-
-exp1(model_names[int(sys.argv[1])])
+exp1(name=first_argv_name(), repeat_id=3)
