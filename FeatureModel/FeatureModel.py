@@ -243,7 +243,7 @@ class FTModelNovelRep(FeatureModel):
             tmp = True
             cursor = feature
             while cursor.parent:
-                if cursor.node_type not in ['m', 'r', 'g']:
+                if cursor.node_type not in ['m', 'r']:
                     tmp = False
                     break
                 cursor = cursor.parent
@@ -255,6 +255,7 @@ class FTModelNovelRep(FeatureModel):
             if f in must1:
                 must1_index.append(f_i)
 
+        # pdb.set_trace()
         # get the reasonable features, i.e., at least one of the child are not optional or the feature itself is 'g'
         reasonable = []
         for feature in ft.features:

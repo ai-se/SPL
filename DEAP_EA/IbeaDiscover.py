@@ -36,6 +36,7 @@ from deap import tools
 from deap.algorithms import varAnd
 from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
 from DEAP_EA.DEAP_tools.EADiscover import EADiscover
+from DEAP_tools.IbeaSelc import selIBEAEnvironment
 import DEAP_tools.stat_parts as stat_parts
 import pdb
 
@@ -53,11 +54,29 @@ class IbeaDiscover(EADiscover):
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-        self.toolbox.register("select", tools.selIBEA)
-
+        self.toolbox.register("en_selc", selIBEAEnvironment)
+        self.toolbox.register("mat_selc", self.binary_tournament_selc)
         self.alg_name = 'IBEA'
 
-    def run(self, record_hof=False, one_puls_n=False):
+
+    @staticmethod
+    def binary_tournament_selc(population, return_size, sip=False):
+        import random
+        parents = []
+        for _ in xrange(return_size):
+            # Pick individuals for tournament
+            tournament = [random.choice(population) for _ in range(2)]
+            # Sort according to fitness
+            if sip:
+                tournament.sort(key=lambda ind: (ind.fitness.conVio, ind.fitness))
+            else:
+                tournament.sort()
+            # Winner is element with smallest fitness
+            parents.append(tournament[0])
+
+        return parents
+
+    def run(self, record_hof=False, sip=False):
         toolbox = self.toolbox
 
         NGEN = self.ea_configurations['NGEN']
@@ -71,22 +90,22 @@ class IbeaDiscover(EADiscover):
         parents = pop
 
         for gen in range(1, NGEN):
-            # Vary the parents
-            offspring = varAnd(parents, toolbox, CXPB, MU)
-
-            pop = parents + offspring
-
             _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
             # environmental selection
-            if one_puls_n:
-                parents = self.one_plus_n_engine(pop, MU, toolbox.select)
+            if sip:
+                parents = self.one_plus_n_engine(pop, MU, toolbox.en_selc)
             else:
-                parents = toolbox.select(pop, MU)
-
+                parents = toolbox.en_selc(pop, MU)
             self.record(parents, gen, evals, record_hof)
 
-        stat_parts.pickle_results(self.ft.name, self.alg_name, parents, self.logbook)
+            mating = toolbox.mat_selc(parents, int(MU), sip)
+            # pdb.set_trace()
+            # Vary the parents
+            offspring = varAnd(mating, toolbox, CXPB, MU)
+            pop = parents + offspring
+
+        # stat_parts.pickle_results(self.ft.name, self.alg_name, parents, self.logbook)
         return pop, self.logbook
 
 
@@ -96,18 +115,16 @@ class IbeaDiscoverSIP(IbeaDiscover):
             feature_model = FTModelNovelRep(feature_model.name)
         super(IbeaDiscoverSIP, self).__init__(feature_model)
 
-    def run(self, record_hof=False, one_puls_n=True):
-        super(IbeaDiscoverSIP, self).run(record_hof, one_puls_n=True)
+    def run(self, record_hof=False, sip=True):
+        return super(IbeaDiscoverSIP, self).run(record_hof, sip=True)
 
 
 def experiment():
-    from FeatureModel.SPLOT_dict import splot_dict
-    name = splot_dict[int(sys.argv[1])]
-    ed = IbeaDiscover(FTModelNovelRep(name))
-    pop, logbook = ed.run(one_puls_n=True)
-
+    from FeatureModel.SPLOT_dict import first_argv_name
+    name = first_argv_name()
+    ed = IbeaDiscoverSIP(FTModelNovelRep(name))
     # ed = IbeaDiscover(FeatureModel(name))
-    # pop, logbook = ed.run(one_puls_n=False)
+    pop, logbook = ed.run()
 
 
 if __name__ == '__main__':

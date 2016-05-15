@@ -147,10 +147,10 @@ class EADiscover(Discoverer):
 
         if self.logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
             last_record_time = self.logbook[-1]['timestamp']
-            stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
+            # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
 
     @staticmethod
-    def one_plus_n_engine(pop, MU, selector):
+    def one_plus_n_engine(pop, MU, selector, **kwargs):
         pop = sorted(pop, key=lambda p: p.fitness.conVio)
         lst = [p.fitness.conVio for p in pop]
         max_vio = pop[MU-1].fitness.conVio
@@ -162,7 +162,7 @@ class EADiscover(Discoverer):
             for l, p in zip(lst, pop):
                 if l == max_vio:
                     secondary.append(p)
-            secondary = selector(secondary, MU-len(prioritized_select))
+            secondary = selector(secondary, MU-len(prioritized_select), **kwargs)
             rst = prioritized_select+secondary
             random.shuffle(rst)
             return rst

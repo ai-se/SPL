@@ -130,7 +130,7 @@ class FeatureTree(object):
 
             child_sum = sum([find(c) for c in node.children])
 
-            for m_child in filter(lambda x: x.node_type in ['m', 'r', 'g'], node.children):
+            for m_child in filter(lambda x: x.node_type in ['m', 'r'], node.children):
                 if find(m_child) == 0:
                     # print m_child
                     # pdb.set_trace()
@@ -146,6 +146,8 @@ class FeatureTree(object):
                 if find(child) == 1:
                     t = check_node(child)
                     if not t:
+                        # print child
+                        # pdb.set_trace()
                         return False
             return True
 

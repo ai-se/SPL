@@ -105,7 +105,7 @@ class Nsga2DiscoverSIP(Nsga2Discover):
         super(Nsga2DiscoverSIP, self).__init__(feature_model)
 
     def run(self, record_hof=False, one_puls_n=True):
-        super(Nsga2DiscoverSIP, self).run(record_hof, one_puls_n=True)
+        return super(Nsga2DiscoverSIP, self).run(record_hof, one_puls_n=True)
 
 
 def experiment():
