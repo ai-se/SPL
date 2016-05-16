@@ -63,4 +63,4 @@ def exp1(name, repeat_id=1):
 
 for i in range(1):
     name = splot_dict[i]
-    exp1(name=first_argv_name(), repeat_id=sys.argv[1])
+    exp1(name=first_argv_name(), repeat_id=int(sys.argv[1]))
