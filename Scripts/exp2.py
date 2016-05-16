@@ -50,7 +50,7 @@ discovers = [IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
              Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP]
 
 
-def exp1(name, repeat_id=1):
+def exp2(name, repeat_id=1):
     LOGBOOK.clear()
     for dis in discovers:
         dis_ins = dis(FeatureModel(name))
@@ -61,6 +61,6 @@ def exp1(name, repeat_id=1):
         with open('{0}/Records/exp2/{1}.{2}.logbooks'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
             pickle.dump(LOGBOOK, f)
 
-for i in range(1):
+for i in range(9):
     name = splot_dict[i]
-    exp1(name=name, repeat_id=int(sys.argv[1]))
+    exp2(name=name, repeat_id=int(sys.argv[1]))
