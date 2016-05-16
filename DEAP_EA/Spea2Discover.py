@@ -51,13 +51,13 @@ class Spea2Discover(EADiscover):
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-        self.toolbox.register("select", tools.selSPEA2)
+        self.toolbox.register("env_select", tools.selSPEA2)
 
-        self.toolbox.register("selectTournament", tools.selTournament, tournsize=2)
+        self.toolbox.register("mate_select", self.binary_tournament_selc)
 
         self.alg_name = 'SPEA2'
 
-    def run(self, record_hof=False, one_puls_n=False):
+    def run(self, record_hof=False, sip=False):
         toolbox = self.toolbox
 
         NGEN = self.ea_configurations['NGEN']
@@ -73,15 +73,15 @@ class Spea2Discover(EADiscover):
             # print gen
 
             # environmental selection
-            if one_puls_n:
-                archive = self.one_plus_n_engine(pop+archive, NBAR, toolbox.select)
+            if sip:
+                archive = self.one_plus_n_engine(pop+archive, NBAR, toolbox.env_select)
             else:
-                archive = toolbox.select(pop + archive, k=NBAR)
+                archive = toolbox.env_select(pop + archive, k=NBAR)
 
             _, evals1 = self.evaluate_pop(archive)  # Evaluate the archive with an invalid fitness
 
             # mating selection
-            mating_pool = toolbox.selectTournament(archive, k=MU)
+            mating_pool = toolbox.mate_select(archive, MU, sip)
             offspring_pool = map(toolbox.clone, mating_pool)
 
             # variation
@@ -99,7 +99,7 @@ class Spea2Discover(EADiscover):
 
             self.record(archive, gen, evals1+evals2, record_hof)
 
-        stat_parts.pickle_results(self.ft.name, self.alg_name, archive, self.logbook)
+        # stat_parts.pickle_results(self.ft.name, self.alg_name, archive, self.logbook)
 
         return pop, self.logbook
 
@@ -109,16 +109,17 @@ class Spea2DiscoverSIP(Spea2Discover):
         if type(feature_model) is not FTModelNovelRep:
             feature_model = FTModelNovelRep(feature_model.name)
         super(Spea2DiscoverSIP, self).__init__(feature_model)
+        self.alg_name = "SPEA2-SIP"
 
-    def run(self, record_hof=False, one_puls_n=True):
-        return super(Spea2DiscoverSIP, self).run(record_hof, one_puls_n=True)
+    def run(self, record_hof=False, sip=True):
+        return super(Spea2DiscoverSIP, self).run(record_hof, sip=True)
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
     ed = Spea2Discover(FTModelNovelRep(name, 4),)
-    pop, logbook = ed.run(one_puls_n=True)
+    pop, logbook = ed.run(sip=True)
 
 if __name__ == '__main__':
     import debug

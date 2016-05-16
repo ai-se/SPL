@@ -29,24 +29,38 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import tools
-import pickle
-import pdb
+
+"""
+Experiment 1 on May 10
+Model: all
+Objectives dimension: 5
+Algorithms: (IBEA, SPEA2, NSGA2) * (1, SIP)
+Repeat: 30
+"""
+
+from FeatureModel.FeatureModel import FeatureModel
+from FeatureModel.SPLOT_dict import first_argv_name, splot_dict
+from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover
 from universe import PROJECT_PATH
-from FeatureModel.SPLOT_dict import splot_dict
+import pickle
 
-model_names = [splot_dict[i] for i in range(9)]
+LOGBOOK = dict()
+discovers = [IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
+             Nsga2Discover.Nsga2Discover, Nsga2Discover.Nsga2DiscoverSIP,
+             Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP]
 
-for name in model_names:
-    print
-    print
-    print name
 
-    with open(PROJECT_PATH+'/Records/exp1/'+name+'.logbooks', 'r') as f:
-        LOGBOOK = pickle.load(f)
+def exp1(name, repeat_id=1):
+    LOGBOOK.clear()
+    for dis in discovers:
+        dis_ins = dis(FeatureModel(name))
+        _, logbook = dis_ins.run()
+        LOGBOOK[str(dis_ins.alg_name)] = logbook
 
-    for alg in ['IBEA', 'IbeaDiscover_SIP', 'NSGA2', 'NSGA2_SIP', 'SPEA2', 'SPEA2_SIP']:
-        logbook = LOGBOOK[alg]
-        print 'time', alg, logbook[-1]['timestamp']
+        # saving
+        with open('{0}/Records/exp2/{1}.{2}.logbooks'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
+            pickle.dump(LOGBOOK, f)
 
-    # pdb.set_trace()
+for i in range(1):
+    name = splot_dict[i]
+    exp1(name=first_argv_name(), repeat_id=sys.argv[1])

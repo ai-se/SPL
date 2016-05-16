@@ -51,11 +51,12 @@ class Nsga2Discover(EADiscover):
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-        self.toolbox.register("select", tools.selNSGA2)
+        self.toolbox.register("env_select", tools.selNSGA2)
+        self.toolbox.register("mate_select", self.binary_tournament_selc)
 
         self.alg_name = 'NSGA2'
 
-    def run(self, record_hof=False, one_puls_n=False):
+    def run(self, record_hof=False, sip=False):
         toolbox = self.toolbox
 
         NGEN = self.ea_configurations['NGEN']
@@ -71,7 +72,7 @@ class Nsga2Discover(EADiscover):
 
             # vary the population
             tools.emo.assignCrowdingDist(pop)
-            offspring = tools.selTournamentDCD(pop, len(pop))
+            offspring = toolbox.mate_select(pop, MU, sip)
             offspring = [toolbox.clone(ind) for ind in offspring]
 
             for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
@@ -86,14 +87,14 @@ class Nsga2Discover(EADiscover):
 
             # Select the next generation population
             # Select the next generation parents
-            if one_puls_n:
-                pop[:] = self.one_plus_n_engine(pop + offspring, MU, toolbox.select)
+            if sip:
+                pop[:] = self.one_plus_n_engine(pop + offspring, MU, toolbox.env_select)
             else:
-                pop[:] = toolbox.select(pop + offspring, MU)
+                pop[:] = toolbox.env_select(pop + offspring, MU)
 
             self.record(pop, gen, evals, record_hof)
 
-        stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
+        # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
 
         return pop, self.logbook
 
@@ -103,17 +104,18 @@ class Nsga2DiscoverSIP(Nsga2Discover):
         if type(feature_model) is not FTModelNovelRep:
             feature_model = FTModelNovelRep(feature_model.name)
         super(Nsga2DiscoverSIP, self).__init__(feature_model)
+        self.alg_name = "NSGA2-SIP"
 
-    def run(self, record_hof=False, one_puls_n=True):
-        return super(Nsga2DiscoverSIP, self).run(record_hof, one_puls_n=True)
+    def run(self, record_hof=False, sip=True):
+        return super(Nsga2DiscoverSIP, self).run(record_hof, sip=True)
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Nsga2Discover(FTModelNovelRep(name,4))
+    ed = Nsga2Discover(FTModelNovelRep(name))
 
-    pop, logbook = ed.run(one_puls_n=True)
+    pop, logbook = ed.run(sip=True)
 
 if __name__ == '__main__':
     import debug

@@ -58,24 +58,6 @@ class IbeaDiscover(EADiscover):
         self.toolbox.register("mat_selc", self.binary_tournament_selc)
         self.alg_name = 'IBEA'
 
-
-    @staticmethod
-    def binary_tournament_selc(population, return_size, sip=False):
-        import random
-        parents = []
-        for _ in xrange(return_size):
-            # Pick individuals for tournament
-            tournament = [random.choice(population) for _ in range(2)]
-            # Sort according to fitness
-            if sip:
-                tournament.sort(key=lambda ind: (ind.fitness.conVio, ind.fitness))
-            else:
-                tournament.sort()
-            # Winner is element with smallest fitness
-            parents.append(tournament[0])
-
-        return parents
-
     def run(self, record_hof=False, sip=False):
         toolbox = self.toolbox
 
@@ -114,6 +96,7 @@ class IbeaDiscoverSIP(IbeaDiscover):
         if type(feature_model) is not FTModelNovelRep:
             feature_model = FTModelNovelRep(feature_model.name)
         super(IbeaDiscoverSIP, self).__init__(feature_model)
+        self.alg_name = 'IBEA-SIP'
 
     def run(self, record_hof=False, sip=True):
         return super(IbeaDiscoverSIP, self).run(record_hof, sip=True)
@@ -123,6 +106,7 @@ def experiment():
     from FeatureModel.SPLOT_dict import first_argv_name
     name = first_argv_name()
     ed = IbeaDiscoverSIP(FTModelNovelRep(name))
+    pdb.set_trace()
     # ed = IbeaDiscover(FeatureModel(name))
     pop, logbook = ed.run()
 

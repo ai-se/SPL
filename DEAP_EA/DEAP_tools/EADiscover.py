@@ -115,6 +115,23 @@ class EADiscover(Discoverer):
                 del individual.fitness.values
         return individual,
 
+    @staticmethod
+    def binary_tournament_selc(population, return_size, sip=False):
+        import random
+        parents = []
+        for _ in xrange(return_size):
+            # Pick individuals for tournament
+            tournament = [random.choice(population) for _ in range(2)]
+            # Sort according to fitness
+            if sip:
+                tournament.sort(key=lambda ind: (ind.fitness.conVio, ind.fitness))
+            else:
+                tournament.sort()
+            # Winner is element with smallest fitness
+            parents.append(tournament[0])
+
+        return parents
+
     def evaluate_pop(self, pop):
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
