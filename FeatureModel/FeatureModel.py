@@ -28,7 +28,7 @@ from operator import itemgetter
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from universe import PROJECT_PATH as spl_addr
 from model import *
-from parser import load_ft_url
+from splot_parser import load_ft_url
 import pickle
 import os
 import pdb

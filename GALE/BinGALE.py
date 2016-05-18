@@ -5,7 +5,7 @@ from GALE_timing import *
 import os,sys
 parserdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/parser/'
 sys.path.insert(0,parserdir)
-from parser import *
+from splot_parser import *
 
 
 class BinGALE(GALE):
