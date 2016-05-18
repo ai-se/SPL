@@ -72,6 +72,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     front = _get_frontier(pop)
 
     front_objs = [f.fitness.values for f in front]
+
     reference_point = [1] * len(front_objs[0])
     hv = HyperVolume(reference_point).compute(front_objs)  # did NOT use deap module calc
 

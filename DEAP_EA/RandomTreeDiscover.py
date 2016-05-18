@@ -34,6 +34,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from deap import tools, creator, base
 from deap.algorithms import varAnd
 from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
+from DEAP_tools.IbeaSelc import selIBEAEnvironment
 from DEAP_tools.EADiscover import EADiscover
 from DEAP_tools import stat_parts
 import pdb
@@ -60,19 +61,26 @@ class RandomTreeDiscover(EADiscover):
         toolbox.unregister("population")
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-        toolbox.register(
-            "mate",
-            tools.cxTwoPoint)
-            # self.mate)
+        # toolbox.register("mate", tools.cxTwoPoint)
+        toolbox.register("mate", self.mate)
 
         toolbox.register(
             "mutate",
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-        toolbox.register("select", tools.selIBEA)
+        toolbox.register("en_selc", selIBEAEnvironment)
+        toolbox.register("mat_selc", self.binary_tournament_selc)
+
+        self.alg_name = 'IBEA-PEN'
 
     def refresh_con_obj(self, pop):
+        """
+        IMPORTANT NOTE: since the program only record the valid candidates. the refresh operator does NOT influence
+        the accuracy of final statistic. There is NO need to recover the normal fitness representation.
+        :param pop:
+        :return:
+        """
         def set_con_obj(inidvidual, value):
             x = list(inidvidual.fitness.values)
             x[1] = value
@@ -83,7 +91,7 @@ class RandomTreeDiscover(EADiscover):
             tmp_list.extend(i.fitness.vioCons)
         count_list = [tmp_list.count(i) for i in range(len(self.ft.ft.con))]
         s = sum(count_list)
-        weight_list = [i/s*2 for i in count_list]
+        weight_list = [i/s for i in count_list]
 
         for i in pop:
             l = i.fitness.vioCons
@@ -96,7 +104,7 @@ class RandomTreeDiscover(EADiscover):
             else:
                 set_con_obj(i, sum(itemgetter(*l)(weight_list)))
 
-    def run(self, record_hof=True):
+    def run(self, record_hof=False):
         toolbox = self.toolbox
         logbook = self.logbook
         stats = self.stats
@@ -108,35 +116,35 @@ class RandomTreeDiscover(EADiscover):
         pop = toolbox.population(n=MU)
 
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-        self.refresh_con_obj(pop)
-        self.record(pop, 0, evals, record_hof)
 
+        self.record(pop, 0, evals, record_hof)
+        self.refresh_con_obj(pop)
         # pdb.set_trace()
         parents = pop[:]
 
         # Begin the generational process
         for gen in range(1, NGEN):
-            # pdb.set_trace()
-            # Vary the parents
-            offspring = varAnd(parents, toolbox, CXPB, MU)
-
-            pop[:] = parents + offspring
-
-            _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
+            _, evals = self.evaluate_pop(pop)
             self.refresh_con_obj(pop)
 
-            # Select the next generation parents
-            parents[:] = toolbox.select(pop, MU)
+            # environment selection
+            parents = toolbox.en_selc(pop, MU)
 
-            self.record(pop, gen, evals, record_hof)
+            self.record(parents, gen, evals, record_hof)
 
-        stat_parts.pickle_results(self.ft.name, 'rr', parents, logbook)
+            mating = toolbox.mat_selc(parents, int(MU))
+
+            offspring = varAnd(mating, toolbox, CXPB, MU)
+
+            pop = parents + offspring
+
+        # stat_parts.pickle_results(self.ft.name, 'rr', parents, logbook)
         return pop, logbook
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
-    for i in range(6,9):
+    for i in range(7,9):
         name = splot_dict[i]
         print
         print

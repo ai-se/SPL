@@ -47,7 +47,7 @@ def drawing_hv(name):
     for alg in algorithms:
         hh = [alg]
         for repeat in range(1, 31):
-            with open("{0}/Records/exp2/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
+            with open("{0}/Records/exp3/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
                 logbooks = pickle.load(f)
                 x = hv(logbooks, alg)
                 hh.append(x)
@@ -65,7 +65,7 @@ def drawing_spread(name):
     for alg in algorithms:
         sp = [alg]
         for repeat in range(1, 31):
-            with open("{0}/Records/exp2/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
+            with open("{0}/Records/exp3/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
                 logbooks = pickle.load(f)
                 x = spread(logbooks, alg)
                 if x == 0.0:
@@ -86,7 +86,7 @@ def drawing_igd(name):
     for alg in algorithms:
         ig = [alg]
         for repeat in range(1, 31):
-            with open("{0}/Records/exp2/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
+            with open("{0}/Records/exp3/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
                 logbooks = pickle.load(f)
                 x = igd(logbooks, alg)
                 if x == 0.0:
@@ -107,7 +107,7 @@ def drawing_runtime(name):
     for alg in algorithms:
         rt = [alg]
         for repeat in range(1, 31):
-            with open("{0}/Records/exp2/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
+            with open("{0}/Records/exp3/{1}.{2}.logbooks".format(PROJECT_PATH, name, repeat), 'r') as f:
                 logbooks = pickle.load(f)
                 x = runtime(logbooks, alg)
                 rt.append(x)
