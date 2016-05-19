@@ -41,7 +41,7 @@ def load_product_url(url):
     feature_name_pattern = re.compile(r'c (\d+)\$? (\w+)\n')
     stat_line_pattern = re.compile(r'p cnf (\d+) (\d+)\n')
     with open(url, 'r') as f:
-        features_names_dict = dict()  # it's the list!
+        features_names_dict = dict()
 
         for line in f:
             if line.startswith('c'):  # record the feature names
