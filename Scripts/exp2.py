@@ -40,14 +40,15 @@ Repeat: 30
 
 from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.SPLOT_dict import first_argv_name, splot_dict
-from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover
+from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover, RandomTreeDiscover
 from universe import PROJECT_PATH
 import pickle
 
 LOGBOOK = dict()
 discovers = [IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
              Nsga2Discover.Nsga2Discover, Nsga2Discover.Nsga2DiscoverSIP,
-             Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP]
+             Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP,
+             RandomTreeDiscover]
 
 
 def exp2(name, repeat_id=1):
