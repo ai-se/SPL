@@ -53,6 +53,9 @@ class RandomTreeDiscover(EADiscover):
         pdb.set_trace()
 
     def __init__(self, feature_model, stat_record_valid_only=True):
+        if type(feature_model) is not FTModelNovelRep:
+            feature_model = FTModelNovelRep(feature_model.name)
+
         super(RandomTreeDiscover, self).__init__(feature_model, stat_record_valid_only)
         toolbox = self.toolbox
         toolbox.unregister("individual")
@@ -92,6 +95,10 @@ class RandomTreeDiscover(EADiscover):
         count_list = [tmp_list.count(i) for i in range(len(self.ft.ft.con))]
         s = sum(count_list)
         weight_list = [i/s for i in count_list]
+        # for i in count_list:
+        #     print '%02d  '% i,
+        # print
+        # pdb.set_trace()
 
         for i in pop:
             l = i.fitness.vioCons
@@ -138,21 +145,20 @@ class RandomTreeDiscover(EADiscover):
 
             pop = parents + offspring
 
+            # if gen%20==0:
+            #     pdb.set_trace()
+
         # stat_parts.pickle_results(self.ft.name, 'rr', parents, logbook)
         return pop, logbook
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
-    for i in range(7,9):
-        name = splot_dict[i]
-        print
-        print
-        print name
-        # name = 'webportal'
-        ed = RandomTreeDiscover(FTModelNovelRep(name))
-        # ed = RandomTreeDiscover(FeatureModel(name))
-        ed.run()
+
+    name = 'eshop'
+    ed = RandomTreeDiscover(FTModelNovelRep(name))
+    # ed = RandomTreeDiscover(FeatureModel(name))
+    ed.run()
 
 if __name__ == '__main__':
     import debug

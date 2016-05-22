@@ -93,11 +93,12 @@ class DimacsModel(object):
                         cores.append(flexible[0]-1)
                     else:
                         deads.append(-flexible[0]-1)
+        return cores, deads, trival_cnfs
 
 
 def demo():
     x = DimacsModel('ecos')
-    x.find_core_dead_features_cnfs()
+    a,b,c = x.find_core_dead_features_cnfs()
     pdb.set_trace()
 
 if __name__ == '__main__':

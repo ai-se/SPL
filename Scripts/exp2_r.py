@@ -114,7 +114,7 @@ def drawing_runtime(name):
         rts.append(rt)
 
     print 'Runtime:'
-    Stat.rdivDemo(rts,higherTheBetter=False)
+    Stat.rdivDemo(rts, higherTheBetter=False)
 
 
 for i in range(8):
