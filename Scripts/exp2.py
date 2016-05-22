@@ -48,7 +48,7 @@ LOGBOOK = dict()
 discovers = [IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
              Nsga2Discover.Nsga2Discover, Nsga2Discover.Nsga2DiscoverSIP,
              Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP,
-             RandomTreeDiscover]
+             RandomTreeDiscover.RandomTreeDiscover]
 
 
 def exp2(name, repeat_id=1):
