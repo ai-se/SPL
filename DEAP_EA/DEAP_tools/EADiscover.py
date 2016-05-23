@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # Copyright (C) 2016, Jianfeng Chen <jchen37@ncsu.edu>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
@@ -90,7 +88,7 @@ class EADiscover(Discoverer):
         self.hof = tools.HallOfFame(300)  # in case we need it
 
         self.ea_configurations = {
-            'NGEN': 101,
+            'NGEN': 501,
             'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,
