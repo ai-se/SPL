@@ -35,10 +35,9 @@ splot_dict = {
     2: "marketplace",
     3: "classicshell",
     4: "carselection",
-    5: "greencar",
-    6: "fmtest",
-    7: "eshop",
-    8: "eis",
+    5: "fmtest",
+    6: "eshop",
+    7: "eis",
 }
 
 
