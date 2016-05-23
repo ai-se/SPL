@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # Copyright (C) 2016, Jianfeng Chen <jchen37@ncsu.edu>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
@@ -42,30 +40,20 @@ from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.SPLOT_dict import first_argv_name, splot_dict
 from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover, RandomTreeDiscover
 from universe import PROJECT_PATH
-from copy import copy
 import pickle
-import pdb
 
-discovers = [IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
+
+discovers = [RandomTreeDiscover.RandomTreeDiscover,
+             IbeaDiscover.IbeaDiscover, IbeaDiscover.IbeaDiscoverSIP,
              Nsga2Discover.Nsga2Discover, Nsga2Discover.Nsga2DiscoverSIP,
-             Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP,
-             RandomTreeDiscover.RandomTreeDiscover]
+             Spea2Discover.Spea2Discover, Spea2Discover.Spea2DiscoverSIP]
+
+LOGBOOK = dict()
 
 
 def exp2(name, repeat_id=1):
-    LOGBOOK = dict()
     LOGBOOK.clear()
     for dis in discovers:
-        # TEMP CODE (RERUN THE IBEA-PEN)
-        if dis != RandomTreeDiscover.RandomTreeDiscover:
-            continue
-        with open('{0}/Records/exp2/{1}.{2}.logbooks'.format(PROJECT_PATH, name, repeat_id), 'r') as f:
-            tmp_logbook = pickle.load(f)
-            del tmp_logbook['IBEA-PEN']
-
-        LOGBOOK = copy(tmp_logbook)
-        # TEMP CODE ENDS...
-
         dis_ins = dis(FeatureModel(name))
         _, logbook = dis_ins.run()
         LOGBOOK[str(dis_ins.alg_name)] = logbook

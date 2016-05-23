@@ -90,7 +90,7 @@ class EADiscover(Discoverer):
         self.hof = tools.HallOfFame(300)  # in case we need it
 
         self.ea_configurations = {
-            'NGEN': 501,
+            'NGEN': 101,
             'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,
