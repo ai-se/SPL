@@ -45,7 +45,7 @@ class EADiscover(Discoverer):
         # check whether 'conVio' set as an objective
         if 'conVio' not in [o.name for o in feature_model.obj]:
             name = feature_model.name
-            self.ft = FeatureModel(name, num_of_attached_objs=len(feature_model) - 2, setConVioAsObj=True)
+            self.ft = FeatureModel(name, num_of_attached_objs=len(feature_model) - 2, add_con_vio_to_objs=True)
         else:
             self.ft = feature_model
 

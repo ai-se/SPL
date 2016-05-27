@@ -29,15 +29,22 @@ import sys
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# splot_dict = {
+#     0: "cellphone",
+#     1: "webportal",
+#     2: "marketplace",
+#     3: "classicshell",
+#     4: "carselection",
+#     5: "fmtest",
+#     6: "eshop",
+#     7: "eis",
+# }
+
 splot_dict = {
     0: "cellphone",
     1: "webportal",
-    2: "marketplace",
-    3: "classicshell",
-    4: "carselection",
-    5: "fmtest",
-    6: "eshop",
-    7: "eis",
+    2: "fmtest",
+    3: "eshop",
 }
 
 

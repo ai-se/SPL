@@ -24,61 +24,30 @@ from __future__ import division
 from os import sys, path
 from operator import itemgetter
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from universe import PROJECT_PATH as spl_addr
+from universe import PROJECT_PATH
+from universe import append_attributes, load_appendix
 from model import *
 from splot_parser import load_ft_url
-import pickle
-import os
-import pdb
-
-
-maximize = False
-minimize = True
-append_attributes = {
-    'cost': (10, 100, minimize),
-    'time': (20, 1000, minimize),
-    'familiarity': (5, 10, maximize),
-    'app1': (0, 10, minimize),
-    'app2': (100, 1000, minimize),
-    'app3': (0, 1, minimize),
-}
 
 
 class FeatureModel(model):
-    def _load_appendix(self, attr_name):
-        subdirectories = os.listdir(spl_addr+'/input')
-        if self.name not in subdirectories:
-            os.mkdir(spl_addr+'/input/'+self.name)
-        data_f = spl_addr + '/input/' + self.name
-
-        try:
-            with open(data_f + '/' + attr_name, 'r') as f:
-                return pickle.load(f)
-        except IOError:  # no such file
-            lower, higher, less_is_more = append_attributes[attr_name]
-            r = random.uniform if higher - lower < 10 else random.randint
-            values = [r(lower, higher) for _ in self.ft.features]
-            with open(data_f + '/' + attr_name, 'w') as f:
-                pickle.dump(values, f)
-            return values
-
-    def __init__(self, name, num_of_attached_objs=3, setConVioAsObj=True):
+    def __init__(self, name, num_of_attached_objs=3, add_con_vio_to_objs=True):
         self.name = name
-        url = spl_addr + '/splot_data/' + self.name + '.xml'
+        url = PROJECT_PATH + '/splot_data/' + self.name + '.xml'
         self.ft = load_ft_url(url)
         self.ft.get_subtree_index_dict()
         self.append_value_dict = dict()
 
         dec = [Has(l.id, 0, 1) for l in self.ft.features]
 
-        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum, goal=lt)]
-        if setConVioAsObj:
+        obj = [Has(name='richness', lo=0, hi=self.ft.featureNum, goal=lt)]
+        if add_con_vio_to_objs:
             obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con)+1, goal=lt))
 
-        attach_attrs = ['cost', 'time', 'familiarity', 'app1', 'app2', 'app3'][:num_of_attached_objs]
+        attach_attrs = ['familiarity', 'defects', 'cost', 'app1', 'app2', 'app3'][:num_of_attached_objs]
         for a in attach_attrs:
-            self.append_value_dict[a] = self._load_appendix(a)
-            g = lt if append_attributes[a][2] else gt
+            self.append_value_dict[a] = load_appendix(self.name, len(self.ft.features), a)
+            g = lt if append_attributes[a][1] else gt
             obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
 
         model.__init__(self, dec, obj)
@@ -329,15 +298,15 @@ class FTModelNovelRep(FeatureModel):
             return res
         return noncore, novel_coding, novel_decoding
 
-    def __init__(self, name, num_of_attached_objs=3, setConVioAsObj=True):
+    def __init__(self, name, num_of_attached_objs=3, add_con_vio_to_objs=True):
         self.name = name
-        url = spl_addr + '/splot_data/' + self.name + '.xml'
+        url = PROJECT_PATH + '/splot_data/' + self.name + '.xml'
         self.ft = load_ft_url(url)
         self.ft.get_subtree_index_dict()
         self.append_value_dict = dict()
 
         obj = [Has(name='fea', lo=0, hi=self.ft.featureNum, goal=lt)]
-        if setConVioAsObj:
+        if add_con_vio_to_objs:
             obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con) + 1, goal=lt))
 
         attach_attrs = ['cost', 'time', 'familiarity', 'app1', 'app2', 'app3'][:num_of_attached_objs]
@@ -393,3 +362,8 @@ class FTModelNovelRep(FeatureModel):
             subroot = self.ft.find_fea_index(self.dec[subroot].name)
         f1, f2 = FeatureModel.swap_tree(self, f1, f2, subroot)
         return P(self.novel_coding(f1)), P(self.novel_coding(f2))
+
+from SPLOT_dict import splot_dict
+for name in splot_dict.values():
+    print FeatureModel(name)
+

@@ -216,7 +216,7 @@ def demo(name):
     import time
     time1 = time.time()
 
-    m = FeatureModel.FeatureModel(name, setConVioAsObj=False)
+    m = FeatureModel.FeatureModel(name, add_con_vio_to_objs=False)
     engine = MutateEngine(m)
     can = engine.gen_valid_one()
     pdb.set_trace()

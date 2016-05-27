@@ -30,16 +30,42 @@ import pdb
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from universe import PROJECT_PATH, load_appendix, append_attributes
+from model import *
 
 
-class DimacsModel(object):
-    def __init__(self, name):
+class DimacsModel(model):
+    def __init__(self, name, num_of_attached_objs=3, add_con_vio_to_objs=True):
         # index in the cnfs are starting at 1!!
         # index in features_names are starting at 0
-        from universe import PROJECT_PATH
+        self.name = name
+
+        # load url
         url = "{0}/dimacs_data/{1}.dimacs".format(PROJECT_PATH, name)
         self.feature_names, self.featureNum, self.cnfs, self.cnfNum = \
             dimacs_parser.load_product_url(url)
+
+        dec = [Has(l, 0, 1) for l in self.feature_names]
+        self.append_value_dict = dict()
+        obj = [Has(name='richness', lo=0, hi=self.featureNum, goal=lt)]
+        if add_con_vio_to_objs:
+            obj.append(Has(name='conVio', lo=0, hi=self.cnfNum, goal=lt))
+
+        attach_attrs = ['familiarity', 'defects', 'cost', 'app1', 'app2', 'app3'][:num_of_attached_objs]
+        for a in attach_attrs:
+            self.append_value_dict[a] = load_appendix(self.name, self.featureNum, a)
+            g = lt if append_attributes[a][1] else gt
+            obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
+
+        model.__init__(self, dec, obj)
+
+    def __repr__(self):
+        return "=====================\n" \
+               "Type: DimacsModel\n" \
+               "Name: {0}\n" \
+               "Feature Number: {1}\n" \
+               "Constraints : {2}\n" \
+               "=====================\n".format(self.name, self.featureNum, self.cnfNum)
 
     def check_cnf(self, cnf_id, lst):
         cnf = self.cnfs[cnf_id]
@@ -97,11 +123,15 @@ class DimacsModel(object):
 
 
 def demo():
-    x = DimacsModel('simple')
+    x = DimacsModel('linux')
+    print(x)
+    exit(0)
     import pycosat
     for i, sol in enumerate(pycosat.itersolve(x.cnfs)):
-        print(sol)
-    pdb.set_trace()
+        print(i)
+        if i > 1000:
+            break
+
     a,b,c = x.find_core_dead_features_cnfs()
 
 if __name__ == '__main__':
