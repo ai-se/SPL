@@ -97,9 +97,12 @@ class DimacsModel(object):
 
 
 def demo():
-    x = DimacsModel('ecos')
-    a,b,c = x.find_core_dead_features_cnfs()
+    x = DimacsModel('simple')
+    import pycosat
+    for i, sol in enumerate(pycosat.itersolve(x.cnfs)):
+        print(sol)
     pdb.set_trace()
+    a,b,c = x.find_core_dead_features_cnfs()
 
 if __name__ == '__main__':
     demo()

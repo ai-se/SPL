@@ -137,5 +137,6 @@ def splot_translate(name):
             f.write(i)
             f.write('\n')
 
-splot_translate('webportal')
-splot_translate('eshop')
+# splot_translate('webportal')
+# splot_translate('eshop')
+splot_translate('simple')
