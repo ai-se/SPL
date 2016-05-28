@@ -31,16 +31,16 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
-from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
-from DEAP_EA.DEAP_tools.EADiscover import EADiscover
+from FeatureModel.FeatureModel import FeatureModel
+from FeatureModel.DEAP_EA.DEAP_tools import EADiscover
+from FeatureModel.DEAP_EA.DEAP_tools import Nsga3Selc
 import DEAP_tools.stat_parts as stat_parts
 import random
-import pdb
 
 
-class Nsga2Discover(EADiscover):
+class Nsga3Discover(EADiscover):
     def __init__(self, feature_model):
-        super(Nsga2Discover, self).__init__(feature_model)
+        super(Nsga3Discover, self).__init__(feature_model)
 
         self.toolbox.register(
             "mate",
@@ -51,28 +51,38 @@ class Nsga2Discover(EADiscover):
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-        self.toolbox.register("env_select", tools.selNSGA2)
-        self.toolbox.register("mate_select", self.binary_tournament_selc)
+        self.toolbox.register("select", Nsga3Selc.sel_nsga_iii)
 
-        self.alg_name = 'NSGA2'
-
-    def run(self, record_hof=False, sip=False):
+    def run(self):
         toolbox = self.toolbox
+        logbook = self.logbook
+        stats = self.stats
 
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
 
         pop = toolbox.population(n=MU)
+
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-        self.record(pop, 0, evals, record_hof)
+
+        ideal_point = Nsga3Selc.find_ideal_point(pop)
+        extremes = Nsga3Selc.find_extreme_points(pop)
+        intercepts = Nsga3Selc.construct_hyperplane(pop, extremes)
+        Nsga3Selc.normalize_objectives(pop, intercepts, ideal_point)
+
+        # rps = Nsga3Selc.generate_reference_points(self.ft.objNum)
+        rps = Nsga3Selc.generate_reference_points(self.ft.objNum, newref=True)
+        Nsga3Selc.associate(pop, rps)
+
+        record = stats.compile(pop)
+        logbook.record(gen=0, evals=evals, **record)
+        print(logbook.stream)
 
         for gen in range(1, NGEN):
-            # print gen
-
             # vary the population
             tools.emo.assignCrowdingDist(pop)
-            offspring = toolbox.mate_select(pop, MU, sip)
+            offspring = tools.selTournamentDCD(pop, len(pop))
             offspring = [toolbox.clone(ind) for ind in offspring]
 
             for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
@@ -83,40 +93,31 @@ class Nsga2Discover(EADiscover):
                 toolbox.mutate(ind2)
                 del ind1.fitness.values, ind2.fitness.values
 
-            _, evals = self.evaluate_pop(offspring)   # Evaluate the offspring with an invalid fitness
+            _, evals = self.evaluate_pop(offspring)  # Evaluate the offspring with an invalid fitness
 
             # Select the next generation population
-            # Select the next generation parents
-            if sip:
-                pop[:] = self.one_plus_n_engine(pop + offspring, MU, toolbox.env_select)
-            else:
-                pop[:] = toolbox.env_select(pop + offspring, MU)
+            pop = toolbox.select(pop + offspring, MU)
+            record = stats.compile(pop)
+            logbook.record(gen=gen, evals=evals, **record)
+            print(logbook.stream)
 
-            self.record(pop, gen, evals, record_hof)
+            if 'last_record_time' not in locals():
+                last_record_time = 0
+            if logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
+                last_record_time = logbook[-1]['timestamp']
+                stat_parts.pickle_results(self.ft.name, 'NSGA3', pop, logbook)
 
-        # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
+        stat_parts.pickle_results(self.ft.name, 'NSGA3', pop, logbook)
 
-        return pop, self.logbook
-
-
-class Nsga2DiscoverSIP(Nsga2Discover):
-    def __init__(self, feature_model):
-        if type(feature_model) is not FTModelNovelRep:
-            feature_model = FTModelNovelRep(feature_model.name)
-        super(Nsga2DiscoverSIP, self).__init__(feature_model)
-        self.alg_name = "NSGA2-SIP"
-
-    def run(self, record_hof=False, sip=True):
-        return super(Nsga2DiscoverSIP, self).run(record_hof, sip=True)
+        return pop, logbook
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import splot_dict
     name = splot_dict[int(sys.argv[1])]
-    ed = Nsga2Discover(FTModelNovelRep(name))
-
-    pop, logbook = ed.run(sip=True)
+    ed = Nsga3Discover(FeatureModel(name))
+    pop, logbook = ed.run()
 
 if __name__ == '__main__':
-    import debug
+    # import debug
     experiment()

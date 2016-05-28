@@ -33,11 +33,10 @@ from deap import base, creator, tools
 from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.discoverer import Discoverer
 from model import *
-import DEAP_EA.DEAP_tools.stat_parts as stat_parts
+import FeatureModel.DEAP_EA.DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pickle
-import pdb
 
 
 class EADiscover(Discoverer):

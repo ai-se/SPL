@@ -31,8 +31,8 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from FeatureModel.FeatureModel import FeatureModel
-from DEAP_EA.DEAP_tools.EADiscover import EADiscover
-from DEAP_EA.DEAP_tools import MoeadSelc
+from FeatureModel.DEAP_EA.DEAP_tools import EADiscover
+from FeatureModel.DEAP_EA.DEAP_tools import MoeadSelc
 import DEAP_tools.stat_parts as stat_parts
 
 
@@ -96,5 +96,4 @@ def experiment():
     pop, logbook = ed.run(one_puls_n=True)
 
 if __name__ == '__main__':
-    import debug
     experiment()

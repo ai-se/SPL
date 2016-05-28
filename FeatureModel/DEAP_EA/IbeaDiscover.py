@@ -26,7 +26,6 @@ from __future__ import division
 
 import os.path
 import sys
-import pickle
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -34,10 +33,9 @@ spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
 from deap import tools
 from deap.algorithms import varAnd
-from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
-from DEAP_EA.DEAP_tools.EADiscover import EADiscover
+from FeatureModel.FeatureModel import FTModelNovelRep
+from FeatureModel.DEAP_EA.DEAP_tools import EADiscover
 from DEAP_tools.IbeaSelc import selIBEAEnvironment
-import DEAP_tools.stat_parts as stat_parts
 import pdb
 
 
@@ -112,5 +110,4 @@ def experiment():
 
 
 if __name__ == '__main__':
-    import debug
     experiment()

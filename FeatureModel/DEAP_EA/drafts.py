@@ -23,21 +23,16 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import tools
-from deap.algorithms import varAnd
-from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
-from DEAP_EA.DEAP_tools.EADiscover import EADiscover
-import DEAP_tools.stat_parts as stat_parts
 import pdb
 import pickle
 from tools.hv import HyperVolume
-from tools.pareto import eps_sort
 
 with open('/Users/jianfeng/git/SPL/input/webportal/6_objs.hof', 'r') as f:
     front_objs = pickle.load(f)

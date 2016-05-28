@@ -31,11 +31,9 @@ sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
-from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
-from DEAP_EA.DEAP_tools.EADiscover import EADiscover
-import DEAP_tools.stat_parts as stat_parts
+from FeatureModel.FeatureModel import FTModelNovelRep
+from FeatureModel.DEAP_EA.DEAP_tools import EADiscover
 import random
-import pdb
 
 
 class Spea2Discover(EADiscover):
@@ -122,5 +120,4 @@ def experiment():
     pop, logbook = ed.run(sip=True)
 
 if __name__ == '__main__':
-    import debug
     experiment()

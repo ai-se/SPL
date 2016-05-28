@@ -21,6 +21,7 @@
 
 
 from __future__ import division
+
 import os.path
 import sys
 
@@ -37,8 +38,9 @@ Repeat: 30
 """
 
 from FeatureModel.FeatureModel import FeatureModel
-from FeatureModel.SPLOT_dict import first_argv_name, splot_dict
-from DEAP_EA import IbeaDiscover, Nsga2Discover, Spea2Discover, RandomTreeDiscover
+from FeatureModel.SPLOT_dict import splot_dict
+from FeatureModel.DEAP_EA import RandomTreeDiscover
+from FeatureModel.DEAP_EA import Spea2Discover, Nsga2Discover, IbeaDiscover
 from universe import PROJECT_PATH
 import pickle
 
