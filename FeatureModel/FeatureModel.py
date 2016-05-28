@@ -96,14 +96,14 @@ class FeatureModel(model):
         candidate.conViolated_index = conViolated_index
 
         for o_name in all_obj_names:
-            if o_name == 'fea' or o_name == 'conVio':
+            if o_name == 'richness' or o_name == 'conVio':
                 continue
 
             total = 0
             for x, f_i in zip(self.append_value_dict[o_name], range(t.featureNum)):
                 if fulfill[f_i] == 1:
                     total += x
-            if not append_attributes[o_name][2]:
+            if not append_attributes[o_name][1]:
                 hi = [o.hi for o in self.obj if o.name == o_name][0]
                 total = hi - total
             candidate.fitness.append(total)
@@ -121,7 +121,7 @@ class FeatureModel(model):
     """
 
     def ok(self, c, con_vio_tol=0):
-        if not hasattr(c, 'snoncores'):
+        if not hasattr(c, 'fitness'):
             self.eval(c)
         elif not c.fitness:
             self.eval(c)
@@ -312,7 +312,7 @@ class FTModelNovelRep(FeatureModel):
         attach_attrs = ['cost', 'time', 'familiarity', 'app1', 'app2', 'app3'][:num_of_attached_objs]
         for a in attach_attrs:
             self.append_value_dict[a] = self._load_appendix(a)
-            g = lt if append_attributes[a][2] else gt
+            g = lt if append_attributes[a][1] else gt
             obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
 
         self.noncore, self.novel_coding, self.novel_decoding = self.coding_func()

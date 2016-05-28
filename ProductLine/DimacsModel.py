@@ -121,12 +121,68 @@ class DimacsModel(model):
                         deads.append(-flexible[0]-1)
         return cores, deads, trival_cnfs
 
+    def eval(self, candidate, doNorm=True, returnFulfill=False, fulfill=None):
+        if not fulfill:
+            fulfill = candidate.decs
+
+        obj1 = self.featureNum - sum(fulfill)  # LESS IS MORE!
+        candidate.fitness = [obj1]
+
+        # cnf violation
+        conVio = self.cnfNum
+        conViolated_index = []
+        for cc_i in range(self.cnfNum):
+            if self.check_cnf(cc_i, fulfill):
+                conVio -= 1
+            else:
+                conViolated_index.append(cc_i)
+
+        all_obj_names = [o.name for o in self.obj]
+        if 'conVio' in all_obj_names:
+            candidate.fitness.append(conVio)
+        candidate.conVio = conVio
+        candidate.conViolated_index = conViolated_index
+
+        for o_name in all_obj_names:
+            if o_name == 'richness' or o_name == 'conVio':
+                continue
+
+            total = 0
+            for x, f_i in zip(self.append_value_dict[o_name], range(self.featureNum)):
+                if fulfill[f_i] == 1:
+                    total += x
+            if not append_attributes[o_name][1]:  # LESS IS MORE!
+                hi = [o.hi for o in self.obj if o.name == o_name][0]
+                total = hi - total
+            candidate.fitness.append(total)
+
+        if doNorm:
+            self.normObjs(candidate)
+
+        if returnFulfill:
+            return fulfill
+        else:
+            return None
+
+    def ok(self, c, con_vio_tol=0):
+        if not hasattr(c, 'fitness'):
+            self.eval(c)
+        elif not c.fitness:
+            self.eval(c)
+
+        return c.conVio <= con_vio_tol
+
 
 def demo():
     x = DimacsModel('linux')
     print(x)
-    exit(0)
     import pycosat
+    can = o()
+    t = pycosat.solve(x.cnfs)
+    t = map(lambda x:int(x>0), t)
+    can.decs = t
+    x.eval(can)
+    pdb.set_trace()
     for i, sol in enumerate(pycosat.itersolve(x.cnfs)):
         print(i)
         if i > 1000:
