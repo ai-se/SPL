@@ -30,46 +30,52 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
 
 from deap import base, creator, tools
-from FeatureModel.FeatureModel import FeatureModel
-from FeatureModel.discoverer import Discoverer
+from ProductLine.DimacsModel import DimacsModel
+from ProductLine.discoverer import Discoverer
 from model import *
-import FeatureModel.DEAP_EA.DEAP_tools.stat_parts as stat_parts
+import DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pickle
 
 
-class EADiscover(Discoverer):
-    def __init__(self, feature_model, stat_record_valid_only=True):
-        # check whether 'conVio' set as an objective
-        if 'conVio' not in [o.name for o in feature_model.obj]:
-            name = feature_model.name
-            self.ft = FeatureModel(name, num_of_attached_objs=len(feature_model) - 2, add_con_vio_to_objs=True)
-        else:
-            self.ft = feature_model
+# TODO unit testing
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
+class EADiscover(Discoverer):
+    def __init__(self, dimacs_model, stat_record_valid_only=True):
+        # check whether 'conVio' set as an objective
+        if 'conVio' not in [o.name for o in dimacs_model.obj]:
+            name = dimacs_model.name
+            self.model = DimacsModel(name, num_of_attached_objs=len(dimacs_model.obj) - 2, add_con_vio_to_objs=True)
+        else:
+            self.model = dimacs_model
+
+        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.model.objNum)
         creator.create("Individual", list, fitness=creator.FitnessMin)
 
         toolbox = base.Toolbox()
 
         toolbox.register("randBin", lambda: int(random.choice([0, 1])))
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.randBin, n=self.ft.decNum)
+        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.randBin, n=self.model.decNum)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         toolbox.register("evaluate", self.eval_func)
 
         stats = tools.Statistics(lambda ind: ind)
 
         """load the optimal in theory (including the not valid individuals)"""
-        if stat_record_valid_only:
-            optimal_record_file = '{0}/input/{1}/{2}_objs.validhof'.format(
-                spl_address, self.ft.name, len(feature_model.obj))
-        else:
-            optimal_record_file = '{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.ft.name, len(feature_model.obj))
+        # TODO ...
+        #
+        # if stat_record_valid_only:
+        #     optimal_record_file = '{0}/input/{1}/{2}_objs.validhof'.format(
+        #         spl_address, self.model.name, len(dimacs_model.obj))
+        # else:
+        #     optimal_record_file = '{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.model.name, len(dimacs_model.obj))
 
-        with open(optimal_record_file, 'r') as f:
-            optimal_in_theory = pickle.load(f)
-            optimal_in_theory = [o for o in optimal_in_theory]
+        # with open(optimal_record_file, 'r') as f:
+        #     optimal_in_theory = pickle.load(f)
+        #     optimal_in_theory = [o for o in optimal_in_theory]
+        optimal_in_theory = None  # TODO ...
+
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
                        optimal_in_theory=optimal_in_theory,
@@ -100,9 +106,9 @@ class EADiscover(Discoverer):
 
     def eval_func(self, dec_l):
         can = o(decs=dec_l)
-        self.ft.eval(can)
-        is_valid_ind = self.ft.ok(can)
-        return tuple(can.fitness), can.conVio, can.conViolated_index, can.correct_ft, is_valid_ind
+        self.model.eval(can)
+        is_valid_ind = self.model.ok(can)
+        return tuple(can.fitness), can.conVio, can.conViolated_index, is_valid_ind
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
@@ -134,8 +140,7 @@ class EADiscover(Discoverer):
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values, ind.fitness.conVio, ind.fitness.vioCons, \
-                ind.fitness.correct_ft, ind.fitness.correct = fit
+            ind.fitness.values, ind.fitness.conVio, ind.fitness.vioCons, ind.fitness.correct = fit
         return pop, len(invalid_ind)
 
     def run(self):
@@ -150,10 +155,10 @@ class EADiscover(Discoverer):
             record = self.stats.compile(pop)
             self.logbook.record(gen=gen, evals=evals, **record)
 
-            print self.logbook.stream
+            print(self.logbook.stream)
 
             if record_hof:
-                with open(spl_address + '/Records/' + self.ft.name + '.hof', 'w') as f:
+                with open(spl_address + '/Records/' + self.model.name + '.hof', 'w') as f:
                     pickle.dump(self.hof, f)
 
         if 'last_record_time' not in locals():
@@ -162,21 +167,3 @@ class EADiscover(Discoverer):
         if self.logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
             last_record_time = self.logbook[-1]['timestamp']
             # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
-
-    @staticmethod
-    def one_plus_n_engine(pop, MU, selector, **kwargs):
-        pop = sorted(pop, key=lambda p: p.fitness.conVio)
-        lst = [p.fitness.conVio for p in pop]
-        max_vio = pop[MU-1].fitness.conVio
-        if len(filter(lambda x: x<=max_vio, lst)) == MU:
-            return pop[0:MU]
-        else:
-            prioritized_select = pop[0:lst.index(max_vio)]
-            secondary = []
-            for l, p in zip(lst, pop):
-                if l == max_vio:
-                    secondary.append(p)
-            secondary = selector(secondary, MU-len(prioritized_select), **kwargs)
-            rst = prioritized_select+secondary
-            random.shuffle(rst)
-            return rst

@@ -21,21 +21,10 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-from abc import ABCMeta, abstractmethod
 
-"""
-Abstract class to define the engine which is for feature model selection
-"""
+from __future__ import division
+import os.path
+import sys
 
-
-class Discoverer:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def __init__(self): pass
-
-    @abstractmethod
-    def gen_valid_one(self): pass
-
-    def run(self):
-        raise NotImplementedError
+sys.dont_write_btyecode = True
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

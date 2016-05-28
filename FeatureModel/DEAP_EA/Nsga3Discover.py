@@ -32,8 +32,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
 from FeatureModel.FeatureModel import FeatureModel
-from FeatureModel.DEAP_EA.DEAP_tools import EADiscover
-from FeatureModel.DEAP_EA.DEAP_tools import Nsga3Selc
+from FeatureModel.DEAP_EA import EADiscover
+from DEAP_tools import Nsga3Selc
 import DEAP_tools.stat_parts as stat_parts
 import random
 

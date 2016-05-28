@@ -21,20 +21,20 @@
 
 
 from __future__ import division
-from operator import itemgetter
+
 import os.path
-import sys
 import random
+import sys
+from operator import itemgetter
 
 sys.dont_write_btyecode = True
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from deap import tools, creator, base
+from deap import tools
 from deap.algorithms import varAnd
-from FeatureModel.FeatureModel import FeatureModel, FTModelNovelRep
+from FeatureModel.FeatureModel import FTModelNovelRep
 from DEAP_tools.IbeaSelc import selIBEAEnvironment
-from DEAP_tools.EADiscover import EADiscover
-from DEAP_tools import stat_parts
+from FeatureModel.DEAP_EA.EADiscover import EADiscover
 import pdb
 
 
@@ -151,13 +151,10 @@ class RandomTreeDiscover(EADiscover):
 
 
 def experiment():
-    from FeatureModel.SPLOT_dict import splot_dict
-
     name = 'eshop'
     ed = RandomTreeDiscover(FTModelNovelRep(name))
     # ed = RandomTreeDiscover(FeatureModel(name))
     ed.run()
 
 if __name__ == '__main__':
-    import debug
     experiment()

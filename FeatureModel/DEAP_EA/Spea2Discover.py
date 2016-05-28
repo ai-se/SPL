@@ -32,7 +32,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from deap import tools
 from FeatureModel.FeatureModel import FTModelNovelRep
-from FeatureModel.DEAP_EA.DEAP_tools import EADiscover
+from FeatureModel.DEAP_EA import EADiscover
 import random
 
 
