@@ -1,5 +1,5 @@
-import numpy as np
-import pdb
+import sys
+
 
 class Node(object):
     def __init__(self, identification, parent=None, node_type='o'):
@@ -84,8 +84,8 @@ class FeatureTree(object):
     def set_features_list(self):
         def setting_feature_list(node):
             if node.node_type == 'g':
-                node.g_u = int(node.g_u) if node.g_u != np.inf else len(node.children)
-                node.g_d = int(node.g_d) if node.g_d != np.inf else len(node.children)
+                node.g_u = int(node.g_u) if node.g_u != sys.maxint else len(node.children)
+                node.g_d = int(node.g_d) if node.g_d != sys.maxint else len(node.children)
                 self.features.append(node)
                 self.groups.append(node)
             if node.node_type != 'g':

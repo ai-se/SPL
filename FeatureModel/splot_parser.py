@@ -1,6 +1,6 @@
 import re
+import sys
 import xml.etree.ElementTree
-import numpy as np
 from Feature_tree import FeatureTree, Node, Constraint
 
 __author__ = "Jianfeng Chen"
@@ -53,7 +53,7 @@ def load_ft_url(url):
             gNode = Node(identification=mg.group(1), parent=layer_dict[layer - 1], node_type='g')
             layer_dict[layer] = gNode
             if mg.group(3) == '*':
-                gNode.g_u = np.inf
+                gNode.g_u = sys.maxint
             else:
                 gNode.g_u = mg.group(3)
             gNode.g_d = mg.group(2)
