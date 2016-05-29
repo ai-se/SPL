@@ -23,14 +23,11 @@
 
 
 from __future__ import division
-import os.path
 import sys
-import pdb
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from FeatureModel.splot_parser import load_ft_url
 from universe import PROJECT_PATH
+
+sys.dont_write_bytecode = True
 
 """
 Translating the SPLOT feature model into dimacs format

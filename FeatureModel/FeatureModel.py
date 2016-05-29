@@ -21,13 +21,14 @@
 
 
 from __future__ import division
-from os import sys, path
 from operator import itemgetter
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from universe import PROJECT_PATH
 from universe import append_attributes, load_appendix
 from model import *
 from splot_parser import load_ft_url
+import sys
+
+sys.dont_write_btyecode = True
 
 
 class FeatureModel(model):

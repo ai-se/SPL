@@ -24,21 +24,19 @@
 
 from __future__ import division
 
-import os.path
-import sys
+from deap import tools
+from deap.algorithms import varAnd
+from FeatureModel.FeatureModel import FTModelNovelRep
+from FeatureModel.FM_EA import EADiscover
+from DEAP_tools.IbeaSelc import selIBEAEnvironment
+import DEAP_tools.stat_parts as stat_parts
 
 sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from deap import tools
-from FeatureModel.FeatureModel import FTModelNovelRep
-from FeatureModel.DEAP_EA import EADiscover
-import random
 
 
-class Spea2Discover(EADiscover):
+class IbeaDiscover(EADiscover):
     def __init__(self, feature_model):
-        super(Spea2Discover, self).__init__(feature_model)
+        super(IbeaDiscover, self).__init__(feature_model)
 
         self.toolbox.register(
             "mate",
@@ -49,75 +47,62 @@ class Spea2Discover(EADiscover):
             self.bit_flip_mutate,
             mutate_rate=self.ea_configurations['MutateRate'])
 
-        self.toolbox.register("env_select", tools.selSPEA2)
-
-        self.toolbox.register("mate_select", self.binary_tournament_selc)
-
-        self.alg_name = 'SPEA2'
+        self.toolbox.register("en_selc", selIBEAEnvironment)
+        self.toolbox.register("mat_selc", self.binary_tournament_selc)
+        self.alg_name = 'IBEA'
 
     def run(self, record_hof=False, sip=False):
         toolbox = self.toolbox
 
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
-        NBAR = self.ea_configurations['SPEAII_archive_size']
+        CXPB = self.ea_configurations['CXPB']
 
         pop = toolbox.population(n=MU)
-        _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
+        _, evals = self.evaluate_pop(pop)
         self.record(pop, 0, evals, record_hof)
 
-        archive = []
+        parents = pop
+
         for gen in range(1, NGEN):
-            # print gen
+            _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
             # environmental selection
             if sip:
-                archive = self.one_plus_n_engine(pop+archive, NBAR, toolbox.env_select)
+                parents = self.one_plus_n_engine(pop, MU, toolbox.en_selc)
             else:
-                archive = toolbox.env_select(pop + archive, k=NBAR)
+                parents = toolbox.en_selc(pop, MU)
+            self.record(parents, gen, evals, record_hof)
 
-            _, evals1 = self.evaluate_pop(archive)  # Evaluate the archive with an invalid fitness
+            mating = toolbox.mat_selc(parents, int(MU), sip)
+            # pdb.set_trace()
+            # Vary the parents
+            offspring = varAnd(mating, toolbox, CXPB, MU)
+            pop = parents + offspring
 
-            # mating selection
-            mating_pool = toolbox.mate_select(archive, MU, sip)
-            offspring_pool = map(toolbox.clone, mating_pool)
-
-            # variation
-            for child1, child2 in zip(offspring_pool[::2], offspring_pool[1::2]):
-                toolbox.mate(child1, child2)
-                del child1.fitness.values
-                del child2.fitness.values
-
-            for mutant in offspring_pool:
-                if random.random() < 0.4:
-                    toolbox.mutate(mutant)
-
-            pop = offspring_pool
-            _, evals2 = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-
-            self.record(archive, gen, evals1+evals2, record_hof)
-
-        # stat_parts.pickle_results(self.ft.name, self.alg_name, archive, self.logbook)
-
+        # stat_parts.pickle_results(self.ft.name, self.alg_name, parents, self.logbook)
         return pop, self.logbook
 
 
-class Spea2DiscoverSIP(Spea2Discover):
+class IbeaDiscoverSIP(IbeaDiscover):
     def __init__(self, feature_model):
         if type(feature_model) is not FTModelNovelRep:
             feature_model = FTModelNovelRep(feature_model.name)
-        super(Spea2DiscoverSIP, self).__init__(feature_model)
-        self.alg_name = "SPEA2-SIP"
+        super(IbeaDiscoverSIP, self).__init__(feature_model)
+        self.alg_name = 'IBEA-SIP'
 
     def run(self, record_hof=False, sip=True):
-        return super(Spea2DiscoverSIP, self).run(record_hof, sip=True)
+        return super(IbeaDiscoverSIP, self).run(record_hof, sip=True)
 
 
 def experiment():
-    from FeatureModel.SPLOT_dict import splot_dict
-    name = splot_dict[int(sys.argv[1])]
-    ed = Spea2Discover(FTModelNovelRep(name, 4),)
-    pop, logbook = ed.run(sip=True)
+    from FeatureModel.SPLOT_dict import first_argv_name
+    name = first_argv_name()
+    ed = IbeaDiscoverSIP(FTModelNovelRep(name))
+    # ed = IbeaDiscover(FeatureModel(name))
+    pop, logbook = ed.run()
+    stat_parts.true_candidate_collector(name, pop)
+
 
 if __name__ == '__main__':
     experiment()

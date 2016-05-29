@@ -22,20 +22,17 @@
 
 from __future__ import division
 
-import os.path
 import random
 import sys
 from operator import itemgetter
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from deap import tools
 from deap.algorithms import varAnd
 from FeatureModel.FeatureModel import FTModelNovelRep
 from DEAP_tools.IbeaSelc import selIBEAEnvironment
-from FeatureModel.DEAP_EA.EADiscover import EADiscover
+from FeatureModel.FM_EA import EADiscover
 import pdb
+
+sys.dont_write_btyecode = True
 
 
 class RandomTreeDiscover(EADiscover):

@@ -24,19 +24,15 @@
 
 from __future__ import division
 
-import os.path
 import sys
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
-
 from deap import tools
 from deap.algorithms import varAnd
 from FeatureModel.FeatureModel import FTModelNovelRep
-from FeatureModel.DEAP_EA import EADiscover
+from ProductLine.DEAP_EA import EADiscover
 from DEAP_tools.IbeaSelc import selIBEAEnvironment
 import pdb
+
+sys.dont_write_bytecode = True
 
 
 class IbeaDiscover(EADiscover):

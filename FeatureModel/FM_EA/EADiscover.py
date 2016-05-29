@@ -22,13 +22,7 @@
 
 from __future__ import division
 
-import os.path
 import sys
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
-
 from deap import base, creator, tools
 from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.discoverer import Discoverer
@@ -37,6 +31,8 @@ import DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pickle
+
+sys.dont_write_btyecode = True
 
 
 class EADiscover(Discoverer):
@@ -93,6 +89,9 @@ class EADiscover(Discoverer):
             'MutateRate': 0.05,
             'SPEAII_archive_size': 100
         }
+
+    def set_ea_gen(self, ngen):
+        self.ea_configurations['NGEN'] = ngen
 
     def gen_valid_one(self):
         assert False, "Do not use this function. Function not provided at this time."

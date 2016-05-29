@@ -1,8 +1,4 @@
-from os import sys, path
-
 from FeatureModel import FeatureModel
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from model import candidate
 
 

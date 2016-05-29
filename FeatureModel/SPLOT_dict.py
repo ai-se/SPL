@@ -23,11 +23,9 @@
 
 
 from __future__ import division
-import os.path
 import sys
 
 sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # splot_dict = {
 #     0: "cellphone",

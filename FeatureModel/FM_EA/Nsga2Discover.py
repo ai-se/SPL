@@ -24,16 +24,13 @@
 
 from __future__ import division
 
-import os.path
 import sys
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from deap import tools
 from FeatureModel.FeatureModel import FTModelNovelRep
-from FeatureModel.DEAP_EA import EADiscover
+from FeatureModel.FM_EA import EADiscover
 import random
+
+sys.dont_write_btyecode = True
 
 
 class Nsga2Discover(EADiscover):

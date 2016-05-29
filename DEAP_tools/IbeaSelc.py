@@ -27,7 +27,6 @@ from __future__ import division
 import numpy as numpy
 import itertools
 import random
-import pdb
 
 
 def selIBEAEnvironment(population, mu, alpha=None, kappa=.05, tournament_n=4):

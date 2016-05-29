@@ -23,34 +23,6 @@
 
 
 from __future__ import division
-
-import os.path
 import sys
 
 sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import pdb
-import pickle
-from tools.hv import HyperVolume
-
-with open('/Users/jianfeng/git/SPL/input/webportal/6_objs.hof', 'r') as f:
-    front_objs = pickle.load(f)
-
-for i in front_objs:
-    del i[1]
-
-# for i in range(len(front_objs)):
-#     for j in range(len(front_objs[i])):
-#         front_objs[i][j] *= 0.8
-
-import random
-random.shuffle(front_objs)
-
-pdb.set_trace()
-front_objs=[[0.1,0.6],[0.2,0.5],[0.3,0.4]]
-
-reference_point = [2] * len(front_objs[0])
-hv = HyperVolume(reference_point).compute(front_objs)  # did NOT use deap module calc
-
-print hv

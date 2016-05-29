@@ -24,16 +24,13 @@
 
 from __future__ import division
 
-import os.path
 import sys
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from FeatureModel.FeatureModel import FeatureModel
-from FeatureModel.DEAP_EA import EADiscover
+from FeatureModel.FM_EA import EADiscover
 from DEAP_tools import MoeadSelc
 import DEAP_tools.stat_parts as stat_parts
+
+sys.dont_write_btyecode = True
 
 
 class MoeadDiscover(EADiscover):

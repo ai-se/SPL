@@ -24,14 +24,12 @@
 
 from __future__ import division
 import dimacs_parser
-import os.path
 import sys
 import pdb
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from universe import PROJECT_PATH, load_appendix, append_attributes
 from model import *
+
+sys.dont_write_bytecode = True
 
 
 class DimacsModel(model):

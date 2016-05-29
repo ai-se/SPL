@@ -24,11 +24,8 @@
 from __future__ import division
 
 import pickle
-from os import sys, path
-from random import choice
 from discoverer import Discoverer
 from FeatureModel import FeatureModel
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from universe import PROJECT_PATH
 
 

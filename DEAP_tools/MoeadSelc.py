@@ -23,16 +23,11 @@
 
 
 from __future__ import division
-import os.path
 import sys
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import copy
-import numpy as np
 from deap import tools
 import random
+
+sys.dont_write_btyecode = True
 
 EPS = 0.000001
 

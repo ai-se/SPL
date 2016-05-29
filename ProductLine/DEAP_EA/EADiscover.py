@@ -22,21 +22,18 @@
 
 from __future__ import division
 
-import os.path
 import sys
-
-sys.dont_write_btyecode = True
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-spl_address = [i for i in sys.path if i.endswith('/SPL')][0]
-
 from deap import base, creator, tools
 from ProductLine.DimacsModel import DimacsModel
 from ProductLine.discoverer import Discoverer
 from model import *
+from universe import PROJECT_PATH
 import DEAP_tools.stat_parts as stat_parts
 import time
 import random
 import pickle
+
+sys.dont_write_btyecode = True
 
 
 # TODO unit testing
@@ -158,7 +155,7 @@ class EADiscover(Discoverer):
             print(self.logbook.stream)
 
             if record_hof:
-                with open(spl_address + '/Records/' + self.model.name + '.hof', 'w') as f:
+                with open(PROJECT_PATH + '/Records/' + self.model.name + '.hof', 'w') as f:
                     pickle.dump(self.hof, f)
 
         if 'last_record_time' not in locals():
