@@ -30,6 +30,7 @@ from FeatureModel.FeatureModel import FTModelNovelRep
 from FeatureModel.FM_EA import EADiscover
 from DEAP_tools.IbeaSelc import selIBEAEnvironment
 import DEAP_tools.stat_parts as stat_parts
+import sys
 
 sys.dont_write_btyecode = True
 
