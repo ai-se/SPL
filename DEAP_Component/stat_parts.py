@@ -63,13 +63,14 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         * frontier_size
         * valid_frontier_size
     """
-    if record_valid_only:
-        pop = filter(lambda p: p.fitness.correct, pop)
-
+    vpop = filter(lambda p: p.fitness.values[1] < 0.001, pop)
     if len(pop) == 0:
         return 0, 0, 0, 0, 0
 
-    front = _get_frontier(pop)
+    if record_valid_only and len(vpop) == 0:
+        return 0, 0, 0, 0, 0
+
+    front = _get_frontier(vpop) if record_valid_only else _get_frontier(pop)
 
     front_objs = [f.fitness.values for f in front]
 
@@ -86,7 +87,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         IGD = convergence(front, optimal_in_theory)
 
     frontier_size = len(front)
-    valid_frontier_size = len([i for i in pop if i.fitness.correct])
+    valid_frontier_size = len(vpop)
 
     return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_frontier_size
 

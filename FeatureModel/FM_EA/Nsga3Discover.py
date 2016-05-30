@@ -28,8 +28,8 @@ import sys
 from deap import tools
 from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.FM_EA.EADiscover import EADiscover
-from DEAP_tools import Nsga3Selc
-import DEAP_tools.stat_parts as stat_parts
+from DEAP_Component import Nsga3Selc
+import DEAP_Component.stat_parts as stat_parts
 import random
 
 sys.dont_write_btyecode = True

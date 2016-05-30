@@ -28,7 +28,7 @@ from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.discoverer import Discoverer
 from model import *
 from universe import PROJECT_PATH as spl_address
-import DEAP_tools.stat_parts as stat_parts
+import DEAP_Component.stat_parts as stat_parts
 import time
 import random
 

@@ -57,7 +57,7 @@ def exp2(name, repeat_id=1):
     LOGBOOK.clear()
     for dis in discovers:
         dis_ins = dis(FeatureModel(name))
-        _, logbook = dis_ins.run()
+        _, logbook = dis_ins.run
         LOGBOOK[str(dis_ins.alg_name)] = logbook
 
         # saving

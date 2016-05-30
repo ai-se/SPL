@@ -28,8 +28,8 @@ from deap import tools
 from deap.algorithms import varAnd
 from FeatureModel.FeatureModel import FTModelNovelRep, FeatureModel
 from FeatureModel.FM_EA.EADiscover import EADiscover
-from DEAP_tools.IbeaSelc import selIBEAEnvironment
-import DEAP_tools.stat_parts as stat_parts
+from DEAP_Component.IbeaSelc import selIBEAEnvironment
+import DEAP_Component.stat_parts as stat_parts
 import pdb
 import sys
 

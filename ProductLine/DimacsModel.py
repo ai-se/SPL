@@ -119,9 +119,12 @@ class DimacsModel(model):
                         deads.append(-flexible[0]-1)
         return cores, deads, trival_cnfs
 
-    def eval(self, candidate, doNorm=True, returnFulfill=False, fulfill=None):
-        if not fulfill:
+    def eval(self, candidate, doNorm=True):
+        if not hasattr(candidate, "fulfill"):
             fulfill = candidate.decs
+        else:
+            fulfill = candidate.decs  # TODO
+        candidate.fulfill = fulfill
 
         obj1 = self.featureNum - sum(fulfill)  # LESS IS MORE!
         candidate.fitness = [obj1]
@@ -157,17 +160,11 @@ class DimacsModel(model):
         if doNorm:
             self.normObjs(candidate)
 
-        if returnFulfill:
-            return fulfill
-        else:
-            return None
-
     def ok(self, c, con_vio_tol=0):
         if not hasattr(c, 'fitness'):
             self.eval(c)
         elif not c.fitness:
             self.eval(c)
-
         return c.conVio <= con_vio_tol
 
 

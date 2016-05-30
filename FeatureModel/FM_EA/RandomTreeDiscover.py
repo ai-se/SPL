@@ -28,7 +28,7 @@ from operator import itemgetter
 from deap import tools
 from deap.algorithms import varAnd
 from FeatureModel.FeatureModel import FTModelNovelRep
-from DEAP_tools.IbeaSelc import selIBEAEnvironment
+from DEAP_Component.IbeaSelc import selIBEAEnvironment
 from FeatureModel.FM_EA.EADiscover import EADiscover
 import pdb
 

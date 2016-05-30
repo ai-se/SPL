@@ -27,11 +27,10 @@ from deap import base, creator, tools
 from ProductLine.DimacsModel import DimacsModel
 from ProductLine.discoverer import Discoverer
 from model import *
-from universe import PROJECT_PATH
-import DEAP_tools.stat_parts as stat_parts
+import DEAP_Component.stat_parts as stat_parts
 import time
 import random
-import pickle
+import pdb
 
 sys.dont_write_btyecode = True
 
@@ -59,23 +58,8 @@ class EADiscover(Discoverer):
 
         stats = tools.Statistics(lambda ind: ind)
 
-        """load the optimal in theory (including the not valid individuals)"""
-        # TODO ...
-        #
-        # if stat_record_valid_only:
-        #     optimal_record_file = '{0}/input/{1}/{2}_objs.validhof'.format(
-        #         spl_address, self.model.name, len(dimacs_model.obj))
-        # else:
-        #     optimal_record_file = '{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.model.name, len(dimacs_model.obj))
-
-        # with open(optimal_record_file, 'r') as f:
-        #     optimal_in_theory = pickle.load(f)
-        #     optimal_in_theory = [o for o in optimal_in_theory]
-        optimal_in_theory = None  # TODO ...
-
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
-                       optimal_in_theory=optimal_in_theory,
                        record_valid_only=stat_record_valid_only)
 
         stats.register("timestamp", stat_parts.timestamp, t=time.time())
@@ -90,7 +74,7 @@ class EADiscover(Discoverer):
         self.hof = tools.HallOfFame(300)  # in case we need it
 
         self.ea_configurations = {
-            'NGEN': 501,
+            'NGEN': 2000,
             'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,
@@ -101,11 +85,12 @@ class EADiscover(Discoverer):
         assert False, "Do not use this function. Function not provided at this time."
         pass
 
-    def eval_func(self, dec_l):
-        can = o(decs=dec_l)
+    def eval_func(self, ind):
+        can = o(decs=ind)
         self.model.eval(can)
-        is_valid_ind = self.model.ok(can)
-        return tuple(can.fitness), can.conVio, can.conViolated_index, is_valid_ind
+        ind.fitness.conVio = can.conVio
+        ind.fitness.correct = self.model.ok(can)
+        return tuple(can.fitness)
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
@@ -116,17 +101,14 @@ class EADiscover(Discoverer):
         return individual,
 
     @staticmethod
-    def binary_tournament_selc(population, return_size, sip=False):
+    def binary_tournament_selc(population, return_size):
         import random
         parents = []
         for _ in xrange(return_size):
             # Pick individuals for tournament
             tournament = [random.choice(population) for _ in range(2)]
             # Sort according to fitness
-            if sip:
-                tournament.sort(key=lambda ind: (ind.fitness.conVio, ind.fitness))
-            else:
-                tournament.sort()
+            tournament.sort()
             # Winner is element with smallest fitness
             parents.append(tournament[0])
 
@@ -135,32 +117,17 @@ class EADiscover(Discoverer):
     def evaluate_pop(self, pop):
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values, ind.fitness.conVio, ind.fitness.vioCons, ind.fitness.correct = fit
+        for i in invalid_ind:
+            self.eval_func(i)
         return pop, len(invalid_ind)
 
     def run(self):
         raise NotImplementedError
 
-    def record(self, pop, gen, evals, record_hof):
-        if record_hof:
-            self.hof.update(pop)
-
+    def record(self, pop, gen, evals):
         # Update the statistics with the new population
         if gen % 100 == 0:
             record = self.stats.compile(pop)
             self.logbook.record(gen=gen, evals=evals, **record)
 
             print(self.logbook.stream)
-
-            if record_hof:
-                with open(PROJECT_PATH + '/Records/' + self.model.name + '.hof', 'w') as f:
-                    pickle.dump(self.hof, f)
-
-        if 'last_record_time' not in locals():
-            last_record_time = 0
-
-        if self.logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-            last_record_time = self.logbook[-1]['timestamp']
-            # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
