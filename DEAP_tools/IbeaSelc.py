@@ -29,7 +29,7 @@ import itertools
 import random
 
 
-def selIBEAEnvironment(population, mu, alpha=None, kappa=.05, tournament_n=4):
+def selIBEAEnvironment(population, mu, alpha=None, kappa=.05, tournament_n=2):
     """IBEA Selector"""
     if alpha is None:
         alpha = mu
@@ -55,11 +55,11 @@ def selIBEAEnvironment(population, mu, alpha=None, kappa=.05, tournament_n=4):
 
     # Do the environmental selection
     population[:] = _environmental_selection(population, alpha)
-    # pdb.set_trace()
-    # Select the parents in a tournament
-    # parents = _mating_selection(population, mu, tournament_n)
 
-    return population
+    # Select the parents in a tournament
+    parents = _mating_selection(population, mu, tournament_n)
+
+    return parents
 
 
 def _calc_box_bounds(population_matrix):

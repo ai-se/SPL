@@ -27,7 +27,7 @@ from __future__ import division
 import sys
 from deap import tools
 from FeatureModel.FeatureModel import FTModelNovelRep
-from FeatureModel.FM_EA import EADiscover
+from FeatureModel.FM_EA.EADiscover import EADiscover
 import random
 
 sys.dont_write_btyecode = True

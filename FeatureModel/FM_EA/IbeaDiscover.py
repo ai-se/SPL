@@ -26,10 +26,11 @@ from __future__ import division
 
 from deap import tools
 from deap.algorithms import varAnd
-from FeatureModel.FeatureModel import FTModelNovelRep
-from FeatureModel.FM_EA import EADiscover
+from FeatureModel.FeatureModel import FTModelNovelRep, FeatureModel
+from FeatureModel.FM_EA.EADiscover import EADiscover
 from DEAP_tools.IbeaSelc import selIBEAEnvironment
 import DEAP_tools.stat_parts as stat_parts
+import pdb
 import sys
 
 sys.dont_write_btyecode = True
@@ -37,11 +38,11 @@ sys.dont_write_btyecode = True
 
 class IbeaDiscover(EADiscover):
     def __init__(self, feature_model):
-        super(IbeaDiscover, self).__init__(feature_model)
+        super(IbeaDiscover, self).__init__(feature_model=feature_model)
 
         self.toolbox.register(
             "mate",
-            tools.cxTwoPoint)
+            tools.cxOnePoint)
 
         self.toolbox.register(
             "mutate",
@@ -52,7 +53,7 @@ class IbeaDiscover(EADiscover):
         self.toolbox.register("mat_selc", self.binary_tournament_selc)
         self.alg_name = 'IBEA'
 
-    def run(self, record_hof=False, sip=False):
+    def run(self):
         toolbox = self.toolbox
 
         NGEN = self.ea_configurations['NGEN']
@@ -61,46 +62,42 @@ class IbeaDiscover(EADiscover):
 
         pop = toolbox.population(n=MU)
         _, evals = self.evaluate_pop(pop)
-        self.record(pop, 0, evals, record_hof)
-
-        parents = pop
 
         for gen in range(1, NGEN):
             _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
 
             # environmental selection
-            if sip:
-                parents = self.one_plus_n_engine(pop, MU, toolbox.en_selc)
-            else:
-                parents = toolbox.en_selc(pop, MU)
-            self.record(parents, gen, evals, record_hof)
+            parents = toolbox.en_selc(pop, MU)
+            self.record(parents, gen, evals)
 
-            mating = toolbox.mat_selc(parents, int(MU), sip)
-            # pdb.set_trace()
+            if gen == NGEN - 1:
+                pop = parents
+                return pop, self.logbook
+
+            mating = toolbox.mat_selc(parents, int(MU))
+
             # Vary the parents
             offspring = varAnd(mating, toolbox, CXPB, MU)
             pop = parents + offspring
 
-        # stat_parts.pickle_results(self.ft.name, self.alg_name, parents, self.logbook)
-        return pop, self.logbook
 
-
-class IbeaDiscoverSIP(IbeaDiscover):
-    def __init__(self, feature_model):
-        if type(feature_model) is not FTModelNovelRep:
-            feature_model = FTModelNovelRep(feature_model.name)
-        super(IbeaDiscoverSIP, self).__init__(feature_model)
-        self.alg_name = 'IBEA-SIP'
-
-    def run(self, record_hof=False, sip=True):
-        return super(IbeaDiscoverSIP, self).run(record_hof, sip=True)
+# class IbeaDiscoverSIP(IbeaDiscover):
+#     def __init__(self, feature_model):
+#         if type(feature_model) is not FTModelNovelRep:
+#             feature_model = FTModelNovelRep(feature_model.name)
+#         super(IbeaDiscoverSIP, self).__init__(feature_model)
+#         self.alg_name = 'IBEA-SIP'
+#
+#     def run(self, record_hof=False, sip=True):
+#         return super(IbeaDiscoverSIP, self).run(record_hof, sip=True)
 
 
 def experiment():
     from FeatureModel.SPLOT_dict import first_argv_name
     name = first_argv_name()
-    ed = IbeaDiscoverSIP(FTModelNovelRep(name))
-    # ed = IbeaDiscover(FeatureModel(name))
+    print(name)
+    # ed = IbeaDiscoverSIP(FTModelNovelRep(name))
+    ed = IbeaDiscover(FeatureModel(name))
     pop, logbook = ed.run()
     stat_parts.true_candidate_collector(name, pop)
 

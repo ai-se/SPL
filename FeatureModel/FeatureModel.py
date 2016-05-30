@@ -63,10 +63,11 @@ class FeatureModel(model):
         s += '\n'
         return s
 
-    def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False, fulfill=None):
+    def eval(self, candidate, doNorm=True, returnFulfill=False, checkTreeStructure=False):
         t = self.ft  # abbr.
-        if not fulfill:
-            fulfill = candidate.decs
+        if not hasattr(candidate, 'fulfill'):
+            candidate.fulfill = candidate.decs
+        fulfill = candidate.fulfill
 
         obj1 = len(t.features) - sum(fulfill)  # LESS IS MORE!
         candidate.fitness = [obj1]
@@ -306,13 +307,13 @@ class FTModelNovelRep(FeatureModel):
         self.ft.get_subtree_index_dict()
         self.append_value_dict = dict()
 
-        obj = [Has(name='fea', lo=0, hi=self.ft.featureNum, goal=lt)]
+        obj = [Has(name='richness', lo=0, hi=self.ft.featureNum, goal=lt)]
         if add_con_vio_to_objs:
             obj.append(Has(name='conVio', lo=0, hi=len(self.ft.con) + 1, goal=lt))
 
-        attach_attrs = ['cost', 'time', 'familiarity', 'app1', 'app2', 'app3'][:num_of_attached_objs]
+        attach_attrs = ['familiarity', 'defects', 'cost', 'app1', 'app2', 'app3'][:num_of_attached_objs]
         for a in attach_attrs:
-            self.append_value_dict[a] = self._load_appendix(a)
+            self.append_value_dict[a] = load_appendix(self.name, self.ft.featureNum, a)
             g = lt if append_attributes[a][1] else gt
             obj.append(Has(name=a, lo=0, hi=sum(self.append_value_dict[a]), goal=g))
 
@@ -325,7 +326,7 @@ class FTModelNovelRep(FeatureModel):
         if not fulfill:
             fulfill = self.novel_decoding(candidate.decs)
             candidate.fulfill = fulfill
-        return FeatureModel.eval(self, candidate, doNorm, returnFulfill, checkTreeStructure, fulfill)
+        return FeatureModel.eval(self, candidate, doNorm, returnFulfill, checkTreeStructure)
 
     def genRandomCan(self, engine_version):
         raise NotImplementedError
@@ -363,8 +364,3 @@ class FTModelNovelRep(FeatureModel):
             subroot = self.ft.find_fea_index(self.dec[subroot].name)
         f1, f2 = FeatureModel.swap_tree(self, f1, f2, subroot)
         return P(self.novel_coding(f1)), P(self.novel_coding(f2))
-
-from SPLOT_dict import splot_dict
-for name in splot_dict.values():
-    print FeatureModel(name)
-

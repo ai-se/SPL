@@ -26,7 +26,7 @@ from __future__ import division
 
 import sys
 from FeatureModel.FeatureModel import FeatureModel
-from FeatureModel.FM_EA import EADiscover
+from FeatureModel.FM_EA.EADiscover import EADiscover
 from DEAP_tools import MoeadSelc
 import DEAP_tools.stat_parts as stat_parts
 

@@ -28,7 +28,7 @@ Abstract class to define the engine which is for feature model selection
 """
 
 
-class Discoverer:
+class Discoverer(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod

@@ -25,7 +25,9 @@
 from __future__ import division
 from deap.tools.emo import sortNondominated
 from deap.benchmarks.tools import diversity, convergence
+import pdb
 import sys
+import os
 import pickle
 import time
 from tools.hv import HyperVolume
@@ -78,7 +80,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     first, last = sort_front_by_obj0[0], sort_front_by_obj0[-1]
     spread = diversity(front, first, last)
 
-    if optimal_in_theory == 'None':  # not available!!
+    if optimal_in_theory is None:  # not available!!
         IGD = -1
     else:
         IGD = convergence(front, optimal_in_theory)
@@ -105,18 +107,21 @@ def pickle_results(model_name, alg_name, pop, logbook):
 
 
 def true_candidate_collector(model_name, pop):
-    archives_file_name = '{0}/input/{1}.true_can.txt'.format(project_path, model_name)
+    archives_file_name = '{0}/input/{1}/true_can_archives.txt'.format(project_path, model_name)
     valid_pop = filter(lambda p: p.fitness.correct, pop)
+    existed = []
+    if os.path.isfile(archives_file_name):  # fetch the exist candidates. avoid repeat recording
+        with open(archives_file_name, 'r') as f:
+            lines = f.readlines()
+            for l in lines:
+                existed.append(map(int, l.strip().split(' ')))
 
     with open(archives_file_name, 'a') as f:
-        existed = []
-        for i in f.readline():
-            existed.append(i)
-
         toadd = []
         for p in valid_pop:
-            if p not in existed:
-                toadd.append(p)
+            if p.fulfill not in existed:
+                toadd.append(p.fulfill)
 
-        import pdb
-        pdb.set_trace()
+        for item in toadd:
+            f.write(' '.join(map(str, item)))
+            f.write('\n')

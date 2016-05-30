@@ -27,10 +27,10 @@ from deap import base, creator, tools
 from FeatureModel.FeatureModel import FeatureModel
 from FeatureModel.discoverer import Discoverer
 from model import *
+from universe import PROJECT_PATH as spl_address
 import DEAP_tools.stat_parts as stat_parts
 import time
 import random
-import pickle
 
 sys.dont_write_btyecode = True
 
@@ -63,9 +63,10 @@ class EADiscover(Discoverer):
         else:
             optimal_record_file = '{0}/input/{1}/{2}_objs.hof'.format(spl_address, self.ft.name, len(feature_model.obj))
 
-        with open(optimal_record_file, 'r') as f:
-            optimal_in_theory = pickle.load(f)
-            optimal_in_theory = [o for o in optimal_in_theory]
+        # with open(optimal_record_file, 'r') as f:
+        #     optimal_in_theory = pickle.load(f)
+        #     optimal_in_theory = [o for o in optimal_in_theory]
+        optimal_in_theory = None  # TODO ...
         stats.register("hv|spread|igd|frontier#|valid#",
                        stat_parts.stat_basing_on_pop,
                        optimal_in_theory=optimal_in_theory,
@@ -97,11 +98,17 @@ class EADiscover(Discoverer):
         assert False, "Do not use this function. Function not provided at this time."
         pass
 
-    def eval_func(self, dec_l):
-        can = o(decs=dec_l)
+    def eval_func(self, individual):
+        can = o(decs=individual)
         self.ft.eval(can)
+
         is_valid_ind = self.ft.ok(can)
-        return tuple(can.fitness), can.conVio, can.conViolated_index, can.correct_ft, is_valid_ind
+        individual.fitness.values = tuple(can.fitness)
+        individual.fitness.conVio = can.conVio
+        individual.fitness.vioCons = can.conViolated_index
+        individual.fitness.correct = is_valid_ind
+        individual.fitness.correct_ft = can.correct_ft
+        individual.fulfill = can.fulfill
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
@@ -129,38 +136,19 @@ class EADiscover(Discoverer):
         return parents
 
     def evaluate_pop(self, pop):
-        # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values, ind.fitness.conVio, ind.fitness.vioCons, \
-                ind.fitness.correct_ft, ind.fitness.correct = fit
+        for i in invalid_ind:  # Evaluate the individuals with an invalid fitness
+            self.toolbox.evaluate(i)
         return pop, len(invalid_ind)
 
     def run(self):
         raise NotImplementedError
 
-    def record(self, pop, gen, evals, record_hof):
-        if record_hof:
-            self.hof.update(pop)
-
-        # Update the statistics with the new population
+    def record(self, pop, gen, evals):
         if gen % 100 == 0:
             record = self.stats.compile(pop)
             self.logbook.record(gen=gen, evals=evals, **record)
-
-            print self.logbook.stream
-
-            if record_hof:
-                with open(spl_address + '/Records/' + self.ft.name + '.hof', 'w') as f:
-                    pickle.dump(self.hof, f)
-
-        if 'last_record_time' not in locals():
-            last_record_time = 0
-
-        if self.logbook[-1]['timestamp'] - last_record_time > 600:  # record the logbook every 10 mins
-            last_record_time = self.logbook[-1]['timestamp']
-            # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
+            print(self.logbook.stream)
 
     @staticmethod
     def one_plus_n_engine(pop, MU, selector, **kwargs):
