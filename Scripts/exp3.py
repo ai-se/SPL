@@ -44,7 +44,7 @@ def exp3(repeat_id=1):
     model = DimacsModel(name, reducedDec=True)
     ed = IbeaDiscover(model)
     ed.set_ea_gen(500000)
-    pop, logbook = ed.run()
+    pop, logbook = ed.run
 
     with open('{0}/Records/exp3/eshop_IBEA_50M.{2}.logbook'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
         pickle.dump(logbook, f)

@@ -41,17 +41,19 @@ date: 05-31-16
 
 
 def exp4(repeat_id=1):
-    names = ['webportal', 'fmtest', 'simple']
+    names = ['webportal', 'cellphone', 'simple']
     for name in names:
         model = DimacsModel(name, reducedDec=True)
         ed = IbeaDiscover(model)
         ed.set_ea_gen(500)
-        pop, logbook = ed.run()
+        pop, logbook = ed.run
 
+        # pop, logbook = ed.run()
         with open('{0}/Records/exp4/{1}_IBEA_50k.{2}.logbook'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
             pickle.dump(logbook, f)
 
         with open('{0}/Records/exp4/{1}_IBEA_50k.{2}.pop'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
             pickle.dump(pop, f)
 
+import debug
 exp4(repeat_id=int(sys.argv[1]))

@@ -136,4 +136,4 @@ def splot_translate(name):
 
 # splot_translate('webportal')
 # splot_translate('eshop')
-splot_translate('simple')
+splot_translate('cellphone')

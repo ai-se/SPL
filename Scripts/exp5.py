@@ -47,7 +47,7 @@ def exp5(repeat_id=1):
         model = DimacsModel(name, reducedDec=True)
         ed = Nsga2Discover(model)
         ed.set_ea_gen(500)
-        pop, logbook = ed.run()
+        pop, logbook = ed.run
 
         with open('{0}/Records/exp4/{1}_NSGA2_50k.{2}.logbook'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
             pickle.dump(logbook, f)
