@@ -44,8 +44,8 @@ class EADiscover(Discoverer):
         else:
             self.ft = feature_model
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum)
-        creator.create("Individual", list, fitness=creator.FitnessMin)
+        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.ft.objNum, correct=bool)
+        creator.create("Individual", list, fitness=creator.FitnessMin, fulfill=list)
 
         toolbox = base.Toolbox()
 

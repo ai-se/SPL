@@ -92,9 +92,6 @@ class IbeaDiscover(EADiscover):
             fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
             for ind, fit in zip(invalid_ind, fitnesses):
                 ind.fitness.values = fit
-            for rr in offspring: # TODO emergency bug!!
-                if not hasattr(rr.fitness, 'correct') and rr in invalid_ind:
-                    pdb.set_trace()
 
             # Update the hall of fame with the generated individuals
             if halloffame is not None:
@@ -108,6 +105,7 @@ class IbeaDiscover(EADiscover):
             logbook.record(gen=gen, nevals=len(invalid_ind), **record)
             if verbose:
                 print(logbook.stream)
+
         return population, logbook
 
     @property
@@ -119,7 +117,7 @@ class IbeaDiscover(EADiscover):
 
         pop = toolbox.population(n=MU)
 
-        pop, logbook = self.eaAlphaMuPlusLambda(pop, toolbox,
+        pop, logbook = algorithms.eaAlphaMuPlusLambda(pop, toolbox,
                                        MU, None, CXPB, 1.0 - CXPB, NGEN, self.stats)
         true_candidate_collector(self.model.name, pop)
         return pop, logbook

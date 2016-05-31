@@ -63,7 +63,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         * frontier_size
         * valid_frontier_size
     """
-    vpop = filter(lambda p: p.fitness.values[1] < 0.001, pop)
+    vpop = filter(lambda p: p.fitness.correct, pop)
     if len(pop) == 0:
         return 0, 0, 0, 0, 0
 
