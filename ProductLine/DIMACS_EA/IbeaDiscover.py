@@ -26,7 +26,8 @@ from __future__ import print_function
 from __future__ import division
 
 import sys
-from deap import tools, algorithms
+from deap import tools
+from DEAP_Component import algorithms
 from ProductLine.DimacsModel import DimacsModel
 from ProductLine.DIMACS_EA.EADiscover import EADiscover
 from DEAP_Component.IbeaSelc import selIBEAEnvironment
@@ -46,67 +47,10 @@ class IbeaDiscover(EADiscover):
 
         self.toolbox.register(
             "mutate",
-            self.bit_flip_mutate,
-            mutate_rate=self.ea_configurations['MutateRate'])
+            self.bit_flip_mutate)
 
         self.toolbox.register("select", selIBEAEnvironment)
         self.alg_name = 'IBEA'
-
-    @staticmethod
-    def eaAlphaMuPlusLambda(population, toolbox, mu, _,
-                            cxpb, mutpb, ngen, stats=None, halloffame=None,
-                            verbose=__debug__):
-
-        """This is the :math:`(~\alpha,\mu~,~\lambda)` evolutionary algorithm."""
-        logbook = tools.Logbook()
-        logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
-
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in population if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
-
-        if halloffame is not None:
-            halloffame.update(population)
-
-        record = stats.compile(population) if stats is not None else {}
-        logbook.record(gen=0, nevals=len(invalid_ind), **record)
-        if verbose:
-            print(logbook.stream)
-
-        parents = population[:]
-
-        # Begin the generational process
-        for gen in range(1, ngen + 1):
-            # Vary the parents
-            if hasattr(toolbox, 'variate'):
-                offspring = toolbox.variate(parents, toolbox, cxpb, mutpb)
-            else:
-                offspring = algorithms.varAnd(parents, toolbox, cxpb, mutpb)
-
-            population[:] = parents + offspring
-
-            # Evaluate the individuals with an invalid fitness
-            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
-
-            # Update the hall of fame with the generated individuals
-            if halloffame is not None:
-                halloffame.update(offspring)
-
-            # Select the next generation parents
-            parents[:] = toolbox.select(population, mu)
-
-            # Update the statistics with the new population
-            record = stats.compile(population) if stats is not None else {}
-            logbook.record(gen=gen, nevals=len(invalid_ind), **record)
-            if verbose:
-                print(logbook.stream)
-
-        return population, logbook
 
     @property
     def run(self):
@@ -114,11 +58,12 @@ class IbeaDiscover(EADiscover):
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
+        MUPB = self.ea_configurations['MutateRate']
 
         pop = toolbox.population(n=MU)
 
         pop, logbook = algorithms.eaAlphaMuPlusLambda(pop, toolbox,
-                                       MU, None, CXPB, 1.0 - CXPB, NGEN, self.stats)
+                                       MU, None, CXPB, MUPB, NGEN, self.stats, verbose=True, fastrecord=100)
         true_candidate_collector(self.model.name, pop)
         return pop, logbook
 

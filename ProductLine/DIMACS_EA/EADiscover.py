@@ -35,8 +35,6 @@ import pdb
 sys.dont_write_btyecode = True
 
 
-# TODO unit testing
-
 class EADiscover(Discoverer):
     def __init__(self, dimacs_model, stat_record_valid_only=True):
         # check whether 'conVio' set as an objective
@@ -46,7 +44,7 @@ class EADiscover(Discoverer):
         else:
             self.model = dimacs_model
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.model.objNum, correct=bool)
+        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * self.model.objNum, correct=bool, conVio=list)
         creator.create("Individual", list, fitness=creator.FitnessMin, fulfill=list)
 
         toolbox = base.Toolbox()
@@ -97,11 +95,12 @@ class EADiscover(Discoverer):
         return tuple(can.fitness)
 
     @staticmethod
-    def bit_flip_mutate(individual, mutate_rate):
-        for i in range(len(individual)):
-            if random.random() < mutate_rate:
-                individual[i] = 1 - individual[i]
-                del individual.fitness.values
+    def bit_flip_mutate(individual):
+        # modification log -- not use the mutateRate parameter. just select one bit and flip that
+        n = len(individual)
+        i = random.randint(0, n-1)
+        individual[i] = 1 - individual[i]
+        del individual.fitness.values
         return individual,
 
     @staticmethod
@@ -128,10 +127,7 @@ class EADiscover(Discoverer):
     def run(self):
         raise NotImplementedError
 
-    def record(self, pop, gen, evals):
-        # Update the statistics with the new population
-        if gen % 100 == 0:
-            record = self.stats.compile(pop)
-            self.logbook.record(gen=gen, evals=evals, **record)
-
-            print(self.logbook.stream)
+    def record(self, pop):
+        record = self.stats.compile(pop)
+        self.logbook.record(**record)
+        print(self.logbook.stream)
