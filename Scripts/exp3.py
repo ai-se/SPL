@@ -25,6 +25,8 @@
 from __future__ import division
 import sys
 import pickle
+import sys
+sys.path.insert(0, "/share/jchen37/SPL")
 from ProductLine.DIMACS_EA.IbeaDiscover import IbeaDiscover
 from ProductLine.DimacsModel import DimacsModel
 from universe import PROJECT_PATH
