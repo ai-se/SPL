@@ -121,7 +121,7 @@ class EADiscover(Discoverer):
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         for i in invalid_ind:
-            self.eval_func(i)
+            i.fitness.values = self.eval_func(i)
         return pop, len(invalid_ind)
 
     def run(self):

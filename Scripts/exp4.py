@@ -40,7 +40,7 @@ date: 05-31-16
 """
 
 
-def exp3(repeat_id=1):
+def exp4(repeat_id=1):
     names = ['webportal', 'fmtest', 'simple']
     for name in names:
         model = DimacsModel(name, reducedDec=True)
@@ -54,4 +54,4 @@ def exp3(repeat_id=1):
         with open('{0}/Records/exp4/{1}_IBEA_50k.{2}.pop'.format(PROJECT_PATH, name, repeat_id), 'w') as f:
             pickle.dump(pop, f)
 
-exp3(repeat_id=int(sys.argv[1]))
+exp4(repeat_id=int(sys.argv[1]))
