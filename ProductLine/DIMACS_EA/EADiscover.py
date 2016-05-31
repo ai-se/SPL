@@ -74,12 +74,15 @@ class EADiscover(Discoverer):
         self.hof = tools.HallOfFame(300)  # in case we need it
 
         self.ea_configurations = {
-            'NGEN': 2000,
+            'NGEN': 500,
             'MU': 100,
             'CXPB': 0.9,
             'MutateRate': 0.05,
             'SPEAII_archive_size': 100
         }
+
+    def set_ea_gen(self, ngen):
+        self.ea_configurations['NGEN'] = ngen
 
     def gen_valid_one(self):
         assert False, "Do not use this function. Function not provided at this time."
@@ -88,13 +91,14 @@ class EADiscover(Discoverer):
     def eval_func(self, ind):
         can = o(decs=ind)
         self.model.eval(can)
+        ind.fulfill = can.fulfill
         ind.fitness.conVio = can.conVio
         ind.fitness.correct = self.model.ok(can)
         return tuple(can.fitness)
 
     @staticmethod
     def bit_flip_mutate(individual, mutate_rate):
-        for i in xrange(len(individual)):
+        for i in range(len(individual)):
             if random.random() < mutate_rate:
                 individual[i] = 1 - individual[i]
                 del individual.fitness.values
@@ -104,7 +108,7 @@ class EADiscover(Discoverer):
     def binary_tournament_selc(population, return_size):
         import random
         parents = []
-        for _ in xrange(return_size):
+        for _ in range(return_size):
             # Pick individuals for tournament
             tournament = [random.choice(population) for _ in range(2)]
             # Sort according to fitness

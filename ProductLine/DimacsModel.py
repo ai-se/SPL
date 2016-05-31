@@ -33,17 +33,24 @@ sys.dont_write_bytecode = True
 
 
 class DimacsModel(model):
-    def __init__(self, name, num_of_attached_objs=3, add_con_vio_to_objs=True):
+    def __init__(self, name, num_of_attached_objs=3, add_con_vio_to_objs=True, reducedDec=False):
         # index in the cnfs are starting at 1!!
         # index in features_names are starting at 0
         self.name = name
+        self.reducedDec = reducedDec
 
         # load url
         url = "{0}/dimacs_data/{1}.dimacs".format(PROJECT_PATH, name)
         self.feature_names, self.featureNum, self.cnfs, self.cnfNum = \
             dimacs_parser.load_product_url(url)
 
-        dec = [Has(l, 0, 1) for l in self.feature_names]
+        if reducedDec:
+            self.cores, self.deads, trival_cnfs = self.find_core_dead_features_cnfs()
+            dec = [Has(l, 0, 1) for i, l in enumerate(self.feature_names) if i not in self.cores+self.deads]
+            self.decode = self.decode_func()
+        else:
+            dec = [Has(l, 0, 1) for l in self.feature_names]
+
         self.append_value_dict = dict()
         obj = [Has(name='richness', lo=0, hi=self.featureNum, goal=lt)]
         if add_con_vio_to_objs:
@@ -77,6 +84,23 @@ class DimacsModel(model):
             if not self.check_cnf(i, lst):
                 return False
         return True
+
+    def decode_func(self):
+        def _decode(l):  # SIMPLE->FULFILL
+            res = [-1] * self.featureNum
+            for i in self.cores:
+                res[i] = 1
+            for i in self.deads:
+                res[i] = 0
+
+            pointer = 0
+            for i in range(len(res)):
+                if res[i] != -1:
+                    continue
+                res[i] = l[pointer]
+                pointer += 1
+            return res
+        return _decode
 
     def find_core_dead_features_cnfs(self):
         """
@@ -120,10 +144,10 @@ class DimacsModel(model):
         return cores, deads, trival_cnfs
 
     def eval(self, candidate, doNorm=True):
-        if not hasattr(candidate, "fulfill"):
-            fulfill = candidate.decs
+        if self.reducedDec:
+            fulfill = self.decode(candidate.decs)
         else:
-            fulfill = candidate.decs  # TODO
+            fulfill = candidate.decs
         candidate.fulfill = fulfill
 
         obj1 = self.featureNum - sum(fulfill)  # LESS IS MORE!
