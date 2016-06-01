@@ -1,0 +1,59 @@
+gen	nevals	hv|spread|igd|frontier#|valid#	timestamp
+0  	100   	(0, 0, 0, 0, 0)               	0.0250499
+100	94    	(0.103, 0.933, -1.0, 7, 8)    	6.7926   
+200	92    	(0.068, 2.283, -1.0, 1, 1)    	13.5489  
+300	90    	(0.11, 0.979, -1.0, 6, 7)     	20.3102  
+400	86    	(0.098, 0.981, -1.0, 4, 7)    	27.0614  
+500	88    	(0.097, 0.951, -1.0, 5, 6)    	33.8333  
+gen	nevals	hv|spread|igd|frontier#|valid#	timestamp
+0  	100   	(0.085, 0.879, -1.0, 2, 4)    	0.01037  
+100	90    	(0.102, 0.854, -1.0, 5, 15)   	5.43417  
+200	92    	(0.148, 0.797, -1.0, 6, 19)   	10.854   
+300	91    	(0.169, 1.04, -1.0, 7, 25)    	16.2645  
+400	88    	(0.17, 0.906, -1.0, 6, 24)    	21.6888  
+500	95    	(0.169, 1.04, -1.0, 7, 21)    	27.1171  
+gen	nevals	hv|spread|igd|frontier#|valid#	timestamp
+0  	100   	(0.033, 0.813, -1.0, 2, 4)    	0.0101531
+100	87    	(0.034, 1.0, -1.0, 3, 17)     	5.53148  
+200	89    	(0.016, 0.6, -1.0, 1, 1)      	11.0055  
+300	92    	(0.016, 1.0, -1.0, 2, 10)     	16.4726  
+400	86    	(0.021, 0.83, -1.0, 2, 10)    	21.9512  
+500	85    	(0.034, 0.75, -1.0, 2, 9)     	27.42    
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@n3n5-12>
+Subject: Job 506664: </share/jchen37/miniconda/bin/python2.7 exp4.py 8> Done
+
+Job </share/jchen37/miniconda/bin/python2.7 exp4.py 8> was submitted from host <login02.hpc.ncsu.edu> by user <jchen37> in cluster <henry2>.
+Job was executed on host(s) <n3n5-12>, in queue <serial>, as user <jchen37> in cluster <henry2>.
+</home/jchen37> was used as the home directory.
+</share/jchen37/SPL/Scripts> was used as the working directory.
+Started at Tue May 31 18:59:32 2016
+Results reported at Tue May 31 19:01:02 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/share/jchen37/miniconda/bin/python2.7 exp4.py 8
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time   :     89.05 sec.
+    Max Memory :        23 MB
+    Max Swap   :       620 MB
+
+    Max Processes  :         3
+    Max Threads    :        11
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <./err/err.506664> for stderr output of this job.
+
