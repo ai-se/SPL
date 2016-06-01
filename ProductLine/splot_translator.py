@@ -152,7 +152,7 @@ def load_augument(name):
     with open(PROJECT_PATH+'/dimacs_data/'+name+'.dimacs.augment', 'w') as f:
         f.write("#FEATURE_INDEX COST USED_BEFORE DEFECTS\n")
         for i, (c,u,d) in enumerate(zip(cost, familiarity, defects)):
-            f.write("{0} {1} {2} {3}\n".format(i, c, u, d))
+            f.write("{0} {1} {2} {3}\n".format(i+1, c, u, d))
 
 # splot_translate('webportal')
 # splot_translate('eshop')
@@ -160,13 +160,14 @@ models = ['cellphone', 'eshop', 'webportal', 'simple']
 from DimacsModel import DimacsModel
 import pdb
 for m in models:
+    load_augument(m)
     mm = DimacsModel(m, reducedDec=True)
     with open(PROJECT_PATH+'/dimacs_data/'+m+'.dimacs.mandatory', 'w') as f:
         for i in mm.cores:
-            f.write(str(i)+'\n')
+            f.write(str(i+1)+'\n')
     f = open(PROJECT_PATH+'/dimacs_data/'+m+'.dimacs.dead', 'w')
     for i in mm.deads:
-        f.write(str(i)+'\n')
+        f.write(str(i+1)+'\n')
     f.close()
     f = open(PROJECT_PATH+'/dimacs_data/'+m+'.dimacs.richseed', 'w')
     f.close()
