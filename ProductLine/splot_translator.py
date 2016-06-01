@@ -24,6 +24,7 @@
 
 from __future__ import division
 import sys
+import pickle
 from FeatureModel.splot_parser import load_ft_url
 from universe import PROJECT_PATH
 
@@ -134,6 +135,38 @@ def splot_translate(name):
             f.write(i)
             f.write('\n')
 
+
+def load_augument(name):
+    cost = []
+    defects = []
+    familiarity = []
+    with open(PROJECT_PATH+'/input/'+name+'/cost', 'r') as f:
+        cost = pickle.load(f)
+
+    with open(PROJECT_PATH+'/input/'+name+'/defects', 'r') as f:
+        defects = pickle.load(f)
+
+    with open(PROJECT_PATH+'/input/'+name+'/familiarity', 'r') as f:
+        familiarity = pickle.load(f)
+
+    with open(PROJECT_PATH+'/dimacs_data/'+name+'.dimacs.augment', 'w') as f:
+        f.write("#FEATURE_INDEX COST USED_BEFORE DEFECTS\n")
+        for i, (c,u,d) in enumerate(zip(cost, familiarity, defects)):
+            f.write("{0} {1} {2} {3}\n".format(i, c, u, d))
+
 # splot_translate('webportal')
 # splot_translate('eshop')
-splot_translate('cellphone')
+models = ['cellphone', 'eshop', 'webportal', 'simple']
+from DimacsModel import DimacsModel
+import pdb
+for m in models:
+    mm = DimacsModel(m, reducedDec=True)
+    with open(PROJECT_PATH+'/dimacs_data/'+m+'.dimacs.mandatory', 'w') as f:
+        for i in mm.cores:
+            f.write(str(i)+'\n')
+    f = open(PROJECT_PATH+'/dimacs_data/'+m+'.dimacs.dead', 'w')
+    for i in mm.deads:
+        f.write(str(i)+'\n')
+    f.close()
+    f = open(PROJECT_PATH+'/dimacs_data/'+m+'.dimacs.richseed', 'w')
+    f.close()
