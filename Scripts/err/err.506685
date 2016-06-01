@@ -1,4 +1,0 @@
-/share/jchen37/miniconda/lib/python2.7/site-packages/deap/creator.py:141: RuntimeWarning: A class named 'FitnessMin' has already been created and it will be overwritten. Consider deleting previous creation of that class or rename it.
-  RuntimeWarning)
-/share/jchen37/miniconda/lib/python2.7/site-packages/deap/creator.py:141: RuntimeWarning: A class named 'Individual' has already been created and it will be overwritten. Consider deleting previous creation of that class or rename it.
-  RuntimeWarning)
