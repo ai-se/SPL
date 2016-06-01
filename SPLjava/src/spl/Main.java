@@ -59,7 +59,7 @@ public class Main {
         try {
 
 //            String fm = args[0];
-            String fm = "/Users/jianfeng/git/SPL/dimacs_data/fiasco.dimacs";
+            String fm = "/Users/jianfeng/git/SPL/dimacs_data/webportal.dimacs";
             String augment = fm + ".augment";
             String dead = fm + ".dead";
             String mandatory = fm + ".mandatory";
@@ -74,7 +74,6 @@ public class Main {
 
             SolutionSet pop = a.execute();
 
-            
             for (int i = 0; i < pop.size(); i++) {
                 Variable v = pop.get(i).getDecisionVariables()[0];
                 System.out.println("Conf" + (i + 1) + ": " + (Binary) v + " ");
@@ -89,6 +88,7 @@ public class Main {
                 System.out.println("");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Usage: java -jar spl.jar fmDimacs timeMS\nThe .augment, .dead, .mandatory and .richseed files should be in the same directory as the FM.");
         }
     }
