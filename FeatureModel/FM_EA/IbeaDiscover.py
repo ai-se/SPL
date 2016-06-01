@@ -99,7 +99,6 @@ def experiment():
     # ed = IbeaDiscoverSIP(FTModelNovelRep(name))
     ed = IbeaDiscover(FeatureModel(name))
     pop, logbook = ed.run()
-    stat_parts.true_candidate_collector(name, pop)
 
 
 if __name__ == '__main__':

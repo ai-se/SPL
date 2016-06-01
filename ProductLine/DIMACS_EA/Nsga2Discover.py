@@ -37,8 +37,8 @@ sys.dont_write_bytecode = True
 
 
 class Nsga2Discover(EADiscover):
-    def __init__(self, feature_model):
-        super(Nsga2Discover, self).__init__(feature_model)
+    def __init__(self, dimacs_model):
+        super(Nsga2Discover, self).__init__(dimacs_model, stat_record_valid_only=True)
 
         self.toolbox.register(
             "mate",
@@ -87,14 +87,13 @@ class Nsga2Discover(EADiscover):
             pop[:] = toolbox.env_select(pop + offspring, MU)
 
             if gen % 100 == 0:
-                self.record(pop)
+                self.record(pop, gen, evals)
 
-        true_candidate_collector(self.model.name, pop)
         return pop, self.logbook
 
 
 def experiment():
-    name = "simple"
+    name = "webportal"
     model = DimacsModel(name, reducedDec=True)
     ed = Nsga2Discover(model)
     pop, logbook = ed.run

@@ -26,54 +26,72 @@ from __future__ import print_function
 from __future__ import division
 
 import sys
+import random
 from deap import tools
-from DEAP_Component import algorithms
 from ProductLine.DimacsModel import DimacsModel
 from ProductLine.DIMACS_EA.EADiscover import EADiscover
-from DEAP_Component.IbeaSelc import selIBEAEnvironment
-from DEAP_Component.stat_parts import true_candidate_collector
+from DEAP_Component import MoeadSelc
 import pdb
 
 sys.dont_write_bytecode = True
 
 
-class IbeaDiscover(EADiscover):
+class MoeadDiscover(EADiscover):
     def __init__(self, dimacs_model):
-        super(IbeaDiscover, self).__init__(dimacs_model)
+        super(MoeadDiscover, self).__init__(dimacs_model, stat_record_valid_only=True)
 
         self.toolbox.register(
             "mate",
-            tools.cxOnePoint)
+            MoeadSelc.cxSimulatedBinary)
 
         self.toolbox.register(
             "mutate",
             self.bit_flip_mutate)
 
-        self.toolbox.register("select", selIBEAEnvironment)
-        self.alg_name = 'IBEA'
+        self.alg_name = 'MOEAD'
 
     @property
     def run(self):
         toolbox = self.toolbox
+
         NGEN = self.ea_configurations['NGEN']
         MU = self.ea_configurations['MU']
         CXPB = self.ea_configurations['CXPB']
-        MUPB = self.ea_configurations['MutateRate']
 
         pop = toolbox.population(n=MU)
+        _, evals = self.evaluate_pop(pop)
+        self.record(pop, 0, evals)
 
-        pop, logbook = algorithms.eaAlphaMuPlusLambda(pop, toolbox,
-                                       MU, None, CXPB, MUPB, NGEN, self.stats, verbose=True, fastrecord=100)
-        return pop, logbook
+        MoeadSelc.setup(len(self.model.obj), pop, 20)
+
+        for gen in range(1, NGEN):
+            evals = 0
+            prioritized_select = []
+            secondary = pop
+
+            for point_id in MoeadSelc.shuffle(range(len(secondary))):
+                child = toolbox.mate(secondary[point_id], pop, CXPB=CXPB)  # crossover
+                toolbox.mutate(child)  # mutant
+
+                if not child.fitness.valid:
+                    evals += 1
+                    toolbox.evaluate(child)  # re-evaluate the mutant
+
+                MoeadSelc.update_neighbors(secondary[point_id], child, secondary)
+
+            pop = prioritized_select + secondary
+
+            if gen % 100 == 0:
+                self.record(pop, gen, evals)
+
+        return pop, self.logbook
 
 
 def experiment():
     name = "webportal"
     model = DimacsModel(name, reducedDec=True)
-    ed = IbeaDiscover(model)
+    ed = MoeadDiscover(model)
     pop, logbook = ed.run
-    pdb.set_trace()
 
 if __name__ == '__main__':
-    import debug
     experiment()

@@ -127,7 +127,7 @@ class EADiscover(Discoverer):
     def run(self):
         raise NotImplementedError
 
-    def record(self, pop):
+    def record(self, pop, gen=None, evals=None):
         record = self.stats.compile(pop)
-        self.logbook.record(**record)
+        self.logbook.record(gen=gen, evals=evals, **record)
         print(self.logbook.stream)
