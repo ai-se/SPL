@@ -20,14 +20,18 @@
 package spl;
 
 import java.io.FileReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.net.URL;
+import java.nio.Buffer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import jmetal.core.Algorithm;
-import jmetal.core.Problem;
-import jmetal.core.SolutionSet;
-import jmetal.core.Variable;
+
+import jmetal.core.*;
 import jmetal.encodings.variable.Binary;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.minisat.core.IOrder;
 import org.sat4j.minisat.core.Solver;
@@ -67,26 +71,48 @@ public class Main {
 
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
 
-            //Algorithm a = new ASE_SettingsIBEA(p).configureASE2013(Integer.parseInt(args[1]));
-            //Algorithm a = new SPL_SettingsIBEA(p).configureSATIBEA(Integer.parseInt(args[1]), fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
-            //Algorithm a = new SPL_SettingsIBEA(p).configureSATIBEA(36000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
-            Algorithm a = new SPL_SettingsNSGA2(p).Nsga2(100000);
+//            Algorithm a = new ASE_SettingsIBEA(p).configureASE2013(Integer.parseInt(args[1]));
+//            Algorithm a = new SPL_SettingsIBEA(p).configureSATIBEA(Integer.parseInt(args[1]), fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+//            Algorithm a = new SPL_SettingsIBEA(p).configureSATIBEA(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+            Algorithm a = new SPL_SettingsEMOs(p).Spea2(50000);
+//            Algorithm a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
 
             SolutionSet pop = a.execute();
+            URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
+            String loc = location.toString();
+
+            String file_path = (loc.substring(5, loc.lastIndexOf("SPL/"))+"SPL/j_res/test.txt");
+            File file = new File(file_path);
+
+            if (!file.exists()){
+                file.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
 
             for (int i = 0; i < pop.size(); i++) {
                 Variable v = pop.get(i).getDecisionVariables()[0];
+                bw.write((Binary) v + "\n");
                 System.out.println("Conf" + (i + 1) + ": " + (Binary) v + " ");
 
             }
 
+            bw.write("~~~\n");
+
             for (int i = 0; i < pop.size(); i++) {
                 Variable v = pop.get(i).getDecisionVariables()[0];
                 for (int j = 0; j < pop.get(i).getNumberOfObjectives(); j++) {
+                    bw.write(pop.get(i).getObjective(j) + " ");
                     System.out.print(pop.get(i).getObjective(j) + " ");
                 }
+                bw.write("\n");
                 System.out.println("");
             }
+
+            bw.close();
+            fw.close();
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Usage: java -jar spl.jar fmDimacs timeMS\nThe .augment, .dead, .mandatory and .richseed files should be in the same directory as the FM.");

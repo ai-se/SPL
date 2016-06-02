@@ -24,6 +24,8 @@ import jmetal.core.Operator;
 import jmetal.core.Problem;
 import jmetal.experiments.Settings;
 import jmetal.metaheuristics.nsgaII.NSGAII;
+import jmetal.metaheuristics.spea2.SPEA2;
+import jmetal.metaheuristics.moead.pMOEAD;
 import jmetal.operators.selection.BinaryTournament;
 import jmetal.util.JMException;
 import jmetal.util.comparators.FitnessComparator;
@@ -31,9 +33,9 @@ import jmetal.util.comparators.FitnessComparator;
 import java.util.HashMap;
 
 /**
- * Settings class of algorithm NSGA-II
+ * Settings class of algorithm NSGA-II , SPEA2 and MOEA/D
  */
-public class SPL_SettingsNSGA2 extends Settings {
+public class SPL_SettingsEMOs extends Settings {
 
     public int populationSize_;
     public int maxEvaluations_;
@@ -48,7 +50,7 @@ public class SPL_SettingsNSGA2 extends Settings {
     /**
      * Constructor
      */
-    public SPL_SettingsNSGA2(Problem p) {
+    public SPL_SettingsEMOs(Problem p) {
         super(p.getName());
 
         problem_ = p;
@@ -61,7 +63,7 @@ public class SPL_SettingsNSGA2 extends Settings {
     public Algorithm Nsga2(int maxEvaluations_) throws JMException {
 
         populationSize_ = 100;
-//        maxEvaluations_ = 10000;
+        this.maxEvaluations_ = maxEvaluations_;
         archiveSize_ = 100;
 
         mutationProbability_ = 0.05;
@@ -102,8 +104,100 @@ public class SPL_SettingsNSGA2 extends Settings {
         return algorithm;
     } // configure
 
+
+    public Algorithm Spea2(int maxEvaluations_) throws JMException {
+
+        populationSize_ = 100;
+        archiveSize_ = 100;
+
+        mutationProbability_ = 0.05;
+        crossoverProbability_ = 0.9;
+
+        Algorithm algorithm;
+        Operator selection;
+        Operator crossover;
+        Operator mutation;
+
+        HashMap parameters; // Operator parameters
+
+        algorithm = new SPEA2(problem_);
+
+        // Algorithm parameters
+        algorithm.setInputParameter("populationSize", populationSize_);
+        algorithm.setInputParameter("maxEvaluations", maxEvaluations_);
+        algorithm.setInputParameter("archiveSize", archiveSize_);
+
+        // Mutation and Crossover for Real codification
+        parameters = new HashMap();
+        parameters.put("probability", crossoverProbability_);
+        crossover = new SinglePointCrossover(parameters);
+
+        parameters = new HashMap();
+        parameters.put("probability", mutationProbability_);
+        mutation = new SATIBEA_BitFlipMutation(parameters);
+
+        /* Selection Operator */
+        parameters = new HashMap();
+        parameters.put("comparator", new FitnessComparator());
+        selection = new BinaryTournament(parameters);
+
+        // Add the operators to the algorithm
+        algorithm.addOperator("crossover", crossover);
+        algorithm.addOperator("mutation", mutation);
+        algorithm.addOperator("selection", selection);
+
+        return algorithm;
+    } // configure
+
+
+    public Algorithm Moead(int maxEvaluations_) throws JMException {
+
+        populationSize_ = 100;
+        archiveSize_ = 100;
+
+        mutationProbability_ = 0.05;
+        crossoverProbability_ = 0.9;
+
+        Algorithm algorithm;
+        Operator selection;
+        Operator crossover;
+        Operator mutation;
+
+        HashMap parameters; // Operator parameters
+
+        algorithm = new pMOEAD(problem_);
+
+        // Algorithm parameters
+        algorithm.setInputParameter("populationSize", populationSize_);
+        algorithm.setInputParameter("maxEvaluations", maxEvaluations_);
+        algorithm.setInputParameter("archiveSize", archiveSize_);
+
+        // Mutation and Crossover for Real codification
+        parameters = new HashMap();
+        parameters.put("probability", crossoverProbability_);
+        crossover = new SinglePointCrossover(parameters);
+
+        parameters = new HashMap();
+        parameters.put("probability", mutationProbability_);
+        mutation = new SATIBEA_BitFlipMutation(parameters);
+
+        /* Selection Operator */
+        parameters = new HashMap();
+        parameters.put("comparator", new FitnessComparator());
+        selection = new BinaryTournament(parameters);
+
+        // Add the operators to the algorithm
+        algorithm.addOperator("crossover", crossover);
+        algorithm.addOperator("mutation", mutation);
+        algorithm.addOperator("selection", selection);
+
+        return algorithm;
+    } // configure
+
+
     /**
-     * Configure IBEA with user-defined parameter experiments.settings
+     * Configure NSGA2 with user-defined parameter experiments.settings
+     * DO NOT USE THIS. Use Nsga2() instead
      *
      * @return A IBEA algorithm object
      * @throws JMException
