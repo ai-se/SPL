@@ -60,7 +60,7 @@ class Nsga2Discover(EADiscover):
 
         pop = toolbox.population(n=MU)
         _, evals = self.evaluate_pop(pop)  # Evaluate the pop with an invalid fitness
-        self.record(pop, 0, evals, record_hof)
+        self.record(pop, 0, evals)
 
         for gen in range(1, NGEN):
             # print gen
@@ -87,7 +87,7 @@ class Nsga2Discover(EADiscover):
             else:
                 pop[:] = toolbox.env_select(pop + offspring, MU)
 
-            self.record(pop, gen, evals, record_hof)
+            self.record(pop, gen, evals)
 
         # stat_parts.pickle_results(self.ft.name, self.alg_name, pop, self.logbook)
 

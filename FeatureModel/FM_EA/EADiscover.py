@@ -145,7 +145,7 @@ class EADiscover(Discoverer):
         raise NotImplementedError
 
     def record(self, pop, gen, evals):
-        if gen % 100 == 0:
+        if gen % 1 == 0:
             record = self.stats.compile(pop)
             self.logbook.record(gen=gen, evals=evals, **record)
             print(self.logbook.stream)
