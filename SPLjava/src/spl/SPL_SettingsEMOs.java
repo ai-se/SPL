@@ -60,7 +60,7 @@ public class SPL_SettingsEMOs extends Settings {
 
 
 
-    public Algorithm Nsga2(int maxEvaluations_) throws JMException {
+    public Algorithm configureNSGA2(int maxEvaluations_) throws JMException {
 
         populationSize_ = 100;
         this.maxEvaluations_ = maxEvaluations_;
@@ -105,7 +105,7 @@ public class SPL_SettingsEMOs extends Settings {
     } // configure
 
 
-    public Algorithm Spea2(int maxEvaluations_) throws JMException {
+    public Algorithm configureSPEA2(int maxEvaluations_) throws JMException {
 
         populationSize_ = 100;
         archiveSize_ = 100;
@@ -150,54 +150,10 @@ public class SPL_SettingsEMOs extends Settings {
     } // configure
 
 
-    public Algorithm Moead(int maxEvaluations_) throws JMException {
-
-        populationSize_ = 100;
-        archiveSize_ = 100;
-
-        mutationProbability_ = 0.05;
-        crossoverProbability_ = 0.9;
-
-        Algorithm algorithm;
-        Operator selection;
-        Operator crossover;
-        Operator mutation;
-
-        HashMap parameters; // Operator parameters
-
-        algorithm = new pMOEAD(problem_);
-
-        // Algorithm parameters
-        algorithm.setInputParameter("populationSize", populationSize_);
-        algorithm.setInputParameter("maxEvaluations", maxEvaluations_);
-        algorithm.setInputParameter("archiveSize", archiveSize_);
-
-        // Mutation and Crossover for Real codification
-        parameters = new HashMap();
-        parameters.put("probability", crossoverProbability_);
-        crossover = new SinglePointCrossover(parameters);
-
-        parameters = new HashMap();
-        parameters.put("probability", mutationProbability_);
-        mutation = new SATIBEA_BitFlipMutation(parameters);
-
-        /* Selection Operator */
-        parameters = new HashMap();
-        parameters.put("comparator", new FitnessComparator());
-        selection = new BinaryTournament(parameters);
-
-        // Add the operators to the algorithm
-        algorithm.addOperator("crossover", crossover);
-        algorithm.addOperator("mutation", mutation);
-        algorithm.addOperator("selection", selection);
-
-        return algorithm;
-    } // configure
-
 
     /**
      * Configure NSGA2 with user-defined parameter experiments.settings
-     * DO NOT USE THIS. Use Nsga2() instead
+     * DO NOT USE THIS. Use configureNSGA2() instead
      *
      * @return A IBEA algorithm object
      * @throws JMException

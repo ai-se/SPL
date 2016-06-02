@@ -95,7 +95,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         * spread
         * IGD
         * frontier_size
-        * valid_frontier_size
+        * valid_rate
     """
     vpop = filter(lambda p: p.fitness.correct, pop)
     if len(pop) == 0:
@@ -120,9 +120,9 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         IGD = convergence(front, optimal_in_theory)
 
     frontier_size = len(front)
-    valid_frontier_size = len(vpop)
+    valid_rate = len(vpop) / len(pop)
 
-    return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_frontier_size
+    return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_rate
 
 
 def get_stats(model_name, j_res_file_name):

@@ -24,14 +24,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.net.URL;
-import java.nio.Buffer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import jmetal.core.*;
 import jmetal.encodings.variable.Binary;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.minisat.core.IOrder;
 import org.sat4j.minisat.core.Solver;
@@ -75,13 +73,14 @@ public class Main {
                     a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
                     break;
                 case "SPEA2":
-                    a = new SPL_SettingsEMOs(p).Spea2(50000);
+                    a = new SPL_SettingsEMOs(p).configureSPEA2(50000);
                     break;
                 case "NSGA2":
-                    a = new SPL_SettingsEMOs(p).Nsga2(50000);
+                    a = new SPL_SettingsEMOs(p).configureNSGA2(50000);
                     break;
                 case "SATIBEA":
-                    a = new SPL_SettingsIBEA(p).configureSATIBEA(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+                    //a = new SPL_SettingsIBEA(p).configureICSE15(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+                    a = new SPL_SettingsIBEA(p).configureSATIBEA(50000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
                     break;
                 default:
                     a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
