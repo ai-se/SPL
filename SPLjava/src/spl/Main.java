@@ -61,21 +61,31 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         try {
-
-//            String fm = args[0];
-            String fm = "/Users/jianfeng/git/SPL/dimacs_data/webportal.dimacs";
+            String name = args[0];
+            String fm = "/Users/jianfeng/git/SPL/dimacs_data/" + name + ".dimacs";
             String augment = fm + ".augment";
             String dead = fm + ".dead";
             String mandatory = fm + ".mandatory";
             String seed = fm + ".richseed";
 
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
-
-//            Algorithm a = new ASE_SettingsIBEA(p).configureASE2013(Integer.parseInt(args[1]));
-//            Algorithm a = new SPL_SettingsIBEA(p).configureSATIBEA(Integer.parseInt(args[1]), fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
-//            Algorithm a = new SPL_SettingsIBEA(p).configureSATIBEA(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
-            Algorithm a = new SPL_SettingsEMOs(p).Spea2(50000);
-//            Algorithm a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
+            Algorithm a;
+            switch (args[1]){
+                case "IBEA":
+                    a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
+                    break;
+                case "SPEA2":
+                    a = new SPL_SettingsEMOs(p).Spea2(50000);
+                    break;
+                case "NSGA2":
+                    a = new SPL_SettingsEMOs(p).Nsga2(50000);
+                    break;
+                case "SATIBEA":
+                    a = new SPL_SettingsIBEA(p).configureSATIBEA(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+                    break;
+                default:
+                    a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
+            }
 
             SolutionSet pop = a.execute();
             URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
