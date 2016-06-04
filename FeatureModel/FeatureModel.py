@@ -364,3 +364,99 @@ class FTModelNovelRep(FeatureModel):
             subroot = self.ft.find_fea_index(self.dec[subroot].name)
         f1, f2 = FeatureModel.swap_tree(self, f1, f2, subroot)
         return P(self.novel_coding(f1)), P(self.novel_coding(f2))
+
+    def get_coding_operators(self):
+        """
+
+        Returns:
+        1st line: the correspond index from simple to complex
+        2nd lint: the index should be set 1 at the complex
+        rest: *,*,*, toset, low, high
+           -> toset = low <= sum(*,*,*) <= high
+        """
+        ft = self.ft
+
+        # find the must-1 features
+        must1 = []
+        for feature in ft.features:
+            tmp = True
+            cursor = feature
+            while cursor.parent:
+                if cursor.node_type not in ['m', 'r']:
+                    tmp = False
+                    break
+                cursor = cursor.parent
+            if tmp:
+                must1.append(feature)
+
+        must1_index = []
+        for f_i, f in enumerate(ft.features):
+            if f in must1:
+                must1_index.append(f_i)
+
+        reasonable = []
+        for feature in ft.features:
+            if feature in must1:
+                continue
+
+            if feature.node_type is 'g':
+                reasonable.append(feature)
+                continue
+
+            if [c for c in feature.children if c.node_type is not 'o']:
+                reasonable.append(feature)
+
+        # get the noncore features
+        noncore = []
+        for f in ft.features:
+            if f not in must1 + reasonable:
+                noncore.append(f)
+
+        noncore_index = []
+        for f_i, f in enumerate(ft.features):
+            if f in noncore:
+                noncore_index.append(f_i)
+
+        reasonable_child_dict = dict()
+        for r in reasonable:
+            child_index = [self.ft.find_fea_index(c) for c in r.children]
+            reasonable_child_dict[r] = (child_index, ft.find_fea_index(r))
+
+        outfile = open(PROJECT_PATH+'/dimacs_data/'+self.name+'.dimacs.sipop', 'w')
+        outfile.write(' '.join(map(str, noncore_index)))
+        outfile.write('\n')
+        outfile.write(' '.join(map(str, must1_index)))
+        outfile.write('\n')
+
+        for f in reversed(ft.features):
+            if f not in reasonable:
+                continue
+            if f.node_type is 'g':
+                outfile.write("{0} {1} {2} {3}".format(
+                    ' '.join(map(str, reasonable_child_dict[f][0])),
+                    reasonable_child_dict[f][1],
+                    f.g_d,
+                    f.g_u
+                ))
+            else:
+                childs = reasonable_child_dict[f][0]
+                if type(childs) is int:
+                    childs = [childs]
+                manatory = []
+                for i in childs:
+                    if ft.features[i].node_type in ['m', 'g']:
+                        manatory.append(i)
+                assert len(manatory) > 0, 'check check here'
+                outfile.write("{0} {1} {2} {3}".format(
+                    ' '.join(map(str, manatory)),
+                    reasonable_child_dict[f][1],
+                    len(manatory),
+                    len(manatory)
+                ))
+            outfile.write('\n')
+        outfile.close()
+        return
+
+import debug
+model = FTModelNovelRep('eshop')
+model.get_coding_operators()
