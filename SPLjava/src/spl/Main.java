@@ -54,7 +54,7 @@ public class Main {
     private static final long iteratorTimeout = 150000;
 
     /**
-     * @param args the command line arguments
+     * @param args the command line arguments -- modelname, alg_name, evaluation_times, [runid]
      */
     public static void main(String[] args) throws Exception {
 
@@ -68,29 +68,40 @@ public class Main {
 
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
             Algorithm a;
-            switch (args[1]){
+
+            int evaluation_times = Integer.parseInt(args[2]);
+            String alg_name = args[1];
+            String runid = "";
+            if (args.length >= 4) {
+                runid = args[3];
+            }
+            switch (alg_name){
                 case "IBEA":
-                    a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
+                    a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
                     break;
                 case "SPEA2":
-                    a = new SPL_SettingsEMOs(p).configureSPEA2(50000);
+                    a = new SPL_SettingsEMOs(p).configureSPEA2(evaluation_times);
                     break;
                 case "NSGA2":
-                    a = new SPL_SettingsEMOs(p).configureNSGA2(50000);
+                    a = new SPL_SettingsEMOs(p).configureNSGA2(evaluation_times);
                     break;
                 case "SATIBEA":
                     //a = new SPL_SettingsIBEA(p).configureICSE15(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
-                    a = new SPL_SettingsIBEA(p).configureSATIBEA(50000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+                    a = new SPL_SettingsIBEA(p).configureSATIBEA(evaluation_times, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
                     break;
                 default:
-                    a = new SPL_SettingsIBEA(p).configureICSE2013(50000);
+                    a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
             }
 
+            long start = System.currentTimeMillis();
             SolutionSet pop = a.execute();
+            float total_time = (System.currentTimeMillis() - start) / 1000.0f;
+
             URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
             String loc = location.toString();
 
-            String file_path = (loc.substring(5, loc.lastIndexOf("SPL/"))+"SPL/j_res/test.txt");
+            String file_tag = name + "_" + alg_name + '_' + evaluation_times/1000 + "k_" + runid + ".txt";
+            String file_path = (loc.substring(5, loc.lastIndexOf("SPL/"))+"SPL/j_res/" + file_tag);
             File file = new File(file_path);
 
             if (!file.exists()){
@@ -119,12 +130,14 @@ public class Main {
                 System.out.println("");
             }
 
+            bw.write("~~~\n" + total_time + "\n");
+
             bw.close();
             fw.close();
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Usage: java -jar spl.jar fmDimacs timeMS\nThe .augment, .dead, .mandatory and .richseed files should be in the same directory as the FM.");
+//            System.out.println("Usage: java -jar spl.jar fmDimacs timeMS\nThe .augment, .dead, .mandatory and .richseed files should be in the same directory as the FM.");
         }
     }
 

@@ -45,8 +45,6 @@ import org.sat4j.tools.ModelIterator;
  */
 public class SPL_BinarySolution extends BinarySolutionType {
 
-
-
     private String fm;
     private int nFeat;
     private List<Integer> mandatoryFeaturesIndices, deadFeaturesIndices;
@@ -65,7 +63,7 @@ public class SPL_BinarySolution extends BinarySolutionType {
         this.seed = seed;
     }
     
-    
+
     public boolean[] randomProduct() {
 
         boolean[] prod = new boolean[nFeat];
