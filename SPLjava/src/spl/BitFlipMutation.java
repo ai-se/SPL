@@ -38,7 +38,7 @@ import jmetal.operators.mutation.Mutation;
 /**
  * @author chris
  */
-public class SATIBEA_BitFlipMutation extends Mutation {
+public class BitFlipMutation extends Mutation {
     /**
      * Valid solution types to apply this operator
      */
@@ -52,7 +52,7 @@ public class SATIBEA_BitFlipMutation extends Mutation {
      * Constructor
      * Creates a new instance of the Bit Flip mutation operator
      */
-    public SATIBEA_BitFlipMutation(HashMap<String, Object> parameters) {
+    public BitFlipMutation(HashMap<String, Object> parameters) {
         super(parameters);
         if (parameters.get("probability") != null)
             mutationProbability_ = (Double) parameters.get("probability");

@@ -8,7 +8,6 @@ import jmetal.util.JMException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -30,7 +29,6 @@ class RestrictNode {
 }
 
 public class ProductLineProblemNovelPrep extends ProductLineProblem {
-    public String opfile;
     private ArrayList<Integer> unzipmap = new ArrayList<Integer>();
     private ArrayList<Integer> manadoryIndices = new ArrayList<Integer>();
     private ArrayList<RestrictNode> rns = new ArrayList<RestrictNode>();
@@ -40,8 +38,8 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
         this.loadZipOperator(opfile);
 
         // removing the reasonable targets
-        for (RestrictNode rn: rns){
-            this.featureIndicesAllowedFlip.remove((Object)rn.target);
+        for (RestrictNode rn : rns) {
+            this.featureIndicesAllowedFlip.remove((Object) rn.target);
         }
 
     }
@@ -83,7 +81,6 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
     }
 
 
-
     @Override
     public void evaluate(Solution sltn) throws JMException {
         Variable[] vars = sltn.getDecisionVariables();
@@ -91,8 +88,8 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
 
         for (RestrictNode rn : rns) {
             int sum = 0;
-            for (Integer i: rn.childs){
-                if (bin.getIth(i)){
+            for (Integer i : rn.childs) {
+                if (bin.getIth(i)) {
                     sum += 1;
                 }
             }

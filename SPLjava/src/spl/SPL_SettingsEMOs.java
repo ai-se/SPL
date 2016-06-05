@@ -25,7 +25,6 @@ import jmetal.core.Problem;
 import jmetal.experiments.Settings;
 import jmetal.metaheuristics.nsgaII.NSGAII;
 import jmetal.metaheuristics.spea2.SPEA2;
-import jmetal.metaheuristics.moead.pMOEAD;
 import jmetal.operators.selection.BinaryTournament;
 import jmetal.util.JMException;
 import jmetal.util.comparators.FitnessComparator;
@@ -85,11 +84,11 @@ public class SPL_SettingsEMOs extends Settings {
         // Mutation and Crossover for Real codification
         parameters = new HashMap();
         parameters.put("probability", crossoverProbability_);
-        crossover = new SinglePointCrossover(parameters);
+        crossover = new SPL_SinglePointCrossover(parameters);
 
         parameters = new HashMap();
         parameters.put("probability", mutationProbability_);
-        mutation = new SATIBEA_BitFlipMutation(parameters);
+        mutation = new BitFlipMutation(parameters);
 
         /* Selection Operator */
         parameters = new HashMap();
@@ -130,11 +129,11 @@ public class SPL_SettingsEMOs extends Settings {
         // Mutation and Crossover for Real codification
         parameters = new HashMap();
         parameters.put("probability", crossoverProbability_);
-        crossover = new SinglePointCrossover(parameters);
+        crossover = new SPL_SinglePointCrossover(parameters);
 
         parameters = new HashMap();
         parameters.put("probability", mutationProbability_);
-        mutation = new SATIBEA_BitFlipMutation(parameters);
+        mutation = new BitFlipMutation(parameters);
 
         /* Selection Operator */
         parameters = new HashMap();
@@ -183,11 +182,11 @@ public class SPL_SettingsEMOs extends Settings {
         // Mutation and Crossover for Real codification
         parameters = new HashMap();
         parameters.put("probability", crossoverProbability_);
-        crossover = new SinglePointCrossover(parameters);
+        crossover = new SPL_SinglePointCrossover(parameters);
 
         parameters = new HashMap();
         parameters.put("probability", mutationProbability_);
-        mutation = new SATIBEA_BitFlipMutation(parameters);
+        mutation = new BitFlipMutation(parameters);
 
         /* Selection Operator */
         parameters = new HashMap();

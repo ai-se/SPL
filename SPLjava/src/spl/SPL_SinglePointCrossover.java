@@ -38,7 +38,7 @@ import jmetal.operators.crossover.Crossover;
 /**
  * @author chris
  */
-public class SinglePointCrossover extends Crossover {
+public class SPL_SinglePointCrossover extends Crossover {
     /**
      * Valid solution types to apply this operator
      */
@@ -52,20 +52,20 @@ public class SinglePointCrossover extends Crossover {
      * Constructor
      * Creates a new instance of the single point crossover operator
      */
-    public SinglePointCrossover(HashMap<String, Object> parameters) {
+    public SPL_SinglePointCrossover(HashMap<String, Object> parameters) {
         super(parameters);
         if (parameters.get("probability") != null)
             crossoverProbability_ = (Double) parameters.get("probability");
-    } // SinglePointCrossover
+    } // SPL_SinglePointCrossover
 
 
     /**
      * Constructor
      * Creates a new instance of the single point crossover operator
      */
-    //public SinglePointCrossover(Properties properties) {
+    //public SPL_SinglePointCrossover(Properties properties) {
     //    this();
-    //} // SinglePointCrossover
+    //} // SPL_SinglePointCrossover
 
     /**
      * Perform the crossover operation.
@@ -159,8 +159,8 @@ public class SinglePointCrossover extends Crossover {
                 } // Int representation
             }
         } catch (ClassCastException e1) {
-            Configuration.logger_.severe("SinglePointCrossover.doCrossover: Cannot perfom " +
-                    "SinglePointCrossover");
+            Configuration.logger_.severe("SPL_SinglePointCrossover.doCrossover: Cannot perfom " +
+                    "SPL_SinglePointCrossover");
             Class cls = java.lang.String.class;
             String name = cls.getName();
             throw new JMException("Exception in " + name + ".doCrossover()");
@@ -181,7 +181,7 @@ public class SinglePointCrossover extends Crossover {
         if (!(VALID_TYPES.contains(parents[0].getType().getClass()) &&
                 VALID_TYPES.contains(parents[1].getType().getClass()))) {
 
-            Configuration.logger_.severe("SinglePointCrossover.execute: the solutions " +
+            Configuration.logger_.severe("SPL_SinglePointCrossover.execute: the solutions " +
                     "are not of the right type. The type should be 'Binary' or 'Int', but " +
                     parents[0].getType() + " and " +
                     parents[1].getType() + " are obtained");
@@ -192,7 +192,7 @@ public class SinglePointCrossover extends Crossover {
         } // if
 
         if (parents.length < 2) {
-            Configuration.logger_.severe("SinglePointCrossover.execute: operator " +
+            Configuration.logger_.severe("SPL_SinglePointCrossover.execute: operator " +
                     "needs two parents");
             Class cls = java.lang.String.class;
             String name = cls.getName();
@@ -211,5 +211,5 @@ public class SinglePointCrossover extends Crossover {
         }
         return offSpring;
     } // execute
-} // SinglePointCrossover
+} // SPL_SinglePointCrossover
 

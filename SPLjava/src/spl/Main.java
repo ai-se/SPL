@@ -77,9 +77,13 @@ public class Main {
             if (args.length >= 4) {
                 runid = args[3];
             }
+
             switch (alg_name){
                 case "IBEA":
                     a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
+                    break;
+                case "SIPIBEA":
+                    a = new SPL_SettingsIBEA(p).configureSIPIBEA(evaluation_times);
                     break;
                 case "SPEA2":
                     a = new SPL_SettingsEMOs(p).configureSPEA2(evaluation_times);
