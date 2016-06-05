@@ -41,13 +41,13 @@ public class ProductLineProblem extends Problem {
     public static int numFeatures;
     private int numConstraints;
     public static List<List<Integer>> constraints;
-    private double[] cost;
-    private boolean[] used_before;
-    private int[] defects;
+    protected double[] cost;
+    protected boolean[] used_before;
+    protected int[] defects;
     private static int n = 0;
-    private List<Integer> mandatoryFeaturesIndices, deadFeaturesIndices;
+    protected List<Integer> mandatoryFeaturesIndices, deadFeaturesIndices;
     public static List<Integer> featureIndicesAllowedFlip;
-    private List<Integer> seed;
+    protected List<Integer> seed;
 
     
     private static final int N_VARS = 1, N_OBJS = 5;
