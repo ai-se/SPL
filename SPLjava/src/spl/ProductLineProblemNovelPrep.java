@@ -45,9 +45,9 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
         this.fm = fm;
         this.augment = augment;
         loadFM(fm, augment);
-        this.mandatoryFeaturesIndices = new ArrayList<Integer>(numberOfVariables_);
-        this.deadFeaturesIndices = new ArrayList<Integer>(numberOfVariables_);
-        featureIndicesAllowedFlip = new ArrayList<Integer>(numberOfVariables_);
+        this.mandatoryFeaturesIndices = new ArrayList<Integer>();
+        this.deadFeaturesIndices = new ArrayList<Integer>();
+        featureIndicesAllowedFlip = new ArrayList<Integer>(unzipmap.size());
         for (int i = 0; i < numberOfVariables_; i++) {
             featureIndicesAllowedFlip.add(i);
         }

@@ -67,8 +67,8 @@ public class Main {
             String seed = fm + ".richseed";
             String opfile = fm + ".sipop";
 
-            Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
-//            Problem p = new ProductLineProblemNovelPrep(fm, augment, mandatory, dead, seed, opfile);
+//            Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
+            Problem p = new ProductLineProblemNovelPrep(fm, augment, mandatory, dead, seed, opfile);
             Algorithm a;
 
             int evaluation_times = Integer.parseInt(args[2]);
