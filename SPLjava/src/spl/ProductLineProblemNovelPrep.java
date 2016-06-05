@@ -8,6 +8,7 @@ import jmetal.util.JMException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -35,11 +36,23 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
     private ArrayList<RestrictNode> rns = new ArrayList<RestrictNode>();
 
     public ProductLineProblemNovelPrep(String fm, String augment, String mandatory, String dead, String seedfile, String opfile) throws Exception {
-        super(fm, augment, mandatory, dead, seedfile);
         this.opfile = opfile;
         loadZipOperator(this.opfile);
-        this.numberOfVariables_ = unzipmap.size();
-        this.solutionType_ = new SPL_BinarySolution(this, numberOfVariables_, fm, mandatoryFeaturesIndices, deadFeaturesIndices, seed);
+
+        this.numberOfVariables_ = N_VARS;
+        this.numberOfObjectives_ = N_OBJS;
+        this.numberOfConstraints_ = 0;
+        this.fm = fm;
+        this.augment = augment;
+        loadFM(fm, augment);
+        this.mandatoryFeaturesIndices = new ArrayList<Integer>(numberOfVariables_);
+        this.deadFeaturesIndices = new ArrayList<Integer>(numberOfVariables_);
+        featureIndicesAllowedFlip = new ArrayList<Integer>(numberOfVariables_);
+        for (int i = 0; i < numberOfVariables_; i++) {
+            featureIndicesAllowedFlip.add(i);
+        }
+
+        this.solutionType_ = new SPL_BinarySolution(this, unzipmap.size(), fm, mandatoryFeaturesIndices, deadFeaturesIndices, seed);
     }
 
     public void loadZipOperator(String opfile) throws Exception {
@@ -106,6 +119,7 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
     public void evaluate(Solution sltn) throws JMException {
         Variable[] vars = sltn.getDecisionVariables();
         Binary bin = (Binary) vars[0];
+
         bin = unzipBin(bin);  // unzipping the short bin
 
         int unselected = 0, unused = 0, defect = 0;
@@ -133,5 +147,4 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
         sltn.setObjective(3, defect);
         sltn.setObjective(4, cost_);
     }
-
 }

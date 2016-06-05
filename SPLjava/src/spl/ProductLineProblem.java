@@ -37,20 +37,24 @@ import jmetal.util.JMException;
 public class ProductLineProblem extends Problem {
 
     public static String fm;
-    private String augment;
+    protected String augment;
     public static int numFeatures;
-    private int numConstraints;
+    protected int numConstraints;
     public static List<List<Integer>> constraints;
     protected double[] cost;
     protected boolean[] used_before;
     protected int[] defects;
-    private static int n = 0;
+    protected static int n = 0;
     protected List<Integer> mandatoryFeaturesIndices, deadFeaturesIndices;
     public static List<Integer> featureIndicesAllowedFlip;
     protected List<Integer> seed;
 
     
-    private static final int N_VARS = 1, N_OBJS = 5;
+    protected static final int N_VARS = 1, N_OBJS = 5;
+
+    public ProductLineProblem(){
+
+    }
 
     public ProductLineProblem(String fm, String augment, String mandatory, String dead, String seedfile) throws Exception {
         this.numberOfVariables_ = N_VARS;
@@ -68,10 +72,6 @@ public class ProductLineProblem extends Problem {
     public List<List<Integer>> getConstraints() {
         return constraints;
     }
-
-  
-    
-    
 
     @Override
     public void evaluate(Solution sltn) throws JMException {

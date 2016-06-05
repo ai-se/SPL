@@ -27,6 +27,7 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$MODULE_DIR$/lib/jmetal4.5.jar!/" />
+          <root url="file://$USER_HOME$/Downloads" />
         </SOURCES>
       </library>
     </orderEntry>
