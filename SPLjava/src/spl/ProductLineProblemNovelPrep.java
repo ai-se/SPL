@@ -36,23 +36,14 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
     private ArrayList<RestrictNode> rns = new ArrayList<RestrictNode>();
 
     public ProductLineProblemNovelPrep(String fm, String augment, String mandatory, String dead, String seedfile, String opfile) throws Exception {
-        this.opfile = opfile;
-        loadZipOperator(this.opfile);
+        super(fm, augment, mandatory, dead, seedfile);
+        this.loadZipOperator(opfile);
 
-        this.numberOfVariables_ = N_VARS;
-        this.numberOfObjectives_ = N_OBJS;
-        this.numberOfConstraints_ = 0;
-        this.fm = fm;
-        this.augment = augment;
-        loadFM(fm, augment);
-        this.mandatoryFeaturesIndices = new ArrayList<Integer>();
-        this.deadFeaturesIndices = new ArrayList<Integer>();
-        featureIndicesAllowedFlip = new ArrayList<Integer>(unzipmap.size());
-        for (int i = 0; i < numberOfVariables_; i++) {
-            featureIndicesAllowedFlip.add(i);
+        // removing the reasonable targets
+        for (RestrictNode rn: rns){
+            this.featureIndicesAllowedFlip.remove((Object)rn.target);
         }
 
-        this.solutionType_ = new SPL_BinarySolution(this, unzipmap.size(), fm, mandatoryFeaturesIndices, deadFeaturesIndices, seed);
     }
 
     public void loadZipOperator(String opfile) throws Exception {
@@ -91,36 +82,22 @@ public class ProductLineProblemNovelPrep extends ProductLineProblem {
         in.close();
     }
 
-    public Binary unzipBin(Binary zipped) {
-        Binary res = new Binary(this.getNumFeatures());
 
-        for (int i = 0; i < unzipmap.size(); i++) {
-            res.setIth(unzipmap.get(i), zipped.getIth(i));
-        }
-
-        for (int i = 0; i < manadoryIndices.size(); i++) {
-            res.setIth(manadoryIndices.get(i), true);
-        }
-
-        for (RestrictNode rn : rns) {
-            int sum = 0;
-            for (Integer i: rn.childs){
-                if (zipped.getIth(i)){
-                    sum += 1;
-                }
-            }
-            res.setIth(rn.target, sum >= rn.sum_lower_bound && sum <= rn.sum_lower_bound);
-        }
-
-        return res;
-    }
 
     @Override
     public void evaluate(Solution sltn) throws JMException {
         Variable[] vars = sltn.getDecisionVariables();
         Binary bin = (Binary) vars[0];
 
-        bin = unzipBin(bin);  // unzipping the short bin
+        for (RestrictNode rn : rns) {
+            int sum = 0;
+            for (Integer i: rn.childs){
+                if (bin.getIth(i)){
+                    sum += 1;
+                }
+            }
+            bin.setIth(rn.target, sum >= rn.sum_lower_bound && sum <= rn.sum_lower_bound);
+        }
 
         int unselected = 0, unused = 0, defect = 0;
         double cost_ = 0.0;

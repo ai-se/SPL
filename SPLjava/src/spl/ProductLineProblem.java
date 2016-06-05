@@ -66,7 +66,6 @@ public class ProductLineProblem extends Problem {
         loadMandatoryDeadFeaturesIndices(mandatory, dead);
         loadSeed(seedfile);
         this.solutionType_ = new SPL_BinarySolution(this, numFeatures, fm,mandatoryFeaturesIndices, deadFeaturesIndices, seed);
-
     }
 
     public List<List<Integer>> getConstraints() {
