@@ -74,7 +74,7 @@ public class SPL_SettingsIBEA extends Settings {
 
         HashMap parameters; // Operator parameters
 
-        algorithm = new IBEATimeLimited(problem_,maxRunTimeMS);
+        algorithm = new SATIBEA_IBEATimeLimited(problem_,maxRunTimeMS);
 
         // Algorithm parameters
         algorithm.setInputParameter("populationSize", populationSize_);
@@ -121,7 +121,7 @@ public class SPL_SettingsIBEA extends Settings {
 
         HashMap parameters; // Operator parameters
 
-        algorithm = new IBEATimeLimited(problem_,maxRunTimeMS);
+        algorithm = new SATIBEA_IBEATimeLimited(problem_,maxRunTimeMS);
 
         // Algorithm parameters
         algorithm.setInputParameter("populationSize", populationSize_);

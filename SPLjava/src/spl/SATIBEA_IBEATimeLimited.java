@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author chris
  */
-public class IBEATimeLimited extends Algorithm {
+public class SATIBEA_IBEATimeLimited extends Algorithm {
 
     private int print_time = 0;
 
@@ -59,7 +59,7 @@ public class IBEATimeLimited extends Algorithm {
      *
      * @param problem Problem to solve
      */
-    public IBEATimeLimited(Problem problem, long maxRunTimeMS) {
+    public SATIBEA_IBEATimeLimited(Problem problem, long maxRunTimeMS) {
         super(problem);
         this.maxRunTimeMS = maxRunTimeMS;
     } // configureSPEA2
@@ -502,12 +502,12 @@ public class IBEATimeLimited extends Algorithm {
                 do {
                     j++;
                     parents[0] = (Solution) selectionOperator.execute(archive);
-                } while (j < IBEATimeLimited.TOURNAMENTS_ROUNDS); // do-while
+                } while (j < SATIBEA_IBEATimeLimited.TOURNAMENTS_ROUNDS); // do-while
                 int k = 0;
                 do {
                     k++;
                     parents[1] = (Solution) selectionOperator.execute(archive);
-                } while (k < IBEATimeLimited.TOURNAMENTS_ROUNDS); // do-while
+                } while (k < SATIBEA_IBEATimeLimited.TOURNAMENTS_ROUNDS); // do-while
 
                 //make the crossover
                 Solution[] offSpring = (Solution[]) crossoverOperator.execute(parents);
