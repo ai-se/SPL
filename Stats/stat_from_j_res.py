@@ -159,15 +159,12 @@ def get_stats(model_name, j_res_file_name):
         lines = map(lambda x: x.rstrip(), lines)
         start = lines.index("~~~")
         decs = lines[:start]
-        fits = lines[start+1:]
+        fits = lines[start+1:-2]
         pop_fitness = map(lambda x: x.split(" "), fits)
         for p_i, p in enumerate(pop_fitness):
             pop_fitness[p_i] = map(float, p)
 
     obj_max = get_obj_max()
-
-    for p in pop_fitness:
-        normalize(p, obj_max)
 
     creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5, correct=bool, conVio=list)
     creator.create("Individual", list, fitness=creator.FitnessMin, fulfill=list)
@@ -175,11 +172,13 @@ def get_stats(model_name, j_res_file_name):
     pop = list()
     for d, p in zip(decs, pop_fitness):
         ind = creator.Individual(map(int,list(d)))
+        correct = p[0] < 0.01
+        normalize(p, obj_max)
         ind.fitness = creator.FitnessMin(p)
-        ind.fitness.correct = p[0] < 0.01
+        ind.fitness.correct = correct
         pop.append(ind)
 
-    return stat_basing_on_pop(pop, record_valid_only=True)
+    return stat_basing_on_pop(pop, record_valid_only=False)
 
 import debug
-print get_stats("webportal", "test.txt")
+print get_stats("2.6.28.6-icse11", "2.6.28.6-icse11_IBEA_50k_1.txt")

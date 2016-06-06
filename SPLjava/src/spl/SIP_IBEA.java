@@ -304,6 +304,12 @@ public class SIP_IBEA extends Algorithm {
             } // while
             // End Create a offSpring solutionSet
             solutionSet = offSpringSolutionSet;
+
+//            double sum = 0;
+//            for (int i = 0; i < archive.size(); i++){
+//                sum += archive.get(i).getObjective(0);
+//            }
+//            System.out.println(sum/archive.size());
         } // while
 
         Ranking ranking = new Ranking(archive);
