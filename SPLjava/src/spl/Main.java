@@ -24,9 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import jmetal.core.*;
 import jmetal.encodings.variable.Binary;
@@ -43,10 +41,7 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.tools.ModelIterator;
 
-/**
- *
- * @author chris
- */
+
 public class Main {
 
     private static Random r = new Random();
@@ -60,7 +55,10 @@ public class Main {
 
         try {
             String name = args[0];
-            String fm = "/Users/jianfeng/git/SPL/dimacs_data/" + name + ".dimacs";
+            URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
+            String loc = location.toString();
+            String project_path = loc.substring(5, loc.lastIndexOf("SPL/")) + "SPL/";  // with '/' at the end
+            String fm = project_path + "dimacs_data/" + name + ".dimacs";
             String augment = fm + ".augment";
             String dead = fm + ".dead";
             String mandatory = fm + ".mandatory";
@@ -70,7 +68,7 @@ public class Main {
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
 //            Problem p = new ProductLineProblemNovelPrep(fm, augment, mandatory, dead, seed, opfile);
             Algorithm a;
-
+//            randomProductSet(30);
             int evaluation_times = Integer.parseInt(args[2]);
             String alg_name = args[1];
             String runid = "";
@@ -84,6 +82,9 @@ public class Main {
                     break;
                 case "SIPIBEA":
                     a = new SPL_SettingsIBEA(p).configureSIPIBEA(evaluation_times);
+                    break;
+                case "TT_I":
+                    a = new SPL_SettingsIBEA(p).configureTest(evaluation_times);
                     break;
                 case "SPEA2":
                     a = new SPL_SettingsEMOs(p).configureSPEA2(evaluation_times);
@@ -103,11 +104,8 @@ public class Main {
             SolutionSet pop = a.execute();
             float total_time = (System.currentTimeMillis() - start) / 1000.0f;
 
-            URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
-            String loc = location.toString();
-
             String file_tag = name + "_" + alg_name + '_' + evaluation_times/1000 + "k_" + runid + ".txt";
-            String file_path = (loc.substring(5, loc.lastIndexOf("SPL/"))+"SPL/j_res/" + file_tag);
+            String file_path = project_path + "j_res/" + file_tag;
             File file = new File(file_path);
 
             if (!file.exists()){
@@ -136,6 +134,8 @@ public class Main {
                 System.out.println("");
             }
 
+
+            System.out.println(total_time);
             bw.write("~~~\n" + total_time + "\n");
 
             bw.close();
@@ -143,7 +143,6 @@ public class Main {
 
         } catch (Exception e) {
             e.printStackTrace();
-//            System.out.println("Usage: java -jar spl.jar fmDimacs timeMS\nThe .augment, .dead, .mandatory and .richseed files should be in the same directory as the FM.");
         }
     }
 
@@ -220,6 +219,21 @@ public class Main {
 
         return s;
     }
+
+//    public static Binary[] randomProductSet(int requries) throws Exception{
+//        ISolver dimacsSolver = SolverFactory.instance().createSolverByName("MiniSAT");
+//        dimacsSolver.setTimeout(150);
+//        DimacsReader dr = new DimacsReader(dimacsSolver);
+//        dr.parseInstance(new FileReader(ProductLineProblem.fm));
+//
+//        ModelIterator solverIterator = new ModelIterator(dimacsSolver);
+//
+//        while (solverIterator.isSatisfiable()){
+//            int[] i = solverIterator.model();
+//            System.out.println(Arrays.toString(i));
+//        }
+//        return null;
+//    }
 
     public boolean[] randomProduct() {
 

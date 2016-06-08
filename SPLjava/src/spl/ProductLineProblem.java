@@ -23,7 +23,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.StringTokenizer;
+import java.util.stream.IntStream;
+
 import jmetal.core.Problem;
 import jmetal.core.Solution;
 import jmetal.core.Variable;
@@ -41,6 +44,7 @@ public class ProductLineProblem extends Problem {
     public static int numFeatures;
     protected int numConstraints;
     public static List<List<Integer>> constraints;
+    private float[] constraintWeight;
     protected double[] cost;
     protected boolean[] used_before;
     protected int[] defects;
@@ -65,6 +69,10 @@ public class ProductLineProblem extends Problem {
         loadFM(fm, augment);
         loadMandatoryDeadFeaturesIndices(mandatory, dead);
         loadSeed(seedfile);
+
+        constraintWeight = new float[constraints.size()];
+        Arrays.fill(constraintWeight, 1f);
+
         this.solutionType_ = new SPL_BinarySolution(this, numFeatures, fm,mandatoryFeaturesIndices, deadFeaturesIndices, seed);
     }
 
@@ -96,7 +104,8 @@ public class ProductLineProblem extends Problem {
             }
 
         }
-        sltn.setObjective(0, numViolatedConstraints(bin));
+//        sltn.setObjective(0, numViolatedConstraints(bin));
+        sltn.setObjective(0, weightedViolatedConstraints(bin));
         sltn.setObjective(1, unselected);
         sltn.setObjective(2, unused);
         sltn.setObjective(3, defect);
@@ -111,7 +120,19 @@ public class ProductLineProblem extends Problem {
         return numFeatures;
     }
 
-    
+    public void updateConstraintWeight(Binary[] bs){
+        int[] counter = new int[constraints.size()];
+        for (Binary b: bs){
+            ArrayList<Integer> tmp = violatedConstraintsIndex(b);
+            for (int i: tmp){
+                counter[i] += 1;
+            }
+        }
+        int sum = Arrays.stream(counter).sum();
+        for (int i = 0; i < this.constraintWeight.length; i ++){
+            constraintWeight[i] = (0f + counter[i]) / sum * constraints.size();
+        }
+    }
     
     
     public int numViolatedConstraints(Binary b) {
@@ -136,6 +157,53 @@ public class ProductLineProblem extends Problem {
         }
 
         return s;
+    }
+
+    public float weightedViolatedConstraints(Binary b) {
+
+        //IVecInt v = bitSetToVecInt(b);
+        float s = 0f;
+//        for (List<Integer> constraint : constraints) {
+        for (int index = 0; index < constraints.size(); index++){
+            List<Integer> constraint = constraints.get(index);
+            boolean sat = false;
+
+            for (Integer i : constraint) {
+                int abs = (i < 0) ? -i : i;
+                boolean sign = i > 0;
+                if (b.getIth(abs - 1) == sign) {
+                    sat = true;
+                    break;
+                }
+            }
+            if (!sat) {
+                s += constraintWeight[index];
+            }
+
+        }
+
+        return s;
+    }
+
+
+    public ArrayList<Integer> violatedConstraintsIndex(Binary b){
+        ArrayList<Integer> res = new ArrayList<>();
+        for (int index = 0; index < constraints.size(); index++){
+            List<Integer> constraint = constraints.get(index);
+            boolean sat = false;
+            for (Integer i: constraint){
+                int abs = (i < 0) ? -i: i;
+                boolean sign = i > 0;
+                if (b.getIth(abs - 1) == sign) {
+                    sat = true;
+                    break;
+                }
+            }
+            if (!sat){
+                res.add(index);
+            }
+        }
+        return res;
     }
 
     public void loadFM(String fm, String augment) throws Exception {

@@ -285,6 +285,51 @@ public class SPL_SettingsIBEA extends Settings {
         return algorithm;
     } // configure
 
+    public Algorithm configureTest(int maxEvaluations_) throws JMException {
+
+        populationSize_ = 100;
+        //maxEvaluations_ = 1000;
+        archiveSize_ = 100;
+
+        mutationProbability_ = 0.05;
+        crossoverProbability_ = 0.9;
+
+        Algorithm algorithm;
+        Operator selection;
+        Operator crossover;
+        Operator mutation;
+
+        HashMap parameters; // Operator parameters
+
+        algorithm = new TT_I(problem_);
+
+        // Algorithm parameters
+        algorithm.setInputParameter("populationSize", populationSize_);
+        algorithm.setInputParameter("maxEvaluations", maxEvaluations_);
+        algorithm.setInputParameter("archiveSize", archiveSize_);
+
+        // Mutation and Crossover for Real codification
+        parameters = new HashMap();
+        parameters.put("probability", crossoverProbability_);
+        crossover = new SPL_SinglePointCrossover(parameters);
+
+        parameters = new HashMap();
+        parameters.put("probability", mutationProbability_);
+        mutation = new BitFlipMutation(parameters);
+
+        /* Selection Operator */
+        parameters = new HashMap();
+        parameters.put("comparator", new FitnessComparator());
+        selection = new BinaryTournament(parameters);
+
+        // Add the operators to the algorithm
+        algorithm.addOperator("crossover", crossover);
+        algorithm.addOperator("mutation", mutation);
+        algorithm.addOperator("selection", selection);
+
+        return algorithm;
+    } // configure
+
     /**
      * Configure IBEA with user-defined parameter experiments.settings
      *

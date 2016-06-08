@@ -159,6 +159,7 @@ def get_stats(model_name, j_res_file_name):
         lines = map(lambda x: x.rstrip(), lines)
         start = lines.index("~~~")
         decs = lines[:start]
+        pdb.set_trace()
         fits = lines[start+1:-2]
         pop_fitness = map(lambda x: x.split(" "), fits)
         for p_i, p in enumerate(pop_fitness):
@@ -181,4 +182,4 @@ def get_stats(model_name, j_res_file_name):
     return stat_basing_on_pop(pop, record_valid_only=False)
 
 import debug
-print get_stats("2.6.28.6-icse11", "2.6.28.6-icse11_IBEA_50k_1.txt")
+print get_stats("linux", "2.6.28.6-icse11_IBEA_50k_1.txt")
