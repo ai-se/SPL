@@ -152,15 +152,17 @@ def get_stats(model_name, j_res_file_name):
 
     def normalize(fitness, objMax):
         for o_i, o in enumerate(fitness):
-            fitness[o_i] = o / obj_max[o_i]
+            fitness[o_i] = o / objMax[o_i]
 
     with open(PROJECT_PATH+'/j_res/'+j_res_file_name, 'r') as f:
         lines = f.readlines()
         lines = map(lambda x: x.rstrip(), lines)
         start = lines.index("~~~")
         decs = lines[:start]
-        pdb.set_trace()
+        print(len(set(decs)))
         fits = lines[start+1:-2]
+        runtime = float(lines[-1])
+        print("runtime: %f" % runtime)
         pop_fitness = map(lambda x: x.split(" "), fits)
         for p_i, p in enumerate(pop_fitness):
             pop_fitness[p_i] = map(float, p)
@@ -172,7 +174,7 @@ def get_stats(model_name, j_res_file_name):
 
     pop = list()
     for d, p in zip(decs, pop_fitness):
-        ind = creator.Individual(map(int,list(d)))
+        ind = creator.Individual(map(int, list(d)))
         correct = p[0] < 0.01
         normalize(p, obj_max)
         ind.fitness = creator.FitnessMin(p)
@@ -182,4 +184,4 @@ def get_stats(model_name, j_res_file_name):
     return stat_basing_on_pop(pop, record_valid_only=False)
 
 import debug
-print get_stats("linux", "2.6.28.6-icse11_IBEA_50k_1.txt")
+print get_stats("eshop", "eshop_SATIBEA_50k_1.txt")

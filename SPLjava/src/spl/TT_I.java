@@ -10,10 +10,7 @@ import jmetal.util.Ranking;
 import jmetal.util.comparators.DominanceComparator;
 import jmetal.encodings.variable.Binary;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class implementing the IBEA algorithm
@@ -281,9 +278,17 @@ public class TT_I extends Algorithm{
             for (int i = 0; i < archive.size(); i++){
                 map[i] = ((ProductLineProblem)this.problem_).violatedConstraintsIndex((Binary)archive.get(i).getDecisionVariables()[0]);
             }
+            int[] tmp_c = new int[343944];
+            for (ArrayList<Integer> aMap : map) {
+                for (int j : aMap) {
+                    tmp_c[j] += 1;
+                }
+            }
+            System.out.println(Arrays.toString(tmp_c).substring(0, 100));
 
             while (offSpringSolutionSet.size() < populationSize){
                 int r_0 = r.nextInt(archiveSize);
+
                 parents[0] = archive.get(r_0);
                 int cursor = 0;
                 int min = Integer.MAX_VALUE;

@@ -93,8 +93,10 @@ public class Main {
                     a = new SPL_SettingsEMOs(p).configureNSGA2(evaluation_times);
                     break;
                 case "SATIBEA":
-                    //a = new SPL_SettingsIBEA(p).configureICSE15(1000, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
-                    a = new SPL_SettingsIBEA(p).configureSATIBEA(evaluation_times, fm, ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
+                    //a = new SPL_SettingsIBEA(p).configureICSE15(1000, fm, ((ProductLineProblem) p).getNumFeatures(),
+                    // ((ProductLineProblem) p).getConstraints());
+                    a = new SPL_SettingsIBEA(p).configureSATIBEA(evaluation_times, fm,
+                            ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
                     break;
                 default:
                     a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
