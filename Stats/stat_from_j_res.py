@@ -28,8 +28,8 @@ from deap.benchmarks.tools import diversity, convergence
 from deap import creator, base
 from deap.tools.emo import sortNondominated
 from Stats.hv import HyperVolume
-from Stats.o import *
 import sys
+import glob
 import pdb
 
 sys.dont_write_btyecode = True
@@ -125,10 +125,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_rate
 
 
-def get_stats(model_name, j_res_file_name):
-    PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
-                      sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
+def get_stats(model_name, res_file):
     def get_obj_max():
         with open(PROJECT_PATH+'/dimacs_data/'+model_name+'.dimacs.augment', 'r') as f:
             lines = f.readlines()
@@ -154,15 +151,15 @@ def get_stats(model_name, j_res_file_name):
         for o_i, o in enumerate(fitness):
             fitness[o_i] = o / objMax[o_i]
 
-    with open(PROJECT_PATH+'/j_res/'+j_res_file_name, 'r') as f:
+    with open(res_file, 'r') as f:
         lines = f.readlines()
         lines = map(lambda x: x.rstrip(), lines)
         start = lines.index("~~~")
         decs = lines[:start]
-        print(len(set(decs)))
+        # print(len(set(decs)))
         fits = lines[start+1:-2]
         runtime = float(lines[-1])
-        print("runtime: %f" % runtime)
+        # print("runtime: %f" % runtime)
         pop_fitness = map(lambda x: x.split(" "), fits)
         for p_i, p in enumerate(pop_fitness):
             pop_fitness[p_i] = map(float, p)
@@ -181,7 +178,37 @@ def get_stats(model_name, j_res_file_name):
         ind.fitness.correct = correct
         pop.append(ind)
 
-    return stat_basing_on_pop(pop, record_valid_only=False)
+    return stat_basing_on_pop(pop, record_valid_only=True)
 
 import debug
-print get_stats("eshop", "eshop_SATIBEA_50k_1.txt")
+
+PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
+                  sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
+# res_file = PROJECT_PATH+'/j_res/'+'eshop_NSGA2_50k_1'+'.txt'
+# print(get_stats("eshop", res_file))
+
+model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
+all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
+algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
+
+for m in model:
+    print('*' * 5)
+    print(m)
+    if m == 'eshop(5M)':
+        tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
+        m = 'eshop'
+    elif m == 'eshop':
+        tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
+    else:
+        tt = filter(lambda f: m in f, all_records)
+
+    group_set = []
+
+    for alg in algs:
+        group_set.append(alg)
+        files = filter(lambda f: '_'+alg+'_' in f, tt)
+        hvs = []
+        for f in files:
+            hvs.append(get_stats(m, f)[0])
+        group_set.append(hvs)

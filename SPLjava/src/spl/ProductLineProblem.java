@@ -104,8 +104,8 @@ public class ProductLineProblem extends Problem {
             }
 
         }
-//        sltn.setObjective(0, numViolatedConstraints(bin));
-        sltn.setObjective(0, weightedViolatedConstraints(bin));
+        sltn.setObjective(0, numViolatedConstraints(bin));
+//        sltn.setObjective(0, weightedViolatedConstraints(bin));
         sltn.setObjective(1, unselected);
         sltn.setObjective(2, unused);
         sltn.setObjective(3, defect);

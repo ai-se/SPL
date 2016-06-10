@@ -99,7 +99,8 @@ public class Main {
                             ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
                     break;
                 default:
-                    a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
+                    a = new TestPlatform(p, 1000);
+//                  a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
             }
 
             long start = System.currentTimeMillis();
@@ -222,20 +223,7 @@ public class Main {
         return s;
     }
 
-//    public static Binary[] randomProductSet(int requries) throws Exception{
-//        ISolver dimacsSolver = SolverFactory.instance().createSolverByName("MiniSAT");
-//        dimacsSolver.setTimeout(150);
-//        DimacsReader dr = new DimacsReader(dimacsSolver);
-//        dr.parseInstance(new FileReader(ProductLineProblem.fm));
-//
-//        ModelIterator solverIterator = new ModelIterator(dimacsSolver);
-//
-//        while (solverIterator.isSatisfiable()){
-//            int[] i = solverIterator.model();
-//            System.out.println(Arrays.toString(i));
-//        }
-//        return null;
-//    }
+
 
     public boolean[] randomProduct() {
 
