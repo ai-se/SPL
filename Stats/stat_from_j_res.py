@@ -100,10 +100,10 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     """
     vpop = filter(lambda p: p.fitness.correct, pop)
     if len(pop) == 0:
-        return 0, 0, 0, 0, 0
+        return 0, 1, 0, 0, 0
 
     if record_valid_only and len(vpop) == 0:
-        return 0, 0, 0, 0, 0
+        return 0, 1, 0, 0, 0
 
     front = _get_frontier(vpop) if record_valid_only else _get_frontier(pop)
 
@@ -193,8 +193,8 @@ model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
 all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
 
+# hypervolume
 for m in model:
-    print('*' * 5)
     print(m)
     if m == 'eshop(5M)':
         tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
@@ -207,15 +207,34 @@ for m in model:
     group_set = []
 
     for alg in algs:
-        group_set.append(alg)
         files = filter(lambda f: '_'+alg+'_' in f, tt)
-        hvs = []
+        spreads = [alg]
         for f in files:
-            hvs.append(get_stats(m, f)[0])
-        group_set.append(hvs)
-    pdb.set_trace()
+            spreads.append(get_stats(m, f)[0])
+        group_set.append(spreads)
     Stat.rdivDemo(data=group_set, higherTheBetter=True)
 
-    print('*' * 5)
-    print()
+    print('\n' * 5)
 
+# spread
+for m in model:
+    print(m)
+    if m == 'eshop(5M)':
+        tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
+        m = 'eshop'
+    elif m == 'eshop':
+        tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
+    else:
+        tt = filter(lambda f: m in f, all_records)
+
+    group_set = []
+
+    for alg in algs:
+        files = filter(lambda f: '_'+alg+'_' in f, tt)
+        spreads = [alg]
+        for f in files:
+            spreads.append(get_stats(m, f)[1])
+        group_set.append(spreads)
+    Stat.rdivDemo(data=group_set, higherTheBetter=False)
+
+    print('\n' * 5)
