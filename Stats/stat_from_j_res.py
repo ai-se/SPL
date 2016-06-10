@@ -28,6 +28,7 @@ from deap.benchmarks.tools import diversity, convergence
 from deap import creator, base
 from deap.tools.emo import sortNondominated
 from Stats.hv import HyperVolume
+from Stats.result_stat import Stat
 import sys
 import glob
 import pdb
@@ -212,3 +213,9 @@ for m in model:
         for f in files:
             hvs.append(get_stats(m, f)[0])
         group_set.append(hvs)
+    pdb.set_trace()
+    Stat.rdivDemo(data=group_set, higherTheBetter=True)
+
+    print('*' * 5)
+    print()
+
