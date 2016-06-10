@@ -36,39 +36,39 @@ import pdb
 sys.dont_write_btyecode = True
 
 
-def dominates(row, rowCandidate):
-    return all(r >= rc for r, rc in zip(row, rowCandidate))
-
-
-def cull(pts):
-    dominated = []
-    cleared = []
-    remaining = pts
-    while remaining:
-        candidate = remaining[0]
-        new_remaining = []
-        for other in remaining[1:]:
-            [new_remaining, dominated][dominates(candidate, other)].append(other)
-        if not any(dominates(other, candidate) for other in new_remaining):
-            cleared.append(candidate)
-        else:
-            dominated.append(candidate)
-        remaining = new_remaining
-    return cleared, dominated
-
-
-def _get_frontier(pop):
-    """
-    return the pareto frontier of the given pop. No duplicate individuals in the returns
-    :param pop:
-    :return:
-    """
-    _, front = cull(pop)
-    uniques = []
-    for f in front:
-        if f not in uniques:
-            uniques.append(f)
-    return uniques
+# def dominates(row, rowCandidate):
+#     return all(r >= rc for r, rc in zip(row, rowCandidate))
+#
+#
+# def cull(pts):
+#     dominated = []
+#     cleared = []
+#     remaining = pts
+#     while remaining:
+#         candidate = remaining[0]
+#         new_remaining = []
+#         for other in remaining[1:]:
+#             [new_remaining, dominated][dominates(candidate, other)].append(other)
+#         if not any(dominates(other, candidate) for other in new_remaining):
+#             cleared.append(candidate)
+#         else:
+#             dominated.append(candidate)
+#         remaining = new_remaining
+#     return cleared, dominated
+#
+#
+# def _get_frontier(pop):
+#     """
+#     return the pareto frontier of the given pop. No duplicate individuals in the returns
+#     :param pop:
+#     :return:
+#     """
+#     _, front = cull(pop)
+#     uniques = []
+#     for f in front:
+#         if f not in uniques:
+#             uniques.append(f)
+#     return uniques
 
 
 def _get_frontier(pop):

@@ -38,7 +38,7 @@ def pycosatSol2binstr(sol):
     return ''.join(res)
 
 
-model = DimacsModel('linux')
+model = DimacsModel('ecos')
 inds = []
 i = 0
 cnfs = deepcopy(model.cnfs)
@@ -52,9 +52,9 @@ while True:
         inds.append(model.Individual(pycosatSol2binstr(sol)))
     tmp = map(list, zip(*inds))
     tmp = map(lambda x:len(set(x)), tmp)
-    group1 =  [i for i,j in enumerate(tmp) if j > 1]
+    group1 = [i for i,j in enumerate(tmp) if j > 1]
 
-    print group1
+    print(group1)
 
     addition = []
     for i, j in zip(group1, itemgetter(*group1)(inds[0])):
