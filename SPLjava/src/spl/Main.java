@@ -68,7 +68,6 @@ public class Main {
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
 //            Problem p = new ProductLineProblemNovelPrep(fm, augment, mandatory, dead, seed, opfile);
             Algorithm a;
-//            randomProductSet(30);
             int evaluation_times = Integer.parseInt(args[2]);
             String alg_name = args[1];
             String runid = "";
@@ -83,9 +82,6 @@ public class Main {
                 case "SIPIBEA":
                     a = new SPL_SettingsIBEA(p).configureSIPIBEA(evaluation_times);
                     break;
-                case "TT_I":
-                    a = new SPL_SettingsIBEA(p).configureTest(evaluation_times);
-                    break;
                 case "SPEA2":
                     a = new SPL_SettingsEMOs(p).configureSPEA2(evaluation_times);
                     break;
@@ -99,8 +95,7 @@ public class Main {
                             ((ProductLineProblem) p).getNumFeatures(), ((ProductLineProblem) p).getConstraints());
                     break;
                 default:
-                    a = new TestPlatform(p, 1000);
-//                  a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
+                  a = new SPL_SettingsIBEA(p).configureICSE2013(evaluation_times);
             }
 
             long start = System.currentTimeMillis();
