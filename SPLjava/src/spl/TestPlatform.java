@@ -30,7 +30,7 @@ public class TestPlatform extends Algorithm {
     public TestPlatform(Problem problem, long maxRunTimeMS) throws Exception {
         super(problem);
         this.maxRunTimeMS = maxRunTimeMS;
-         x = randomProductSet(1000);
+//         x = randomProductSet(1000);
     } // configureSPEA2
 
     public  static Binary[] randomProductSet(int requries) throws Exception{
@@ -57,7 +57,7 @@ public class TestPlatform extends Algorithm {
 
 
     public SolutionSet execute() throws JMException, ClassNotFoundException {
-        Solution xx = new Solution(this.problem_, x);
+//        Solution xx = new Solution(this.problem_, x);
 
         return null;
     }

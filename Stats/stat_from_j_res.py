@@ -36,41 +36,6 @@ import pdb
 sys.dont_write_btyecode = True
 
 
-# def dominates(row, rowCandidate):
-#     return all(r >= rc for r, rc in zip(row, rowCandidate))
-#
-#
-# def cull(pts):
-#     dominated = []
-#     cleared = []
-#     remaining = pts
-#     while remaining:
-#         candidate = remaining[0]
-#         new_remaining = []
-#         for other in remaining[1:]:
-#             [new_remaining, dominated][dominates(candidate, other)].append(other)
-#         if not any(dominates(other, candidate) for other in new_remaining):
-#             cleared.append(candidate)
-#         else:
-#             dominated.append(candidate)
-#         remaining = new_remaining
-#     return cleared, dominated
-#
-#
-# def _get_frontier(pop):
-#     """
-#     return the pareto frontier of the given pop. No duplicate individuals in the returns
-#     :param pop:
-#     :return:
-#     """
-#     _, front = cull(pop)
-#     uniques = []
-#     for f in front:
-#         if f not in uniques:
-#             uniques.append(f)
-#     return uniques
-
-
 def _get_frontier(pop):
     """
     return the pareto frontier of the given pop. No duplicate individuals in the returns
@@ -100,10 +65,10 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     """
     vpop = filter(lambda p: p.fitness.correct, pop)
     if len(pop) == 0:
-        return 0, 1, 0, 0, 0
+        return 0, 1, 1, 0, 0
 
     if record_valid_only and len(vpop) == 0:
-        return 0, 1, 0, 0, 0
+        return 0, 1, 1, 0, 0
 
     front = _get_frontier(vpop) if record_valid_only else _get_frontier(pop)
 
@@ -114,12 +79,10 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
 
     first, last = sort_front_by_obj0[0], sort_front_by_obj0[-1]
     spread = diversity(front, first, last)
-
     if optimal_in_theory is None:  # not available!!
         IGD = -1
     else:
         IGD = convergence(front, optimal_in_theory)
-
     frontier_size = len(front)
     valid_rate = len(vpop) / len(pop)
 
@@ -179,21 +142,32 @@ def get_stats(model_name, res_file):
         ind.fitness.correct = correct
         pop.append(ind)
 
-    return stat_basing_on_pop(pop, record_valid_only=True)
+    # fetch the optimal_on_theory
+    with open(PROJECT_PATH+'/optimal_in_his/'+model_name+'.txt', 'r') as f:
+        lines = f.readlines()
+        lines = map(lambda x: x.rstrip(), lines)
+        start = lines.index("~~~")
+        fits = lines[start + 1:-2]
+        opt_pop_fitness = map(lambda x: x.split(" "), fits)
+        for p_i, p in enumerate(opt_pop_fitness):
+            opt_pop_fitness[p_i] = map(float, p)
+    optimal_in_theory = list()
+    for p in opt_pop_fitness:
+        normalize(p, obj_max)
+        optimal_in_theory.append(p)
+
+    return stat_basing_on_pop(pop, record_valid_only=True, optimal_in_theory=optimal_in_theory)
 
 import debug
 
 PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-# res_file = PROJECT_PATH+'/j_res/'+'eshop_NSGA2_50k_1'+'.txt'
-# print(get_stats("eshop", res_file))
-
 model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
+# model = ['eshop']
 all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
 
-# hypervolume
 for m in model:
     print(m)
     if m == 'eshop(5M)':
@@ -204,37 +178,28 @@ for m in model:
     else:
         tt = filter(lambda f: m in f, all_records)
 
-    group_set = []
+    group_set_hv = []
+    group_set_spread = []
+    group_set_igd = []
 
     for alg in algs:
         files = filter(lambda f: '_'+alg+'_' in f, tt)
+        hvs = [alg]
         spreads = [alg]
+        igds = [alg]
         for f in files:
-            spreads.append(get_stats(m, f)[0])
-        group_set.append(spreads)
-    Stat.rdivDemo(data=group_set, higherTheBetter=True)
-
-    print('\n' * 5)
-
-# spread
-for m in model:
-    print(m)
-    if m == 'eshop(5M)':
-        tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
-        m = 'eshop'
-    elif m == 'eshop':
-        tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
-    else:
-        tt = filter(lambda f: m in f, all_records)
-
-    group_set = []
-
-    for alg in algs:
-        files = filter(lambda f: '_'+alg+'_' in f, tt)
-        spreads = [alg]
-        for f in files:
-            spreads.append(get_stats(m, f)[1])
-        group_set.append(spreads)
-    Stat.rdivDemo(data=group_set, higherTheBetter=False)
+            a, b, c, _, _ = get_stats(m, f)
+            hvs.append(a)
+            spreads.append(b)
+            igds.append(c)
+        group_set_hv.append(hvs)
+        group_set_spread.append(spreads)
+        group_set_igd.append(igds)
+    print('Hypervolume')
+    Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
+    print('\n\nSpread')
+    Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
+    print('\n\nIGD')
+    Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
 
     print('\n' * 5)

@@ -56,9 +56,9 @@ public class ProductLineProblem extends Problem {
     
     protected static final int N_VARS = 1, N_OBJS = 5;
 
-    public ProductLineProblem(){
-
-    }
+//    public ProductLineProblem(){
+//
+//    }
 
     public ProductLineProblem(String fm, String augment, String mandatory, String dead, String seedfile) throws Exception {
         this.numberOfVariables_ = N_VARS;
@@ -120,19 +120,19 @@ public class ProductLineProblem extends Problem {
         return numFeatures;
     }
 
-    public void updateConstraintWeight(Binary[] bs){
-        int[] counter = new int[constraints.size()];
-        for (Binary b: bs){
-            ArrayList<Integer> tmp = violatedConstraintsIndex(b);
-            for (int i: tmp){
-                counter[i] += 1;
-            }
-        }
-        int sum = Arrays.stream(counter).sum();
-        for (int i = 0; i < this.constraintWeight.length; i ++){
-            constraintWeight[i] = (0f + counter[i]) / sum * constraints.size();
-        }
-    }
+//    public void updateConstraintWeight(Binary[] bs){
+//        int[] counter = new int[constraints.size()];
+//        for (Binary b: bs){
+//            ArrayList<Integer> tmp = violatedConstraintsIndex(b);
+//            for (int i: tmp){
+//                counter[i] += 1;
+//            }
+//        }
+//        int sum = Arrays.stream(counter).sum();
+//        for (int i = 0; i < this.constraintWeight.length; i ++){
+//            constraintWeight[i] = (0f + counter[i]) / sum * constraints.size();
+//        }
+//    }
     
     
     public int numViolatedConstraints(Binary b) {
@@ -159,31 +159,31 @@ public class ProductLineProblem extends Problem {
         return s;
     }
 
-    public float weightedViolatedConstraints(Binary b) {
-
-        //IVecInt v = bitSetToVecInt(b);
-        float s = 0f;
-//        for (List<Integer> constraint : constraints) {
-        for (int index = 0; index < constraints.size(); index++){
-            List<Integer> constraint = constraints.get(index);
-            boolean sat = false;
-
-            for (Integer i : constraint) {
-                int abs = (i < 0) ? -i : i;
-                boolean sign = i > 0;
-                if (b.getIth(abs - 1) == sign) {
-                    sat = true;
-                    break;
-                }
-            }
-            if (!sat) {
-                s += constraintWeight[index];
-            }
-
-        }
-
-        return s;
-    }
+//    public float weightedViolatedConstraints(Binary b) {
+//
+//        //IVecInt v = bitSetToVecInt(b);
+//        float s = 0f;
+////        for (List<Integer> constraint : constraints) {
+//        for (int index = 0; index < constraints.size(); index++){
+//            List<Integer> constraint = constraints.get(index);
+//            boolean sat = false;
+//
+//            for (Integer i : constraint) {
+//                int abs = (i < 0) ? -i : i;
+//                boolean sign = i > 0;
+//                if (b.getIth(abs - 1) == sign) {
+//                    sat = true;
+//                    break;
+//                }
+//            }
+//            if (!sat) {
+//                s += constraintWeight[index];
+//            }
+//
+//        }
+//
+//        return s;
+//    }
 
 
     public ArrayList<Integer> violatedConstraintsIndex(Binary b){
