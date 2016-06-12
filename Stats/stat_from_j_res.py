@@ -71,7 +71,6 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         return 0, 1, 1, 0, 0
 
     front = _get_frontier(vpop) if record_valid_only else _get_frontier(pop)
-
     front_objs = [f.fitness.values for f in front]
     reference_point = [1] * len(front_objs[0])
     hv = HyperVolume(reference_point).compute(front_objs)  # did NOT use deap module calc
@@ -131,7 +130,7 @@ def get_stats(model_name, res_file):
     obj_max = get_obj_max()
 
     creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5, correct=bool, conVio=list)
-    creator.create("Individual", list, fitness=creator.FitnessMin, fulfill=list)
+    creator.create("Individual", tuple, fitness=creator.FitnessMin, fulfill=list)
 
     pop = list()
     for d, p in zip(decs, pop_fitness):
@@ -155,7 +154,6 @@ def get_stats(model_name, res_file):
     for p in opt_pop_fitness:
         normalize(p, obj_max)
         optimal_in_theory.append(p)
-
     return stat_basing_on_pop(pop, record_valid_only=True, optimal_in_theory=optimal_in_theory)
 
 import debug
@@ -163,43 +161,49 @@ import debug
 PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
-# model = ['eshop']
-all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
-algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
+# model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
+# # model = ['eshop']
+# all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
+# algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
+#
+# for m in model:
+#     print(m)
+#     if m == 'eshop(5M)':
+#         tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
+#         m = 'eshop'
+#     elif m == 'eshop':
+#         tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
+#     else:
+#         tt = filter(lambda f: m in f, all_records)
+#
+#     group_set_hv = []
+#     group_set_spread = []
+#     group_set_igd = []
+#
+#     for alg in algs:
+#         files = filter(lambda f: '_'+alg+'_' in f, tt)
+#         hvs = [alg]
+#         spreads = [alg]
+#         igds = [alg]
+#         for f in files:
+#             a, b, c, _, _ = get_stats(m, f)
+#             hvs.append(a)
+#             spreads.append(b)
+#             igds.append(c)
+#         group_set_hv.append(hvs)
+#         group_set_spread.append(spreads)
+#         group_set_igd.append(igds)
+#     print('Hypervolume')
+#     Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
+#     print('\n\nSpread')
+#     Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
+#     print('\n\nIGD')
+#     Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
+#
+#     print('\n' * 5)
 
-for m in model:
-    print(m)
-    if m == 'eshop(5M)':
-        tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
-        m = 'eshop'
-    elif m == 'eshop':
-        tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
-    else:
-        tt = filter(lambda f: m in f, all_records)
+print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
+print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_50k_2.txt')
 
-    group_set_hv = []
-    group_set_spread = []
-    group_set_igd = []
-
-    for alg in algs:
-        files = filter(lambda f: '_'+alg+'_' in f, tt)
-        hvs = [alg]
-        spreads = [alg]
-        igds = [alg]
-        for f in files:
-            a, b, c, _, _ = get_stats(m, f)
-            hvs.append(a)
-            spreads.append(b)
-            igds.append(c)
-        group_set_hv.append(hvs)
-        group_set_spread.append(spreads)
-        group_set_igd.append(igds)
-    print('Hypervolume')
-    Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
-    print('\n\nSpread')
-    Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
-    print('\n\nIGD')
-    Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
-
-    print('\n' * 5)
+# print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/eshop_SATIBEA_50k_10.txt')

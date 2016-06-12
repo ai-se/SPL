@@ -26,7 +26,8 @@ import sys
 from os import path
 from deap import base, creator, tools
 from ProductLine.dimacs_parser import load_product_url
-
+import bitstring
+import random
 
 sys.dont_write_btyecode = True
 
@@ -55,7 +56,7 @@ class DimacsModel:
                 self.used_before.append(bool(int(b)))
                 self.defects.append(int(c))
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5)
+        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5, vioconindex=list())
         creator.create("Individual", str, fitness=creator.FitnessMin)
 
         self.creator = creator
@@ -65,15 +66,28 @@ class DimacsModel:
         self.toolbox.register("evaluate", self.eval_ind)
         self.eval = self.toolbox.evaluate
 
+    def get_random_bit_ind(self, background=None, mask=None):
+        dec = ''
+        if mask is None:
+            mask = range(self.featureNum)
+        for i in range(self.featureNum):
+            if i in mask:
+                dec += random.choice(['0', '1'])
+            else:
+                dec += background[i]
+        return self.Individual(dec)
+
     def eval_ind(self, ind):
         convio = 0
-        for c in self.cnfs:
+        ind.fitness.vioconindex = []
+        for c_i, c in enumerate(self.cnfs):
             corr = False
             for x in c:
                 if sign(x) == ind[abs(x)-1]:
                     corr = True
                     break
             if not corr:
+                ind.fitness.vioconindex.append(c_i)
                 convio += 1
 
         unselected, unused, defect, cost = 0, 0, 0, 0
