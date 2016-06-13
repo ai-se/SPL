@@ -21,10 +21,13 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+from __future__ import division
 from ProductLine.DimacsModel import DimacsModel
 from operator import itemgetter
 from copy import deepcopy
 from deap import tools
+from itertools import groupby
+from Stats.stat_from_j_res import stat_basing_on_pop
 from sway import sway
 import pycosat
 import random
@@ -134,7 +137,7 @@ def binary_tournament_selc(population, return_size):
 def run(model):
     groups, appendix = grouping_dimacs_model_by_sat_solver(model)
     toolbox = model.toolbox
-    NGEN = 50
+    NGEN = 20
     MU = 300
     CXPB = 0.03
 
@@ -143,8 +146,12 @@ def run(model):
     # for sol, _ in zip(sat_engine, range(MU)):
     #     pop.append(model.Individual(pycosatSol2binstr(sol)))
 
-    for i in appendix:
-        pop.append(model.Individual(i))
+    # for i in appendix:
+    #     pop.append(model.Individual(i))
+    with open("/Users/jianfeng/git/SPL/seed.txt", 'r') as f:
+        lines = f.readlines()
+        for l in lines:
+            pop.append(model.Individual(l[:-1]))
 
     def dominate(ind1, ind2):
         if not ind1.fitness.valid:
@@ -153,21 +160,25 @@ def run(model):
             model.eval(ind2)
         return ind1 < ind2
 
-    out = sway(pop, better=dominate, enough=MU)
-    pop = out[0]
-
+    # out = sway(pop, better=dominate, enough=MU)
+    # pop = out[0]
     # for _ in range(int(MU)):
     #     # pop.append(model.get_random_bit_ind(background=appendix[0], mask=[j for i in groups for j in i]))
-    #     appendix.append(model.get_random_bit_ind())
+    #     pop.append(model.gen_random_bit_ind_r(random.uniform(0,1)))
+        # appendix.append(model.get_random_bit_ind())
 
     random.shuffle(pop)
     pop = pop[:MU]
     for p in pop:
         if not p.fitness.valid:
             model.eval(p)
-    return pop
+    # return pop
+
+    # assigning the group id
+    for p in pop:
+        p.gid = int(p.count('1') / len(p) * 10)
+
     for gen in range(1, NGEN):
-        print(gen)
         for p in pop:
             if not p.fitness.valid:
                 model.eval(p)
@@ -175,15 +186,34 @@ def run(model):
         # pdb.set_trace()
         offspring = tools.selTournamentDCD(pop, len(pop))
         offspring = [toolbox.clone(ind) for ind in offspring]
-        for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() <= CXPB:
-                a = offspring.index(ind1)
-                b = offspring.index(ind2)
-                offspring[a], offspring[b] = mate(ind1, ind2, groups, model)
-                offspring[a] = intra_group_mutate(offspring[a], groups, appendix, model)
-                offspring[b] = intra_group_mutate(offspring[b], groups, appendix, model)
-                model.eval(offspring[a])
-                model.eval(offspring[b])
+
+        for k, g in groupby(offspring, lambda x: x.gid):
+            g = list(g)
+            if len(g) < 2: continue
+            for ind1, ind2 in zip(g[::2], g[1::2]):
+                if random.random() <= CXPB:
+                    a = offspring.index(ind1)
+                    b = offspring.index(ind2)
+                    offspring[a], offspring[b] = mate(ind1, ind2, groups, model)
+                    # offspring[a] = intra_group_mutate(offspring[a], groups, appendix, model)
+                    # offspring[b] = intra_group_mutate(offspring[b], groups, appendix, model)
+                    model.eval(offspring[a])
+                    model.eval(offspring[b])
+                    # pdb.set_trace()
+                    # del ind1.fitness.values, ind2.fitness.values
+
+        for p in offspring:
+            p.gid = int(p.count('1') / len(p) * 10)
+
+        # for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
+        #     if random.random() <= CXPB:
+        #         a = offspring.index(ind1)
+        #         b = offspring.index(ind2)
+        #         offspring[a], offspring[b] = mate(ind1, ind2, groups, model)
+        #         # offspring[a] = intra_group_mutate(offspring[a], groups, appendix, model)
+        #         # offspring[b] = intra_group_mutate(offspring[b], groups, appendix, model)
+        #         model.eval(offspring[a])
+        #         model.eval(offspring[b])
                 # pdb.set_trace()
             # del ind1.fitness.values, ind2.fitness.values
 

@@ -93,4 +93,4 @@ def print_out_optimals(model_name):
             f.write(' '.join(map(str, fer)))
             f.write('\n')
 
-print_out_optimals('linux')
+print_out_optimals('ecos')

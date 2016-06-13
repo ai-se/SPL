@@ -77,6 +77,15 @@ class DimacsModel:
                 dec += background[i]
         return self.Individual(dec)
 
+    def gen_random_bit_ind_r(self, pb=0.5):
+        dec = ''
+        for i in range(self.featureNum):
+            if random.uniform(0,1) <= pb:
+                dec += '1'
+            else:
+                dec += '0'
+        return self.Individual(dec)
+
     def eval_ind(self, ind):
         convio = 0
         ind.fitness.vioconindex = []

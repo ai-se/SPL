@@ -26,22 +26,26 @@ public class GroupedProblem {
 
         }
         try {
-//            IOrder order = new RandomWalkDecorator(new VarOrderHeap(new PositiveLiteralSelectionStrategy()), 1);
+            IOrder order = new RandomWalkDecorator(new VarOrderHeap(new NegativeLiteralSelectionStrategy()), 1);
             ISolver dimacsSolver = SolverFactory.instance().createSolverByName("MiniSAT");
             dimacsSolver.setTimeout(1000);
             DimacsReader dr = new DimacsReader(dimacsSolver);
             dr.parseInstance(new FileReader(fm));
-
-//            ((Solver) dimacsSolver).setOrder(order);
+//
+            ((Solver) dimacsSolver).setOrder(order);
             ISolver solverIterator = new ModelIterator(dimacsSolver);
             solverIterator.setTimeoutMs(10000);
             ArrayList<int[]> solutions = new ArrayList();
             int num = 0;
             while (solverIterator.isSatisfiable()) {
                 int[] i = solverIterator.model();
-                solutions.add(i);
-                if (num++ > trigger_size)
-                    break;
+                for(int x:i)
+                    System.out.print(x>0?'1':'0');
+                System.out.println();
+                continue;
+//                solutions.add(i);
+//                if (num++ > trigger_size)
+//                    break;
             }
 
             for (int i = 0; i < solutions.get(0).length; i++){
