@@ -159,11 +159,11 @@ def binary_tournament_selc(population, return_size):
     return parents
 
 
-def run(model):
+def run(model, seedonly=False):
     # groups, appendix = grouping_dimacs_model_by_sat_solver(model)
     groups = []
     toolbox = model.toolbox
-    NGEN = 50
+    NGEN = 150
     MU = 300
     CXPB = 0.04
 
@@ -198,7 +198,8 @@ def run(model):
     for p in pop:
         if not p.fitness.valid:
             model.eval(p)
-    # return pop
+
+    if seedonly: return pop
 
     for gen in range(1, NGEN):
         for p in pop:
@@ -248,23 +249,25 @@ def run(model):
 
 def running(model_name):
     model = DimacsModel(model_name)
-    t1 = time.time()
-    rr = run(model)
-    runtime = time.time() - t1
-    with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_1k_{1}.txt".format(model_name, 1), "w") as f:
-        for r in rr:
-            f.write(r)
+    for i in range(1,3):
+        t1 = time.time()
+        rr = run(model)
+        runtime = time.time() - t1
+        with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_50k_{1}.txt".format(model_name, i), "w") as f:
+        # with open("/Users/jianfeng/git/SPL/j_res/{0}_SWAY_{1}.txt".format(model_name, i), "w") as f:
+            for r in rr:
+                f.write(r)
+                f.write('\n')
+            f.write('~~~\n')
+            for r in rr:
+                f.write(' '.join(map(str, r.fitness.values)))
+                f.write('\n')
+            f.write('~~~\n')
+            f.write(str(runtime))
             f.write('\n')
-        f.write('~~~\n')
-        for r in rr:
-            f.write(' '.join(map(str, r.fitness.values)))
-            f.write('\n')
-        f.write('~~~\n')
-        f.write(str(runtime))
-        f.write('\n')
 
 import debug
-running('freebsd')
+running('linux')
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
