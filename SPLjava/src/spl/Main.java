@@ -67,7 +67,7 @@ public class Main {
 
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
 //            Problem p = new ProductLineProblemNovelPrep(fm, augment, mandatory, dead, seed, opfile);
-//            GroupedProblem.grouping((ProductLineProblem) p, 100); System.exit(0);
+            GroupedProblem.grouping((ProductLineProblem) p, 100); System.exit(0);
             Algorithm a;
             int evaluation_times = Integer.parseInt(args[2]);
             String alg_name = args[1];

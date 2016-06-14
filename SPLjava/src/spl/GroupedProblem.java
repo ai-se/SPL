@@ -23,7 +23,6 @@ public class GroupedProblem {
         boolean[] prod = new boolean[problem.getNumFeatures()];
         for (int i = 0; i < prod.length; i++) {
             prod[i] = r.nextBoolean();
-
         }
         try {
             IOrder order = new RandomWalkDecorator(new VarOrderHeap(new NegativeLiteralSelectionStrategy()), 1);
@@ -38,9 +37,22 @@ public class GroupedProblem {
             ArrayList<int[]> solutions = new ArrayList();
             int num = 0;
             while (solverIterator.isSatisfiable()) {
+
+                for (int i = 0; i < prod.length; i++) {
+//                    prod[i] = r.nextBoolean();
+                    prod[i] = false;
+//                    prod[i] = true;
+                }
+
                 int[] i = solverIterator.model();
-                for(int x:i)
-                    System.out.print(x>0?'1':'0');
+                for(int x:i){
+                    if (x > 0)
+                        prod[x-1] = true;
+                    else
+                        prod[-x-1] = false;
+                }
+                for (boolean x:prod)
+                    System.out.print(x?'1':'0');
                 System.out.println();
                 continue;
 //                solutions.add(i);

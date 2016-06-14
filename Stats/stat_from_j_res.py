@@ -160,11 +160,13 @@ import debug
 
 PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
-# model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
+#
+# # model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
+# model = ['eshop', 'ecos']
 # # model = ['eshop']
 # all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
-# algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
+# algs = ['SAT1', 'IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
 #
 # for m in model:
 #     print(m)
@@ -182,6 +184,8 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 #
 #     for alg in algs:
 #         files = filter(lambda f: '_'+alg+'_' in f, tt)
+#         if len(files) == 0:
+#             continue
 #         hvs = [alg]
 #         spreads = [alg]
 #         igds = [alg]
@@ -202,8 +206,11 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 #
 #     print('\n' * 5)
 
-print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
 # print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_550k_32.txt')
 
-# print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SAT1_1k_1.txt')
 # print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/eshop_SATIBEA_50k_10.txt')
+
+print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/freebsd_SAT1_1k_1.txt')
+print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/freebsd_SATIBEA_5k_31.txt')

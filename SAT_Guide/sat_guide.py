@@ -248,8 +248,10 @@ def run(model):
 
 def running(model_name):
     model = DimacsModel(model_name)
+    t1 = time.time()
     rr = run(model)
-    with open("/Users/jianfeng/git/SPL/j_res/e.txt", "w") as f:
+    runtime = time.time() - t1
+    with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_1k_{1}.txt".format(model_name, 1), "w") as f:
         for r in rr:
             f.write(r)
             f.write('\n')
@@ -257,10 +259,12 @@ def running(model_name):
         for r in rr:
             f.write(' '.join(map(str, r.fitness.values)))
             f.write('\n')
-        f.write('~~~\n3\n')
+        f.write('~~~\n')
+        f.write(str(runtime))
+        f.write('\n')
 
 import debug
-running('ecos')
+running('freebsd')
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-

@@ -92,5 +92,8 @@ def print_out_optimals(model_name):
         for fer in frontier:
             f.write(' '.join(map(str, fer)))
             f.write('\n')
-
-print_out_optimals('ecos')
+try:
+    model = sys.argv[1]
+except:
+    model = 'linux'
+print_out_optimals(model)
