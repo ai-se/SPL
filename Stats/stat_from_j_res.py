@@ -203,7 +203,7 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 #     print('\n' * 5)
 
 print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
-# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_50k_2.txt')
+# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_550k_32.txt')
 
 # print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/e.txt')
 # print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/eshop_SATIBEA_50k_10.txt')

@@ -39,6 +39,7 @@ sign = lambda x: '1' if x>0 else '0'
 
 class DimacsModel:
     def __init__(self, fm_name):
+        self.name = fm_name
         fm = "{0}/dimacs_data/{1}.dimacs".format(PROJECT_PATH, fm_name)
         _, self.featureNum, self.cnfs, self.cnfNum = load_product_url(fm)
 

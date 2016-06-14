@@ -26,9 +26,10 @@ from ProductLine.DimacsModel import DimacsModel
 from operator import itemgetter
 from copy import deepcopy
 from deap import tools
-from itertools import groupby
-from Stats.stat_from_j_res import stat_basing_on_pop
+from itertools import groupby, islice
+# from Stats.stat_from_j_res import stat_basing_on_pop
 from sway import sway
+import time
 import pycosat
 import random
 import pdb
@@ -107,18 +108,42 @@ def intra_group_mutate(ind, groups, appendix, model):
 
 
 def mate(ind1, ind2, groups, model):
-    g = deepcopy(groups)
-    random.shuffle(g)
-    g = g[:int(len(g)*0.1)]
-    g = [item for i in g for item in i]
-    s1 = list(ind1)
-    s2 = list(ind2)
-    for i in range(len(s1)):
-        if i in g:
-            s1[i], s2[i] = s2[i], s1[i]
-    ind1 = model.Individual(''.join(s1))
-    ind2 = model.Individual(''.join(s2))
-    return ind1, ind2
+    # g = deepcopy(groups)
+    # random.shuffle(g)
+    # g = g[:int(len(g)*0.1)]
+    # g = [item for i in g for item in i]
+    # s1 = list(ind1)
+    # s2 = list(ind2)
+    # for i in range(len(s1)):
+    #     if i in g:
+    #         s1[i], s2[i] = s2[i], s1[i]
+    # split_point = random.randint(0, len(s1))
+    # ind1 = model.Individual(''.join(s1[:split_point]+s2[split_point:]))
+    # ind2 = model.Individual(''.join(s2[:split_point]+s1[split_point:]))
+    # pdb.set_trace()
+    # return ind1, ind2
+
+    diff = [i for i, (x, y) in enumerate(zip(ind1, ind2)) if x != y]
+    # lock the irrelevant parts
+    cnfs = []
+    for i in range(len(ind1)):
+        if random.random() < 0.1: continue
+        if i not in diff:
+            if ind1[i] == '1':
+                cnfs += [[i+1]]
+            else:
+                cnfs += [[-i-1]]
+    sat_engine = pycosat.itersolve(model.cnfs + cnfs)
+    l = list(islice(sat_engine, 2))
+    if len(l) == 0:
+        return ind1, ind2
+    if len(l) == 1:
+        return model.Individual(pycosatSol2binstr(l[0])), ind2
+    else:
+        ind1 = model.Individual(pycosatSol2binstr(l[0]))
+        ind2 = model.Individual(pycosatSol2binstr(l[1]))
+        # pdb.set_trace()
+        return ind1, ind2
 
 
 def binary_tournament_selc(population, return_size):
@@ -135,11 +160,12 @@ def binary_tournament_selc(population, return_size):
 
 
 def run(model):
-    groups, appendix = grouping_dimacs_model_by_sat_solver(model)
+    # groups, appendix = grouping_dimacs_model_by_sat_solver(model)
+    groups = []
     toolbox = model.toolbox
-    NGEN = 20
+    NGEN = 50
     MU = 300
-    CXPB = 0.03
+    CXPB = 0.04
 
     pop = []
     # sat_engine = pycosat.itersolve(model.cnfs)
@@ -148,17 +174,17 @@ def run(model):
 
     # for i in appendix:
     #     pop.append(model.Individual(i))
-    with open("/Users/jianfeng/git/SPL/seed.txt", 'r') as f:
+    with open("/Users/jianfeng/git/SPL/tmp_seed/"+model.name+".txt", 'r') as f:
         lines = f.readlines()
         for l in lines:
             pop.append(model.Individual(l[:-1]))
 
-    def dominate(ind1, ind2):
-        if not ind1.fitness.valid:
-            model.eval(ind1)
-        if not ind2.fitness.valid:
-            model.eval(ind2)
-        return ind1 < ind2
+    # def dominate(ind1, ind2):
+    #     if not ind1.fitness.valid:
+    #         model.eval(ind1)
+    #     if not ind2.fitness.valid:
+    #         model.eval(ind2)
+    #     return ind1 < ind2
 
     # out = sway(pop, better=dominate, enough=MU)
     # pop = out[0]
@@ -174,21 +200,21 @@ def run(model):
             model.eval(p)
     # return pop
 
-    # assigning the group id
-    for p in pop:
-        p.gid = int(p.count('1') / len(p) * 10)
-
     for gen in range(1, NGEN):
         for p in pop:
             if not p.fitness.valid:
                 model.eval(p)
         tools.emo.assignCrowdingDist(pop)
-        # pdb.set_trace()
         offspring = tools.selTournamentDCD(pop, len(pop))
         offspring = [toolbox.clone(ind) for ind in offspring]
 
-        for k, g in groupby(offspring, lambda x: x.gid):
-            g = list(g)
+        # get the group id
+        for p in offspring:
+            p.gid = int(p.count('1') / len(p) * 10)
+        gids = [i.gid for i in offspring]
+
+        for k in set(gids):
+            g = [ind for i, ind in enumerate(offspring) if gids[i] == k]
             if len(g) < 2: continue
             for ind1, ind2 in zip(g[::2], g[1::2]):
                 if random.random() <= CXPB:
@@ -201,9 +227,6 @@ def run(model):
                     model.eval(offspring[b])
                     # pdb.set_trace()
                     # del ind1.fitness.values, ind2.fitness.values
-
-        for p in offspring:
-            p.gid = int(p.count('1') / len(p) * 10)
 
         # for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
         #     if random.random() <= CXPB:
