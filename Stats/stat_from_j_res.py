@@ -162,7 +162,7 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 #
 # model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
-model = ['eshop', 'ecos', 'freebsd', 'linux']
+model = ['eshop', 'ecos', 'freebsd']
 # model = ['eshop']
 all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
