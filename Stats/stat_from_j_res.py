@@ -85,7 +85,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     frontier_size = len(front)
     valid_rate = len(vpop) / len(pop)
 
-    return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_rate
+    return round(hv, 3), round(spread, 3), IGD, frontier_size, valid_rate
 
 
 def get_stats(model_name, res_file):
@@ -162,11 +162,11 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 #
 # model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
-model = ['eshop', 'ecos', 'freebsd']
-# model = ['eshop']
+model = ['eshop', 'ecos', 'freebsd', 'linux']
+# model = ['freebsd']
 all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
-algs = ['SAT1', 'SWAY' 'SATIBEA']
+algs = ['SAT1', 'SWAY', 'SATIBEA']
 
 for m in model:
     print(m)
@@ -204,12 +204,12 @@ for m in model:
         group_set_spread.append(spreads)
         group_set_igd.append(igds)
         group_set_runtime.append(runtimes)
-
     print('Hypervolume')
     Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
     print('\n\nSpread')
     Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
     print('\n\nIGD')
+    pdb.set_trace()
     Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
     print('\n\nRuntime')
     Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)

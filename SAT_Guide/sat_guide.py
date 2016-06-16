@@ -163,7 +163,7 @@ def run(model, seedonly=False):
     # groups, appendix = grouping_dimacs_model_by_sat_solver(model)
     groups = []
     toolbox = model.toolbox
-    NGEN = 150
+    NGEN = 50
     MU = 300
     CXPB = 0.04
 
@@ -207,6 +207,7 @@ def run(model, seedonly=False):
                 model.eval(p)
         tools.emo.assignCrowdingDist(pop)
         offspring = tools.selTournamentDCD(pop, len(pop))
+        pdb.set_trace()
         offspring = [toolbox.clone(ind) for ind in offspring]
 
         # get the group id
@@ -253,7 +254,8 @@ def running(model_name):
         t1 = time.time()
         rr = run(model)
         runtime = time.time() - t1
-        with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_50k_{1}.txt".format(model_name, i), "w") as f:
+        with open("/Users/jianfeng/git/SPL/j_res/e.txt".format(model_name, i), "w") as f:
+        # with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_50k_{1}.txt".format(model_name, i), "w") as f:
         # with open("/Users/jianfeng/git/SPL/j_res/{0}_SWAY_{1}.txt".format(model_name, i), "w") as f:
             for r in rr:
                 f.write(r)
@@ -267,7 +269,7 @@ def running(model_name):
             f.write('\n')
 
 import debug
-running('linux')
+running('ecos')
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
