@@ -207,14 +207,14 @@ def run(model, seedonly=False):
                 model.eval(p)
         tools.emo.assignCrowdingDist(pop)
         offspring = tools.selTournamentDCD(pop, len(pop))
-        pdb.set_trace()
         offspring = [toolbox.clone(ind) for ind in offspring]
 
         # get the group id
         for p in offspring:
             p.gid = int(p.count('1') / len(p) * 10)
         gids = [i.gid for i in offspring]
-
+        if gen == NGEN-2:
+            pdb.set_trace()
         for k in set(gids):
             g = [ind for i, ind in enumerate(offspring) if gids[i] == k]
             if len(g) < 2: continue
@@ -244,7 +244,6 @@ def run(model, seedonly=False):
 
         # Select the next generation parents
         pop[:] = tools.selNSGA2(pop + offspring, MU)
-
     return pop
 
 

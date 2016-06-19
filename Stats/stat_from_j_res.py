@@ -160,13 +160,14 @@ import debug
 
 PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-#
+
 # model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
-model = ['eshop', 'ecos', 'freebsd', 'linux']
+model = ['eshop', 'fiasco', 'ecos', 'freebsd', 'linux', 'uClinux']
 # model = ['freebsd']
 all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
-algs = ['SAT1', 'SWAY', 'SATIBEA']
+all_records += glob.glob('/Users/jianfeng/Desktop/j_res_sat/*.txt')
+algs = ['SWAY', 'SATIBEA0', 'SATIBEA50k']
 
 for m in model:
     print(m)
@@ -184,7 +185,12 @@ for m in model:
     group_set_runtime = []
 
     for alg in algs:
-        files = filter(lambda f: '_'+alg+'_' in f, tt)
+        if alg == 'SWAY':
+            files = filter(lambda f: '_'+alg+'_' in f, tt)
+        if alg == 'SATIBEA0':
+            files = filter(lambda f: '_SATIBEA_0k_' in f, tt)
+        if alg == 'SATIBEA50k':
+            files = filter(lambda f: '_SATIBEA_50k_' in f, tt)
         if len(files) == 0:
             continue
         hvs = [alg]
@@ -204,23 +210,21 @@ for m in model:
         group_set_spread.append(spreads)
         group_set_igd.append(igds)
         group_set_runtime.append(runtimes)
-    print('Hypervolume')
-    Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
-    print('\n\nSpread')
-    Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
-    print('\n\nIGD')
-    pdb.set_trace()
+    # print('Hypervolume')
+    # Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
+    # print('\n\nSpread')
+    # Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
+    # print('\n\nIGD')
+    print(group_set_igd)
     Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
-    print('\n\nRuntime')
-    Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)
+    # print('\n\nRuntime')
+    # Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)
 
     print('\n' * 5)
 
-# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
-# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_550k_32.txt')
 
 # print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SAT1_1k_1.txt')
 # print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/eshop_SATIBEA_50k_10.txt')
 
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SAT1_1k_1.txt')
-# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_5k_33.txt')
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_5k_45.txt')
