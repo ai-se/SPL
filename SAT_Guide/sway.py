@@ -26,33 +26,15 @@ from __future__ import division
 import sys
 from math import sqrt, exp
 import random
+import itertools
 import pdb
 sys.dont_write_btyecode = True
 
 
-def bin_dominate(ind1, ind2):
-    """
-
-    Args:
-        ind1:
-        ind2:
-    ALL VALUES ARE LESS IS MORE!!!!
-    Returns: whether ind1 dominates ind2, i.e. True if ind1 is better than ind2
-
-    """
-    f1 = tuple(ind1.fitness.values)
-    f2 = tuple(ind2.fitness.values)
-
-    for i, j in zip(f1, f2):
-        if i > j:
-            return False
-
-    if f1 == f2:
-        return False
-    return True
-
 mins = list()
 maxs = list()
+evalFunc = None
+evalCount = 0
 
 
 def _norm(f1):
@@ -78,11 +60,49 @@ def cont_dominate(ind1, ind2):
     ALL VALUES ARE LESS IS MORE!!!!
     Returns: whether ind1 dominates ind2, i.e. True if ind1 is better than ind2
     """
+    global evalCount
+    if not ind1.fitness.valid:
+        evalFunc(ind1)
+        evalCount += 1
+
+    if not ind2.fitness.valid:
+        evalFunc(ind2)
+        evalCount += 1
+
     f1 = tuple(ind1.fitness.values)
     f2 = tuple(ind2.fitness.values)
     f1 = _norm(f1)
     f2 = _norm(f2)
     return _loss(f1, f2) < _loss(f2, f1)
+
+
+def bin_dominate(ind1, ind2):
+    """
+
+    Args:
+        ind1:
+        ind2:
+    ALL VALUES ARE LESS IS MORE!!!!
+    Returns: whether ind1 dominates ind2, i.e. True if ind1 is better than ind2
+
+    """
+    global evalCount
+    if not ind1.fitness.valid:
+        evalFunc(ind1)
+        evalCount += 1
+    if not ind2.fitness.valid:
+        evalCount += 1
+        evalFunc(ind2)
+    f1 = tuple(ind1.fitness.values)
+    f2 = tuple(ind2.fitness.values)
+
+    for i, j in zip(f1, f2):
+        if i > j:
+            return False
+
+    if f1 == f2:
+        return False
+    return True
 
 
 def distance(ind1, ind2):
@@ -94,13 +114,12 @@ def distance(ind1, ind2):
     return d
 
 
-def sway(pop, better=bin_dominate, enough=None):
-    global mins, maxs
-    if len(mins) == 0 or len(maxs) == 0:
-        fits = [p.fitness.values for p in pop]
-        fits = map(list, zip(*fits))
-        mins = map(min, fits)
-        maxs = map(max, fits)
+def sway(pop, ms, Ms, evalfunc, better=bin_dominate, enough=None):
+    global evalCount, mins, maxs, evalFunc
+    mins = ms
+    maxs = Ms
+    evalFunc = evalfunc
+    evalCount = 0
 
     if enough is None:
         enough = max(sqrt(len(pop)), 20)
@@ -139,4 +158,5 @@ def sway(pop, better=bin_dominate, enough=None):
                 cluster(east_items, out)
         return out
 
-    return cluster(pop, [])
+    res = cluster(pop, [])
+    return list(itertools.chain.from_iterable(res))

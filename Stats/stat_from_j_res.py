@@ -162,69 +162,69 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 # model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
-model = ['eshop', 'fiasco', 'ecos', 'freebsd', 'linux', 'uClinux']
-# model = ['freebsd']
-all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
-all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
-all_records += glob.glob('/Users/jianfeng/Desktop/j_res_sat/*.txt')
-algs = ['SWAY', 'SATIBEA0', 'SATIBEA50k']
+# model = ['eshop', 'fiasco', 'ecos', 'freebsd', 'linux', 'uClinux']
+# # model = ['freebsd']
+# all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
+# all_records += glob.glob('/Users/jianfeng/Desktop/j_res_sat/*.txt')
+# algs = ['SWAY', 'SATIBEA0', 'SATIBEA50k']
+#
+# for m in model:
+#     print(m)
+#     if m == 'eshop(5M)':
+#         tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
+#         m = 'eshop'
+#     elif m == 'eshop':
+#         tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
+#     else:
+#         tt = filter(lambda f: m in f, all_records)
+#
+#     group_set_hv = []
+#     group_set_spread = []
+#     group_set_igd = []
+#     group_set_runtime = []
+#
+#     for alg in algs:
+#         if alg == 'SWAY':
+#             files = filter(lambda f: '_'+alg+'_' in f, tt)
+#         if alg == 'SATIBEA0':
+#             files = filter(lambda f: '_SATIBEA_0k_' in f, tt)
+#         if alg == 'SATIBEA50k':
+#             files = filter(lambda f: '_SATIBEA_50k_' in f, tt)
+#         if len(files) == 0:
+#             continue
+#         hvs = [alg]
+#         spreads = [alg]
+#         igds = [alg]
+#         runtimes = [alg]
+#
+#         for f in files:
+#             (a, b, c, d, e), runtime = get_stats(m, f)
+#             if e == 0: continue
+#             hvs.append(a)
+#             spreads.append(b)
+#             igds.append(c)
+#             runtimes.append(runtime)
+#         if len(hvs) == 1: continue
+#         group_set_hv.append(hvs)
+#         group_set_spread.append(spreads)
+#         group_set_igd.append(igds)
+#         group_set_runtime.append(runtimes)
+#     # print('Hypervolume')
+#     # Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
+#     # print('\n\nSpread')
+#     # Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
+#     # print('\n\nIGD')
+#     print(group_set_igd)
+#     Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
+#     # print('\n\nRuntime')
+#     # Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)
+#
+#     print('\n' * 5)
 
-for m in model:
-    print(m)
-    if m == 'eshop(5M)':
-        tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
-        m = 'eshop'
-    elif m == 'eshop':
-        tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
-    else:
-        tt = filter(lambda f: m in f, all_records)
 
-    group_set_hv = []
-    group_set_spread = []
-    group_set_igd = []
-    group_set_runtime = []
-
-    for alg in algs:
-        if alg == 'SWAY':
-            files = filter(lambda f: '_'+alg+'_' in f, tt)
-        if alg == 'SATIBEA0':
-            files = filter(lambda f: '_SATIBEA_0k_' in f, tt)
-        if alg == 'SATIBEA50k':
-            files = filter(lambda f: '_SATIBEA_50k_' in f, tt)
-        if len(files) == 0:
-            continue
-        hvs = [alg]
-        spreads = [alg]
-        igds = [alg]
-        runtimes = [alg]
-
-        for f in files:
-            (a, b, c, d, e), runtime = get_stats(m, f)
-            if e == 0: continue
-            hvs.append(a)
-            spreads.append(b)
-            igds.append(c)
-            runtimes.append(runtime)
-        if len(hvs) == 1: continue
-        group_set_hv.append(hvs)
-        group_set_spread.append(spreads)
-        group_set_igd.append(igds)
-        group_set_runtime.append(runtimes)
-    # print('Hypervolume')
-    # Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
-    # print('\n\nSpread')
-    # Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
-    # print('\n\nIGD')
-    print(group_set_igd)
-    Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
-    # print('\n\nRuntime')
-    # Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)
-
-    print('\n' * 5)
-
-
-# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SAT1_1k_1.txt')
-# print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/eshop_SATIBEA_50k_10.txt')
+print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
+print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_50k_1.txt')
 
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SAT1_1k_1.txt')
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_5k_45.txt')

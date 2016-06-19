@@ -32,6 +32,7 @@ from sway import sway
 import time
 import pycosat
 import random
+import subprocess
 import pdb
 
 
@@ -158,6 +159,78 @@ def binary_tournament_selc(population, return_size):
 
     return parents
 
+def printseeds(model, order=2):
+    t1 = time.time()
+    p = subprocess.Popen(
+        ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'positive', str(int(10 ** order / 3))],
+        stdout=subprocess.PIPE)
+    xs1 = p.communicate()[0].split('\n')[:-1]
+    p = subprocess.Popen(
+        ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'negative', str(int(10 ** order / 3))],
+        stdout=subprocess.PIPE)
+    xs2 = p.communicate()[0].split('\n')[:-1]
+    p = subprocess.Popen(
+        ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'random', str(int(10 ** order / 3))],
+        stdout=subprocess.PIPE)
+    xs3 = p.communicate()[0].split('\n')[:-1]
+
+    lines = xs1 + xs2 + xs3
+    random.shuffle(lines)
+    t2 = time.time() - t1
+
+    with open('/Users/jianfeng/git/SPL/tmp_seed/'+model.name+'.txt', 'w') as f:
+        for l in lines:
+            f.writelines(l+'\n')
+        f.write('~~~\n')
+        f.write(str(t2)+'\n')
+
+skiptime = 0
+
+def sway(model, order=4, use_bin_instead_of_con = False, applyseed=False):
+    global skiptime
+    skiptime = 0
+    from SAT_Guide.sway import bin_dominate, cont_dominate, sway, evalCount
+    cmpr = bin_dominate if use_bin_instead_of_con else cont_dominate
+    mins = [0, 0, 0, 0, 0]
+    maxs = [model.cnfNum, model.featureNum, model.featureNum, sum(model.defects), sum(model.cost)]
+
+    # generating the random seed
+    pop = []
+    if applyseed:
+        with open('/Users/jianfeng/git/SPL/tmp_seed/'+model.name+'.txt', 'r') as f:
+            lines = f.readlines()
+            skiptime = float(lines[-1])
+            lines = lines[:-2]
+            lines = map(lambda x:x.strip(), lines)
+            random.shuffle(lines)
+    else:
+        p = subprocess.Popen(
+            ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'positive', str(int(10**order/3))],
+            stdout=subprocess.PIPE)
+        xs1 = p.communicate()[0].split('\n')[:-1]
+        p = subprocess.Popen(
+            ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'negative', str(int(10 ** order / 3))],
+            stdout=subprocess.PIPE)
+        xs2 = p.communicate()[0].split('\n')[:-1]
+        p = subprocess.Popen(
+            ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'random', str(int(10 ** order / 3))],
+            stdout=subprocess.PIPE)
+        xs3 = p.communicate()[0].split('\n')[:-1]
+
+        lines = xs1 + xs2 + xs3
+        random.shuffle(lines)
+
+    for l in lines:
+        pop.append(model.Individual(l))
+
+    final_pop = sway(pop, ms = mins, Ms = maxs, evalfunc = model.eval, better=cmpr, enough = 300)
+    evalC = evalCount
+    for p in final_pop:
+        if not p.fitness.valid:
+            model.eval(p)
+
+    return final_pop, evalC
+
 
 def run(model, swayonly=False):
     # groups, appendix = grouping_dimacs_model_by_sat_solver(model)
@@ -251,13 +324,19 @@ def run(model, swayonly=False):
 
 def running(model_name):
     model = DimacsModel(model_name)
-    for i in range(1,3):
+    # printseeds(model, 4)
+    # exit(0)
+    for i in range(10,21):
         t1 = time.time()
-        rr = run(model, swayonly=True)
+        # rr = run(model, swayonly=True)
+        rr, eval_count = sway(model, use_bin_instead_of_con=(i%2==0), applyseed=True)
         runtime = time.time() - t1
-        with open("/Users/jianfeng/git/SPL/j_res/e.txt".format(model_name, i), "w") as f:
-        # with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_50k_{1}.txt".format(model_name, i), "w") as f:
-        # with open("/Users/jianfeng/git/SPL/j_res/{0}_SWAY_{1}.txt".format(model_name, i), "w") as f:
+        if (i%2==0):
+            alg = 'SWAY4B'
+        else:
+            alg = 'SWAY4C'
+
+        with open("../j_res/{0}_{1}_{2}_{3}.txt".format(model_name, alg, eval_count,i), "w") as f:
             for r in rr:
                 f.write(r)
                 f.write('\n')
@@ -266,11 +345,11 @@ def running(model_name):
                 f.write(' '.join(map(str, r.fitness.values)))
                 f.write('\n')
             f.write('~~~\n')
-            f.write(str(runtime))
+            f.write(str(runtime+skiptime))
             f.write('\n')
 
 import debug
-running('ecos')
+running('fiasco')
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
