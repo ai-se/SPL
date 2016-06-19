@@ -89,6 +89,9 @@ public class Main {
                 case "NSGA2":
                     a = new SPL_SettingsEMOs(p).configureNSGA2(evaluation_times);
                     break;
+                case "IBEASEED":
+                    a = new SPL_SettingsIBEA(p).configureIBEASEED(evaluation_times);
+                    break;
                 case "SATIBEA":
                     //a = new SPL_SettingsIBEA(p).configureICSE15(1000, fm, ((ProductLineProblem) p).getNumFeatures(),
                     // ((ProductLineProblem) p).getConstraints());

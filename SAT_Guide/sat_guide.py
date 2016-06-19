@@ -159,7 +159,7 @@ def binary_tournament_selc(population, return_size):
     return parents
 
 
-def run(model, seedonly=False):
+def run(model, swayonly=False):
     # groups, appendix = grouping_dimacs_model_by_sat_solver(model)
     groups = []
     toolbox = model.toolbox
@@ -199,7 +199,9 @@ def run(model, seedonly=False):
         if not p.fitness.valid:
             model.eval(p)
 
-    if seedonly: return pop
+    if swayonly:
+        t = sway(pop)
+        pdb.set_trace()
 
     for gen in range(1, NGEN):
         for p in pop:
@@ -251,7 +253,7 @@ def running(model_name):
     model = DimacsModel(model_name)
     for i in range(1,3):
         t1 = time.time()
-        rr = run(model)
+        rr = run(model, swayonly=True)
         runtime = time.time() - t1
         with open("/Users/jianfeng/git/SPL/j_res/e.txt".format(model_name, i), "w") as f:
         # with open("/Users/jianfeng/git/SPL/j_res/{0}_SAT1_50k_{1}.txt".format(model_name, i), "w") as f:

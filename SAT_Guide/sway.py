@@ -24,13 +24,84 @@
 
 from __future__ import division
 import sys
-from math import sqrt
+from math import sqrt, exp
 import random
 import pdb
 sys.dont_write_btyecode = True
 
 
-def sway(pop, better, enough=None):
+def bin_dominate(ind1, ind2):
+    """
+
+    Args:
+        ind1:
+        ind2:
+    ALL VALUES ARE LESS IS MORE!!!!
+    Returns: whether ind1 dominates ind2, i.e. True if ind1 is better than ind2
+
+    """
+    f1 = tuple(ind1.fitness.values)
+    f2 = tuple(ind2.fitness.values)
+
+    for i, j in zip(f1, f2):
+        if i > j:
+            return False
+
+    if f1 == f2:
+        return False
+    return True
+
+mins = list()
+maxs = list()
+
+
+def _norm(f1):
+    res = list()
+    for f, m, M in zip(f1, mins, maxs):
+        if m == M:
+            res.append(0)
+        else:
+            res.append((f-m)/(M-m))
+    return res
+
+
+def _loss(f1, f2):
+    return sum(exp(i - j) for i, j in zip(f1, f2)) / len(f1)
+
+
+def cont_dominate(ind1, ind2):
+    """
+
+    Args:
+        ind1:
+        ind2:
+    ALL VALUES ARE LESS IS MORE!!!!
+    Returns: whether ind1 dominates ind2, i.e. True if ind1 is better than ind2
+    """
+    f1 = tuple(ind1.fitness.values)
+    f2 = tuple(ind2.fitness.values)
+    f1 = _norm(f1)
+    f2 = _norm(f2)
+    return _loss(f1, f2) < _loss(f2, f1)
+
+
+def distance(ind1, ind2):
+    # Jaccard distance
+    d = 0
+    for i, j in zip(ind1, ind2):
+        if i != j:
+            d += 1
+    return d
+
+
+def sway(pop, better=bin_dominate, enough=None):
+    global mins, maxs
+    if len(mins) == 0 or len(maxs) == 0:
+        fits = [p.fitness.values for p in pop]
+        fits = map(list, zip(*fits))
+        mins = map(min, fits)
+        maxs = map(max, fits)
+
     if enough is None:
         enough = max(sqrt(len(pop)), 20)
 
@@ -44,14 +115,6 @@ def sway(pop, better, enough=None):
                 res = x
         return res
 
-    def distance(ind1, ind2):
-        # Jaccard distance
-        d = 0
-        for i, j in zip(ind1, ind2):
-            if i != j:
-                d += 1
-        return d
-
     def split(items, middle):
         rand = random.choice(items)
         east = furthest(rand, items)
@@ -60,8 +123,8 @@ def sway(pop, better, enough=None):
         for x in items:
             a = distance(x, west)
             b = distance(x, east)
-            # x.d = (a*a + c*c - b*b) / (2*c + 0.0001)
-            x.d = min(a, b)
+            x.d = (a*a + c*c - b*b) / (2*c + 0.0001)
+            # x.d = min(a, b)
         items = sorted(items, key=lambda i: i.d)
         return west, east, items[:middle], items[middle:]
 
