@@ -326,7 +326,7 @@ def running(model_name):
     model = DimacsModel(model_name)
     # printseeds(model, 4)
     # exit(0)
-    for i in range(10,21):
+    for i in range(11, 16):
         t1 = time.time()
         # rr = run(model, swayonly=True)
         rr, eval_count = sway(model, use_bin_instead_of_con=(i%2==0), applyseed=True)
@@ -349,7 +349,7 @@ def running(model_name):
             f.write('\n')
 
 import debug
-running('fiasco')
+running('linux')
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-

@@ -34,7 +34,7 @@ public class TMP_m {
         }
 
         ISolver dimacsSolver = SolverFactory.instance().createSolverByName("MiniSAT");
-        dimacsSolver.setTimeout(1000);
+        dimacsSolver.setTimeout(10000000);
         DimacsReader dr = new DimacsReader(dimacsSolver);
         URL location = Main.class.getProtectionDomain().getCodeSource().getLocation();
         String loc = location.toString();
@@ -43,7 +43,7 @@ public class TMP_m {
 //
         ((Solver) dimacsSolver).setOrder(order);
         ISolver solverIterator = new ModelIterator(dimacsSolver);
-        solverIterator.setTimeoutMs(10000);
+        solverIterator.setTimeoutMs(10000000);
         int mode = 3;
         if (args[2].equals("positive"))
             mode = 1;
