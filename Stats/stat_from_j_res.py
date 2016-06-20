@@ -24,7 +24,8 @@
 
 from __future__ import division
 from os import path
-from deap.benchmarks.tools import diversity, convergence
+from deap.benchmarks.tools import diversity
+from Stats.igd import igd_metric
 from deap import creator, base
 from deap.tools.emo import sortNondominated
 from Stats.hv import HyperVolume
@@ -81,7 +82,7 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     if optimal_in_theory is None:  # not available!!
         IGD = -1
     else:
-        IGD = convergence(front, optimal_in_theory)
+        IGD = igd_metric(front, optimal_in_theory)
     frontier_size = len(front)
     valid_rate = len(vpop) / len(pop)
 
@@ -167,7 +168,7 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 # all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 # all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
 # all_records += glob.glob('/Users/jianfeng/Desktop/j_res_sat/*.txt')
-# algs = ['SWAY', 'SATIBEA0', 'SATIBEA50k']
+# algs = ['SWAY4B', 'SWAY4C', 'SATIBEA0', 'SATIBEA50k']
 #
 # for m in model:
 #     print(m)
@@ -185,7 +186,7 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 #     group_set_runtime = []
 #
 #     for alg in algs:
-#         if alg == 'SWAY':
+#         if alg == 'SWAY4B' or alg == 'SWAY4C':
 #             files = filter(lambda f: '_'+alg+'_' in f, tt)
 #         if alg == 'SATIBEA0':
 #             files = filter(lambda f: '_SATIBEA_0k_' in f, tt)
@@ -210,21 +211,28 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 #         group_set_spread.append(spreads)
 #         group_set_igd.append(igds)
 #         group_set_runtime.append(runtimes)
-#     # print('Hypervolume')
+#     print('Hypervolume')
+#     print(group_set_hv)
 #     # Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
-#     # print('\n\nSpread')
+#     print('\n\nSpread')
+#     print(group_set_spread)
 #     # Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
-#     # print('\n\nIGD')
+#     print('\n\nIGD')
 #     print(group_set_igd)
-#     Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
-#     # print('\n\nRuntime')
+#     # Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
+#     print('\n\nRuntime')
+#     print(group_set_runtime)
 #     # Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)
 #
 #     print('\n' * 5)
 
 
-print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
-print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_50k_1.txt')
+# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_50k_1.txt')
 
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SAT1_1k_1.txt')
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_5k_45.txt')
+
+print get_stats('uClinux', '/Users/jianfeng/git/SPL/j_res/e.txt')
+print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_50k_21.txt')
+print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_0k_10024.txt')
