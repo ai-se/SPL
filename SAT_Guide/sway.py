@@ -107,10 +107,11 @@ def bin_dominate(ind1, ind2):
 
 def distance(ind1, ind2):
     # Jaccard distance
-    d = 0
-    for i, j in zip(ind1, ind2):
-        if i != j:
-            d += 1
+    # d = 0
+    # for i, j in zip(ind1, ind2):
+    #     if i != j:
+    #         d += 1
+    d = abs(ind1.count('1')-ind2.count('1'))
     return d
 
 
@@ -137,13 +138,13 @@ def sway(pop, ms, Ms, evalfunc, better=bin_dominate, enough=None):
     def split(items, middle):
         rand = random.choice(items)
         east = furthest(rand, items)
-        west = furthest(rand, items)
+        west = furthest(east, items)
         c = distance(west, east)
         for x in items:
             a = distance(x, west)
             b = distance(x, east)
-            x.d = (a*a + c*c - b*b) / (2*c + 0.0001)
-            # x.d = min(a, b)
+            # x.d = (a*a + c*c - b*b) / (2*c + 0.0001)
+            x.d = min(a, b)
         items = sorted(items, key=lambda i: i.d)
         return west, east, items[:middle], items[middle:]
 

@@ -24,7 +24,7 @@
 
 from __future__ import division
 from os import path
-from deap.benchmarks.tools import diversity
+from deap.benchmarks.tools import diversity, convergence
 from Stats.igd import igd_metric
 from deap import creator, base
 from deap.tools.emo import sortNondominated
@@ -75,10 +75,12 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
     front_objs = [f.fitness.values for f in front]
     reference_point = [1] * len(front_objs[0])
     hv = HyperVolume(reference_point).compute(front_objs)  # did NOT use deap module calc
+    # hv = -1  # TODO
     sort_front_by_obj0 = sorted(front, key=lambda f: f.fitness.values[1], reverse=True)
 
     first, last = sort_front_by_obj0[0], sort_front_by_obj0[-1]
     spread = diversity(front, first, last)
+    # spread = -1  # TODO
     if optimal_in_theory is None:  # not available!!
         IGD = -1
     else:
@@ -168,7 +170,10 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 # all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
 # all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/*.txt')
 # all_records += glob.glob('/Users/jianfeng/Desktop/j_res_sat/*.txt')
-# algs = ['SWAY4B', 'SWAY4C', 'SATIBEA0', 'SATIBEA50k']
+# all_records += glob.glob('/Users/jianfeng/Desktop/j_res_jun21/*.txt')
+#
+# # algs = ['SWAY4B', 'SWAY4C', 'SATIBEA0', 'SATIBEA50k']
+# algs = ['IBEASEED']
 #
 # for m in model:
 #     print(m)
@@ -192,6 +197,8 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 #             files = filter(lambda f: '_SATIBEA_0k_' in f, tt)
 #         if alg == 'SATIBEA50k':
 #             files = filter(lambda f: '_SATIBEA_50k_' in f, tt)
+#         if alg == 'IBEASEED':
+#             files = filter(lambda f: '_IBEASEED_50k_' in f, tt)
 #         if len(files) == 0:
 #             continue
 #         hvs = [alg]
@@ -232,7 +239,14 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SAT1_1k_1.txt')
 # print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_5k_45.txt')
+#
+# # print get_stats('uClinux', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# # print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_50k_21.txt')
+# # print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_0k_10024.txt')
+#
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_50k_18.txt')
+# print get_stats('linux', '/Users/jianfeng/Desktop/j_res_sat/linux_SATIBEA_0k_10024.txt')
 
-print get_stats('uClinux', '/Users/jianfeng/git/SPL/j_res/e.txt')
-print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_50k_21.txt')
-print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_0k_10024.txt')
+
+print get_stats('eshop', '/Users/jianfeng/git/SPL/j_res/e.txt')

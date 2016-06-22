@@ -25,14 +25,14 @@
 from __future__ import division
 from math import sqrt
 import sys
-
+import pdb
 sys.dont_write_btyecode = True
 
 
-def igd_metric(first_front, optimal_front):
+def igd_metric(first_front, ref_front):
     dimension = len(first_front[0].fitness.values)
     distances = []
-    for opt_ind in optimal_front:
+    for opt_ind in ref_front:
         distances.append(float("inf"))
         for ind in first_front:
             dist = 0.

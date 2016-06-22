@@ -159,7 +159,7 @@ def binary_tournament_selc(population, return_size):
 
     return parents
 
-def printseeds(model, order=2):
+def printseeds(model, order=2, output_without_write=False):
     t1 = time.time()
     p = subprocess.Popen(
         ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'positive', str(int(10 ** order / 3))],
@@ -177,6 +177,9 @@ def printseeds(model, order=2):
     lines = xs1 + xs2 + xs3
     random.shuffle(lines)
     t2 = time.time() - t1
+
+    if output_without_write:
+        return lines
 
     with open('/Users/jianfeng/git/SPL/tmp_seed/'+model.name+'.txt', 'w') as f:
         for l in lines:
@@ -204,7 +207,6 @@ def sway(model, order=4, use_bin_instead_of_con = False, applyseed=False):
             lines = map(lambda x:x.strip(), lines)
             random.shuffle(lines)
     else:
-        order = 3.5
         p = subprocess.Popen(
             ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'positive', str(int(10**order/3))],
             stdout=subprocess.PIPE)
@@ -217,30 +219,95 @@ def sway(model, order=4, use_bin_instead_of_con = False, applyseed=False):
             ['java', '-jar', 'minisat.jar', model.name, str(model.featureNum), 'random', str(int(10 ** order / 3))],
             stdout=subprocess.PIPE)
         xs3 = p.communicate()[0].split('\n')[:-1]
-        lines = xs1 + xs2 + xs3
+        # lines = xs1 + xs2 + xs3
+        lines = xs3
         random.shuffle(lines)
-
-    for l in lines[:1000]:
+    lines = list(set(lines))
+    for l in lines:
         pop.append(model.Individual(l))
     for p in pop:
         model.eval(p)
-    return pop, 4
-    final_pop = sway(pop, ms = mins, Ms = maxs, evalfunc = model.eval, better=cmpr,)
-    evalC = evalCount
-    for p in final_pop:
+
+    return pop, 0
+
+    #
+    # final_pop = sway(pop, ms = mins, Ms = maxs, evalfunc = model.eval, better=cmpr,)
+    # evalC = evalCount
+    # for p in final_pop:
+    #     if not p.fitness.valid:
+    #         model.eval(p)
+    #
+    # return final_pop, evalC
+
+
+def run2(model, swayonly=False):
+    toolbox = model.toolbox
+    groups = list()
+    NGEN = 100
+    MU = 300
+    CXPB = 0.05
+
+    pop = []
+    lines = printseeds(model, 3, True)
+    for l in lines:
+        pop.append(model.Individual(l))
+
+    random.shuffle(pop)
+    pop = pop[:MU]
+    # for p in pop:
+    #     if not p.fitness.valid:
+    #         model.eval(p)
+
+    from SAT_Guide.sway import bin_dominate, cont_dominate, sway, evalCount
+    # cmpr = bin_dominate if use_bin_instead_of_con else cont_dominate
+    mins = [0, 0, 0, 0, 0]
+    maxs = [model.cnfNum, model.featureNum, model.featureNum, sum(model.defects), sum(model.cost)]
+    offspring = pop
+    for gen in range(1, NGEN):
+        print(gen)
+        for p in pop:
+            if not p.fitness.valid:
+                model.eval(p)
+        tools.emo.assignCrowdingDist(pop)
+        offspring = tools.selTournamentDCD(pop, len(pop))
+        offspring = [toolbox.clone(ind) for ind in offspring]
+
+        # get the group id
+        for p in offspring:
+            p.gid = int(p.count('1') / len(p) * 10)
+        gids = [i.gid for i in offspring]
+        for k in set(gids):
+            g = [ind for i, ind in enumerate(offspring) if gids[i] == k]
+            if len(g) < 2: continue
+            for ind1, ind2 in zip(g[::2], g[1::2]):
+                if random.random() <= CXPB:
+                    a = offspring.index(ind1)
+                    b = offspring.index(ind2)
+                    offspring[a], offspring[b] = mate(ind1, ind2, groups, model)
+                    model.eval(offspring[a])
+                    model.eval(offspring[b])
+
+        # Select the next generation parents
+        pop[:] = tools.selNSGA2(pop + offspring, MU)
+        # pdb.set_trace()
+        # pop[:] = sway(pop+offspring,  ms=mins, Ms=maxs, evalfunc=model.eval, better=bin_dominate, enough=50)
+        # pop[:] = pop+offspring
+        # random.shuffle(pop)
+        # pop = pop[:MU]
+        # pdb.set_trace()
+    for p in pop:
         if not p.fitness.valid:
             model.eval(p)
-
-    return final_pop, evalC
+    return pop
 
 
 def run(model, swayonly=False):
     # groups, appendix = grouping_dimacs_model_by_sat_solver(model)
     groups = []
     toolbox = model.toolbox
-    NGEN = 50
+    NGEN = 166
     MU = 300
-    CXPB = 0.04
+    CXPB = 0.05
 
     pop = []
     # sat_engine = pycosat.itersolve(model.cnfs)
@@ -249,10 +316,13 @@ def run(model, swayonly=False):
 
     # for i in appendix:
     #     pop.append(model.Individual(i))
-    with open("/Users/jianfeng/git/SPL/tmp_seed/"+model.name+".txt", 'r') as f:
-        lines = f.readlines()
-        for l in lines:
-            pop.append(model.Individual(l[:-1]))
+    # with open("/Users/jianfeng/git/SPL/tmp_seed/"+model.name+".txt", 'r') as f:
+    #     lines = f.readlines()
+    #     for l in lines[:1000]:
+    #         pop.append(model.Individual(l[:-1]))
+    lines = printseeds(model, 3, True)
+    for l in lines:
+        pop.append(model.Individual(l))
 
     # def dominate(ind1, ind2):
     #     if not ind1.fitness.valid:
@@ -279,6 +349,7 @@ def run(model, swayonly=False):
         pdb.set_trace()
 
     for gen in range(1, NGEN):
+        print(gen)
         for p in pop:
             if not p.fitness.valid:
                 model.eval(p)
@@ -290,8 +361,8 @@ def run(model, swayonly=False):
         for p in offspring:
             p.gid = int(p.count('1') / len(p) * 10)
         gids = [i.gid for i in offspring]
-        if gen == NGEN-2:
-            pdb.set_trace()
+        # if gen == NGEN-2:
+        #     pdb.set_trace()
         for k in set(gids):
             g = [ind for i, ind in enumerate(offspring) if gids[i] == k]
             if len(g) < 2: continue
@@ -330,7 +401,7 @@ def running(model_name):
     # exit(0)
     for i in range(0,1):
         t1 = time.time()
-        # rr = run(model, swayonly=True)
+        # rr = run2(model, swayonly=False)
         rr, eval_count = sway(model, use_bin_instead_of_con=(i%2==0), applyseed=False)
         runtime = time.time() - t1
         if (i%2==0):
@@ -352,7 +423,7 @@ def running(model_name):
             f.write('\n')
 
 import debug
-running('uClinux')
+running('eshop')
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
