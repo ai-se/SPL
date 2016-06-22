@@ -189,6 +189,7 @@ def printseeds(model, order=2, output_without_write=False):
 
 skiptime = 0
 
+
 def sway(model, order=4, use_bin_instead_of_con = False, applyseed=False):
     global skiptime
     skiptime = 0
@@ -228,7 +229,7 @@ def sway(model, order=4, use_bin_instead_of_con = False, applyseed=False):
     for p in pop:
         model.eval(p)
 
-    return pop, 0
+    return pop, 10**order
 
     #
     # final_pop = sway(pop, ms = mins, Ms = maxs, evalfunc = model.eval, better=cmpr,)
@@ -399,7 +400,7 @@ def running(model_name):
     model = DimacsModel(model_name)
     # printseeds(model, 4)
     # exit(0)
-    for i in range(0,1):
+    for i in range(1, 11):
         t1 = time.time()
         # rr = run2(model, swayonly=False)
         rr, eval_count = sway(model, use_bin_instead_of_con=(i%2==0), applyseed=False)
@@ -409,8 +410,8 @@ def running(model_name):
         else:
             alg = 'SWAY4C'
 
-        # with open("../j_res/{0}_{1}_{2}_{3}.txt".format(model_name, alg, eval_count,i), "w") as f:
-        with open("../j_res/e.txt", 'w') as f:
+        with open("../j_res/seeding/{0}_{1}_{2}_{3}.txt".format(model_name, "SEEDs", eval_count, i), "w") as f:
+        # with open("../j_res/e.txt", 'w') as f:
             for r in rr:
                 f.write(r)
                 f.write('\n')
@@ -423,7 +424,9 @@ def running(model_name):
             f.write('\n')
 
 import debug
-running('eshop')
+for m in ['eshop', 'fiasco', 'ecos', 'freebsd', 'linux', 'uClinux']:
+    running(m)
+
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-

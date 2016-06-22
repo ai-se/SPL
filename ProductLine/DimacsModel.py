@@ -136,6 +136,60 @@ class DimacsModel:
     #     return parents
     #
 
+    # def find_core_dead_features_cnfs(self):
+    #     """
+    #     :return:
+    #     cores, index start at 0, all core features must be 1
+    #     deads, index start at 0, all dead features must be 0
+    #     trival_cnfs: these cnfs is useless. if all cores be 1 and all deads be 0
+    #     """
+    #     max_cnf_len = max(len(cnf) for cnf in self.cnfs)
+    #     cores = []
+    #     deads = []
+    #     trival_cnfs = []
+    #     for cnf in self.cnfs:
+    #         if len(cnf) == 1:
+    #             if cnf[0] > 0:
+    #                 cores.append(cnf[0]-1)
+    #             else:
+    #                 deads.append(-cnf[0]-1)
+    #
+    #     for l in range(2, max_cnf_len+1):
+    #         for cnf in self.cnfs:
+    #             if len(cnf) != l:
+    #                 continue
+    #
+    #             flexible = []
+    #             for i in cnf:
+    #                 if abs(i)-1 not in cores+deads:
+    #                     flexible.append(i)
+    #                 elif abs(i)-1 in cores and i > 0:
+    #                     trival_cnfs.append(cnf)
+    #                     break
+    #                 elif abs(i)-1 in deads and i < 0:
+    #                     trival_cnfs.append(cnf)
+    #                     break
+    #
+    #             if (cnf not in trival_cnfs) and len(flexible) == 1:
+    #                 if flexible[0] > 0:
+    #                     cores.append(flexible[0]-1)
+    #                 else:
+    #                     deads.append(-flexible[0]-1)
+    #     return cores, deads, trival_cnfs
+
+# if __name__ == "__main__":
+#     import pdb
+#     m=DimacsModel("toybox")
+#     cores, deads, trival_cnfs = m.find_core_dead_features_cnfs()
+#     cores = sorted(cores)
+#     deads = sorted(deads)
+#     with open("/Users/jianfeng/git/SPL/dimacs_data/"+m.name+".dimacs.mandatory", "w") as f:
+#         for i in cores:
+#             f.write("%d\n"%(i+1))
+#
+#     with open("/Users/jianfeng/git/SPL/dimacs_data/" + m.name + ".dimacs.dead", "w") as f:
+#         for i in deads:
+#             f.write("%d\n" % (i + 1))
 
 # #!/usr/bin/env python
 # # -*- coding: utf-8 -*-
