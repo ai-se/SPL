@@ -400,7 +400,7 @@ def running(model_name):
     model = DimacsModel(model_name)
     # printseeds(model, 4)
     # exit(0)
-    for i in range(1, 11):
+    for i in range(1, 5):
         t1 = time.time()
         # rr = run2(model, swayonly=False)
         rr, eval_count = sway(model, use_bin_instead_of_con=(i%2==0), applyseed=False)
@@ -424,7 +424,7 @@ def running(model_name):
             f.write('\n')
 
 import debug
-for m in ['eshop', 'fiasco', 'ecos', 'freebsd', 'linux', 'uClinux']:
+for m in ['webportal', 'coreboot', 'embtoolkit', 'toybox']:
     running(m)
 
 

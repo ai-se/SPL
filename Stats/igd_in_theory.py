@@ -42,7 +42,8 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
 
 folders = [PROJECT_PATH+'/j_res',
            '/Users/jianfeng/Desktop/hpc_jres',
-           '/Users/jianfeng/Desktop/j_res_sat']
+           '/Users/jianfeng/Desktop/j_res_sat',
+           PROJECT_PATH+'/j_res/seeding']
 
 
 def _get_frontier(pop):
