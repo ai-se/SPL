@@ -26,7 +26,7 @@ import sys
 from os import path
 from deap import base, creator, tools
 from ProductLine.dimacs_parser import load_product_url
-
+import random
 
 sys.dont_write_btyecode = True
 
@@ -38,6 +38,7 @@ sign = lambda x: '1' if x>0 else '0'
 
 class DimacsModel:
     def __init__(self, fm_name):
+        self.name = fm_name
         fm = "{0}/dimacs_data/{1}.dimacs".format(PROJECT_PATH, fm_name)
         _, self.featureNum, self.cnfs, self.cnfNum = load_product_url(fm)
 
@@ -55,7 +56,7 @@ class DimacsModel:
                 self.used_before.append(bool(int(b)))
                 self.defects.append(int(c))
 
-        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5)
+        creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5, vioconindex=list())
         creator.create("Individual", str, fitness=creator.FitnessMin)
 
         self.creator = creator
@@ -65,15 +66,45 @@ class DimacsModel:
         self.toolbox.register("evaluate", self.eval_ind)
         self.eval = self.toolbox.evaluate
 
-    def eval_ind(self, ind):
+    def get_random_bit_ind(self, background=None, mask=None):
+        dec = ''
+        if mask is None:
+            mask = range(self.featureNum)
+        for i in range(self.featureNum):
+            if i in mask:
+                dec += random.choice(['0', '1'])
+            else:
+                dec += background[i]
+        return self.Individual(dec)
+
+    def gen_random_bit_ind_r(self, pb=0.5):
+        dec = ''
+        for i in range(self.featureNum):
+            if random.uniform(0,1) <= pb:
+                dec += '1'
+            else:
+                dec += '0'
+        return self.Individual(dec)
+
+    def eval_ind(self, ind, normalized=True):
+        """
+        return the fitness, but it might be no needed.
+        Args:
+            ind:
+
+        Returns:
+
+        """
         convio = 0
-        for c in self.cnfs:
+        ind.fitness.vioconindex = []
+        for c_i, c in enumerate(self.cnfs):
             corr = False
             for x in c:
                 if sign(x) == ind[abs(x)-1]:
                     corr = True
                     break
             if not corr:
+                ind.fitness.vioconindex.append(c_i)
                 convio += 1
 
         unselected, unused, defect, cost = 0, 0, 0, 0
@@ -86,16 +117,41 @@ class DimacsModel:
                     defect += self.defects[i]
                 else:
                     unused += 1
-        ind.fitness.values = (convio, unselected, unused, defect, cost)
+        if normalized:
+            ind.fitness.values = (convio/self.cnfNum,
+                                  unselected/self.featureNum,
+                                  unused/self.featureNum,
+                                  defect/sum(self.defects),
+                                  cost/sum(self.cost))
+        else:
+            ind.fitness.values = (convio, unselected, unused, defect, cost)
 
-    # @staticmethod
-    # def bit_flip_mutate(individual):
-    #     # modification log -- not use the mutateRate parameter. just select one bit and flip that
-    #     n = len(individual)
-    #     i = random.randint(0, n-1)
-    #     individual[i] = 1 - individual[i]
-    #     del individual.fitness.values
-    #     return individual,
+    @staticmethod
+    def bit_flip_mutate(individual):
+        # modification log -- not use the mutateRate parameter. just select one bit and flip that
+        n = len(individual)
+        i = random.randint(0, n-1)
+        T = type(individual)
+        if individual[i] == '0':
+            individual = T(individual[:i]+'1'+individual[i+1:])
+        del individual.fitness.values
+        return individual,
+
+    @staticmethod
+    def cxTwoPoint(ind1, ind2):
+        v1 = list(ind1[:])
+        v2 = list(ind2[:])
+        split = random.randint(0, len(v1)-1)
+        for i in range(split):
+            v1[i], v2[i] = v2[i], v1[i]
+        T = type(ind1)
+        ind1 = T(''.join(v1))
+        ind2 = T(''.join(v2))
+        del ind1.fitness.values
+        del ind2.fitness.values
+        return ind1, ind2
+
+
     #
     # @staticmethod
     # def binary_tournament_selc(population, return_size):
@@ -112,6 +168,60 @@ class DimacsModel:
     #     return parents
     #
 
+    # def find_core_dead_features_cnfs(self):
+    #     """
+    #     :return:
+    #     cores, index start at 0, all core features must be 1
+    #     deads, index start at 0, all dead features must be 0
+    #     trival_cnfs: these cnfs is useless. if all cores be 1 and all deads be 0
+    #     """
+    #     max_cnf_len = max(len(cnf) for cnf in self.cnfs)
+    #     cores = []
+    #     deads = []
+    #     trival_cnfs = []
+    #     for cnf in self.cnfs:
+    #         if len(cnf) == 1:
+    #             if cnf[0] > 0:
+    #                 cores.append(cnf[0]-1)
+    #             else:
+    #                 deads.append(-cnf[0]-1)
+    #
+    #     for l in range(2, max_cnf_len+1):
+    #         for cnf in self.cnfs:
+    #             if len(cnf) != l:
+    #                 continue
+    #
+    #             flexible = []
+    #             for i in cnf:
+    #                 if abs(i)-1 not in cores+deads:
+    #                     flexible.append(i)
+    #                 elif abs(i)-1 in cores and i > 0:
+    #                     trival_cnfs.append(cnf)
+    #                     break
+    #                 elif abs(i)-1 in deads and i < 0:
+    #                     trival_cnfs.append(cnf)
+    #                     break
+    #
+    #             if (cnf not in trival_cnfs) and len(flexible) == 1:
+    #                 if flexible[0] > 0:
+    #                     cores.append(flexible[0]-1)
+    #                 else:
+    #                     deads.append(-flexible[0]-1)
+    #     return cores, deads, trival_cnfs
+
+# if __name__ == "__main__":
+#     import pdb
+#     m=DimacsModel("toybox")
+#     cores, deads, trival_cnfs = m.find_core_dead_features_cnfs()
+#     cores = sorted(cores)
+#     deads = sorted(deads)
+#     with open("/Users/jianfeng/git/SPL/dimacs_data/"+m.name+".dimacs.mandatory", "w") as f:
+#         for i in cores:
+#             f.write("%d\n"%(i+1))
+#
+#     with open("/Users/jianfeng/git/SPL/dimacs_data/" + m.name + ".dimacs.dead", "w") as f:
+#         for i in deads:
+#             f.write("%d\n" % (i + 1))
 
 # #!/usr/bin/env python
 # # -*- coding: utf-8 -*-

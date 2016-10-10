@@ -41,7 +41,9 @@ PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 folders = [PROJECT_PATH+'/j_res',
-           '/Users/jianfeng/Desktop/hpc_jres']
+           '/Users/jianfeng/Desktop/hpc_jres',
+           '/Users/jianfeng/Desktop/j_res_sat',
+           PROJECT_PATH+'/j_res/seeding']
 
 
 def _get_frontier(pop):
@@ -92,5 +94,8 @@ def print_out_optimals(model_name):
         for fer in frontier:
             f.write(' '.join(map(str, fer)))
             f.write('\n')
-
-print_out_optimals('linux')
+try:
+    model = sys.argv[1]
+except:
+    model = 'linux'
+print_out_optimals(model)

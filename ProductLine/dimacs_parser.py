@@ -25,7 +25,7 @@
 from __future__ import division
 import re
 import sys
-from universe import PROJECT_PATH
+from SAT_Guide.universe import PROJECT_PATH
 
 sys.dont_write_bytecode = True
 

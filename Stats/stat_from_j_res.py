@@ -25,6 +25,7 @@
 from __future__ import division
 from os import path
 from deap.benchmarks.tools import diversity, convergence
+from Stats.igd import igd_metric
 from deap import creator, base
 from deap.tools.emo import sortNondominated
 from Stats.hv import HyperVolume
@@ -63,7 +64,8 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         * frontier_size
         * valid_rate
     """
-    vpop = filter(lambda p: p.fitness.correct, pop)
+    if record_valid_only:
+        vpop = filter(lambda p: p.fitness.correct, pop)
     if len(pop) == 0:
         return 0, 1, 1, 0, 0
 
@@ -71,22 +73,26 @@ def stat_basing_on_pop(pop, record_valid_only, optimal_in_theory=None):
         return 0, 1, 1, 0, 0
 
     front = _get_frontier(vpop) if record_valid_only else _get_frontier(pop)
-
     front_objs = [f.fitness.values for f in front]
     reference_point = [1] * len(front_objs[0])
     hv = HyperVolume(reference_point).compute(front_objs)  # did NOT use deap module calc
+    # hv = -1  # TODO
     sort_front_by_obj0 = sorted(front, key=lambda f: f.fitness.values[1], reverse=True)
 
     first, last = sort_front_by_obj0[0], sort_front_by_obj0[-1]
-    spread = diversity(front, first, last)
+    spread = diversity(front, first.fitness.values, last.fitness.values)
+    # spread = -1  # TODO
     if optimal_in_theory is None:  # not available!!
         IGD = -1
     else:
-        IGD = convergence(front, optimal_in_theory)
+        IGD = igd_metric(front, optimal_in_theory)
     frontier_size = len(front)
-    valid_rate = len(vpop) / len(pop)
+    if record_valid_only:
+        valid_rate = len(vpop) / len(pop)
+    else:
+        valid_rate = -1
 
-    return round(hv, 3), round(spread, 3), round(IGD, 3), frontier_size, valid_rate
+    return round(hv, 3), round(spread, 3), IGD, frontier_size, valid_rate
 
 
 def get_stats(model_name, res_file):
@@ -131,7 +137,7 @@ def get_stats(model_name, res_file):
     obj_max = get_obj_max()
 
     creator.create("FitnessMin", base.Fitness, weights=[-1.0] * 5, correct=bool, conVio=list)
-    creator.create("Individual", list, fitness=creator.FitnessMin, fulfill=list)
+    creator.create("Individual", tuple, fitness=creator.FitnessMin, fulfill=list)
 
     pop = list()
     for d, p in zip(decs, pop_fitness):
@@ -155,51 +161,112 @@ def get_stats(model_name, res_file):
     for p in opt_pop_fitness:
         normalize(p, obj_max)
         optimal_in_theory.append(p)
-
-    return stat_basing_on_pop(pop, record_valid_only=True, optimal_in_theory=optimal_in_theory)
+    return stat_basing_on_pop(pop, record_valid_only=True, optimal_in_theory=optimal_in_theory), runtime
 
 import debug
 
 PROJECT_PATH, _ = [i for i in sys.path if i.endswith('SPL')][0], \
                   sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
-# model = ['eshop']
-all_records = glob.glob('/Users/jianfeng/Desktop/hpc_jres/*.txt')
-algs = ['IBEA', 'SATIBEA', 'NSGA2', 'SPEA2']
+# model = ['cellphone', 'webportal', 'eshop', 'eshop(5M)']
+# model = ['eshop', 'fiasco', ]
+# model = ['ecos', 'freebsd', ]
+# model = ['linux', 'uClinux',]
+# model = ['webportal', 'eshop' ,]
+# model = ['embtoolkit', 'toybox']
+# model = ['webportal', 'eshop', 'toybox', 'uClinux', 'ecos', 'fiasco', 'coreboot', 'freebsd', 'embtoolkit', 'linux']
 
-for m in model:
-    print(m)
-    if m == 'eshop(5M)':
-        tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
-        m = 'eshop'
-    elif m == 'eshop':
-        tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
-    else:
-        tt = filter(lambda f: m in f, all_records)
+# model = ['embtoolkit']
+# all_records = glob.glob('/Users/jianfeng/git/SPL/j_res/IBEASEED/*.txt')
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/SATIBEA/*.txt')
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/SATIBEA0/*.txt')
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/SWAY4_16/*.txt')
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/SWAY4_32/*.txt')
+# all_records += glob.glob('/Users/jianfeng/git/SPL/j_res/SWAY4_D/*.txt')
+#
+#
+# # algs = ['SWAY4_32', 'SWAY4_16', 'SATIBEA0', 'SATIBEA50k','IBEASEED']
+# algs = ['SWAY4_D']
+#
+# for m in model:
+#     print(m)
+#     if m == 'eshop(5M)':
+#         tt = filter(lambda f: 'eshop' in f and '5000k' in f, all_records)
+#         m = 'eshop'
+#     elif m == 'eshop':
+#         tt = filter(lambda f: 'eshop' in f and '5000k' not in f, all_records)
+#     else:
+#         tt = filter(lambda f: '/'+m+'_' in f, all_records)
+#
+#     group_set_hv = []
+#     group_set_spread = []
+#     group_set_igd = []
+#     group_set_runtime = []
+#
+#     for alg in algs:
+#         if alg == 'SWAY4_16' or alg == 'SWAY4_32':
+#             files = filter(lambda f: '_'+alg+'_' in f, tt)
+#         if alg == 'SATIBEA0':
+#             files = filter(lambda f: '_SATIBEA_0k_' in f, tt)
+#         if alg == 'SATIBEA50k':
+#             files = filter(lambda f: '_SATIBEA_50k_' in f, tt)
+#         if alg == 'IBEASEED':
+#             files = filter(lambda f: '_IBEASEED_50k_' in f, tt)
+#         if alg == 'SEEDs':
+#             files = filter(lambda f: '_SEEDs_' in f, tt)
+#         if alg == 'IBEASEED':
+#             files = filter(lambda f: '_IBEASEED_' in f, tt)
+#         if alg == 'SWAY4_D':
+#             files = filter(lambda f: '_SWAY4_D_' in f, tt)
+#         if len(files) == 0:
+#             continue
+#
+#         hvs = [alg]
+#         spreads = [alg]
+#         igds = [alg]
+#         runtimes = [alg]
+#
+#         for f in files:
+#             (a, b, c, d, e), runtime = get_stats(m, f)
+#             if e == 0: continue
+#             hvs.append(a)
+#             spreads.append(b)
+#             igds.append(c)
+#             runtimes.append(runtime)
+#         if len(hvs) == 1: continue
+#         group_set_hv.append(hvs)
+#         group_set_spread.append(spreads)
+#         group_set_igd.append(igds)
+#         group_set_runtime.append(runtimes)
+#     print('Hypervolume')
+#     print(group_set_hv)
+#     # Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
+#     print('\n\nSpread')
+#     print(group_set_spread)
+#     # Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
+#     print('\n\nIGD')
+#     print(group_set_igd)
+#     # Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
+#     print('\n\nRuntime')
+#     print(group_set_runtime)
+#     # Stat.rdivDemo(data=group_set_runtime, higherTheBetter=False)
+#
+#     print('\n' * 5)
 
-    group_set_hv = []
-    group_set_spread = []
-    group_set_igd = []
 
-    for alg in algs:
-        files = filter(lambda f: '_'+alg+'_' in f, tt)
-        hvs = [alg]
-        spreads = [alg]
-        igds = [alg]
-        for f in files:
-            a, b, c, _, _ = get_stats(m, f)
-            hvs.append(a)
-            spreads.append(b)
-            igds.append(c)
-        group_set_hv.append(hvs)
-        group_set_spread.append(spreads)
-        group_set_igd.append(igds)
-    print('Hypervolume')
-    Stat.rdivDemo(data=group_set_hv, higherTheBetter=True)
-    print('\n\nSpread')
-    Stat.rdivDemo(data=group_set_spread, higherTheBetter=False)
-    print('\n\nIGD')
-    Stat.rdivDemo(data=group_set_igd, higherTheBetter=False)
+# print get_stats('webportal', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('ecos', '/Users/jianfeng/git/SPL/j_res/ecos_SATIBEA_50k_1.txt')
 
-    print('\n' * 5)
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SAT1_1k_1.txt')
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_5k_45.txt')
+#
+# # print get_stats('uClinux', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# # print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_50k_21.txt')
+# # print get_stats('uClinux', '/Users/jianfeng/Desktop/j_res_sat/uClinux_SATIBEA_0k_10024.txt')
+#
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/e.txt')
+# print get_stats('linux', '/Users/jianfeng/git/SPL/j_res/linux_SATIBEA_50k_18.txt')
+# print get_stats('linux', '/Users/jianfeng/Desktop/j_res_sat/linux_SATIBEA_0k_10024.txt')
+
+
+# print get_stats('webportal', '/Users/jianfeng/git/SPL/j_res/SWAY4_16/webportal_SWAY4_16_17_1.txt')

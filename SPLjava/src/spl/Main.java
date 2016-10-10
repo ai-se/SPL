@@ -67,6 +67,7 @@ public class Main {
 
             Problem p = new ProductLineProblem(fm, augment, mandatory, dead, seed);
 //            Problem p = new ProductLineProblemNovelPrep(fm, augment, mandatory, dead, seed, opfile);
+//            GroupedProblem.grouping((ProductLineProblem) p, 100); System.exit(0);
             Algorithm a;
             int evaluation_times = Integer.parseInt(args[2]);
             String alg_name = args[1];
@@ -87,6 +88,9 @@ public class Main {
                     break;
                 case "NSGA2":
                     a = new SPL_SettingsEMOs(p).configureNSGA2(evaluation_times);
+                    break;
+                case "IBEASEED":
+                    a = new SPL_SettingsIBEA(p).configureIBEASEED(evaluation_times);
                     break;
                 case "SATIBEA":
                     //a = new SPL_SettingsIBEA(p).configureICSE15(1000, fm, ((ProductLineProblem) p).getNumFeatures(),

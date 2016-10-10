@@ -73,7 +73,6 @@ public class SPL_BinarySolution extends BinarySolutionType {
         }
 
         int rand = r.nextInt(3);
-
         try {
             IOrder order;
             if (rand == 0) {
